@@ -14,14 +14,14 @@ love.graphics.cleanDrawText = function(textObject, renderPosition, renderSize, s
 		textOffset.X = textOffset.X/2
 	elseif xAlign == "right" then
 	end
-	
+
 	if yAlign == "top" then
 		textOffset.Y = 0
 	elseif yAlign == "center" then
 		textOffset.Y = textOffset.Y/2
 	elseif xAlign == "bottom" then
 	end
-	
+
 	local pos = renderPosition + textOffset
 	love.graphics.draw(textObject, pos.X, pos.Y, 0, scale.X, scale.Y)
 end
@@ -39,7 +39,7 @@ love.graphics.newImage = function(path)
 	if cachedImages[path] then
 		return cachedImages[path]
 	end
-	
+
 	local image = originalNewImage(path)
 	cachedImages[path] = image
 	return image

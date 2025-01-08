@@ -10,7 +10,7 @@ module.new = function()
 	self.Size = UDim2.new(0, 200, 0, 50)
 	self.Position = UDim2.new(0, 0, 0, 0)
 	self.AnchorPoint = Vector.new(0, 0)
-	self.BackgroundColor = Color.From255(255, 255, 255, 255)
+	self.Color = Color.From255(255, 255, 255, 255)
 
 	self.RenderSize = Vector.zero
 	self.RenderPosition = Vector.zero
@@ -19,11 +19,11 @@ module.new = function()
 end
 
 function module:Update(dt)
-	if self._size ~= self.Size or self._position ~= self.Position or self._anchorPoint ~= self.AnchorPoint or self._backgroundColor ~= self.BackgroundColor then
+	if self._size ~= self.Size or self._position ~= self.Position or self._anchorPoint ~= self.AnchorPoint or self._color ~= self.Color then
 		self._size = self.Size
 		self._position = self.Position
 		self._anchorPoint = self.AnchorPoint
-		self._backgroundColor = self.BackgroundColor
+		self._color = self.Color
 
 		self._changed = true
 	end
@@ -42,7 +42,7 @@ end
 
 function module:Draw()
 	if self.__type == "Frame" then
-		self.BackgroundColor:Apply()
+		self.Color:Apply()
 		love.graphics.rectangle("fill", self.RenderPosition.X, self.RenderPosition.Y, self.RenderSize.X, self.RenderSize.Y)
 	end
 

@@ -14,6 +14,10 @@ module.lerp = function(a,b,x)
 	return (b-a)*x + a
 end
 
+module.map = function(x, inMin, inMax, outMin, outMax)
+	return module.lerp(outMin, outMax, (x-inMin)/(inMax-inMin))
+end
+
 module.sign = function(x)
 	return x < 0 and -1 or x > 0 and 1 or 0
 end

@@ -35,9 +35,9 @@ end
 
 function module:Draw()
 	if self._hovering then
-		(self.BackgroundColor-Color.new(.2,.2,.2,0)):Apply()
+		(self.Color-Color.new(.2,.2,.2,0)):Apply()
 	else
-		self.BackgroundColor:Apply()
+		self.Color:Apply()
 	end
 	love.graphics.rectangle("fill", self.RenderPosition.X, self.RenderPosition.Y, self.RenderSize.X, self.RenderSize.Y)
 

@@ -9,13 +9,6 @@ module.find = function(tbl, value)
 	end
 end
 
--- local regRemove = table.remove
--- module.remove = function(tbl, index)
--- 	if tbl then
--- 		regRemove(tbl, index)
--- 	end
--- end
-
 for i,v in pairs(table) do
 	if not module[i] then
 		module[i] = v
