@@ -1,5 +1,5 @@
 local module = {}
-module.Base = require("Classes.Instances.TextLabel")
+module.Base = require("Classes.Instances.Frame")
 module.__index = module
 module.__type = "TextLabel"
 setmetatable(module, module.Base)
@@ -11,6 +11,9 @@ module.new = function()
 
 	self.Text = ""
 	self.Font = nil -- you can set it as a font if you want
+	self.TextStretch = false
+	self.XAlignment = "center"
+	self.YAlignment = "center"
 
 	return self
 end
@@ -29,6 +32,9 @@ end
 
 function module:Draw()
 	self.Color:Apply()
+
+	love.graphics.cleanDrawText(self._textObject, self.RenderPosition, self.RenderSize, self.TextStretch, self.XAlignment, self.YAlignment)
+	
 	-- love.graphics.rectangle("fill", self.RenderPosition.X, self.RenderPosition.Y, self.RenderSize.X, self.RenderSize.Y)
 
 	module.Base.Draw(self)

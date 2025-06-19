@@ -5,20 +5,20 @@ love.graphics.cleanDrawText = function(textObject, renderPosition, renderSize, s
 	if not stretch then
 		local smallest = math.min(scale.X, scale.Y)
 		local biggest = math.max(scale.X, scale.Y)
-		scale.X, scale.Y = smallest, smallest
+		scale = Vector.new(smallest, smallest)
 	end
 	local textOffset = renderSize - textSize * scale
 	if xAlign == "left" then
-		textOffset.X = 0
+		textOffset = Vector.new(0, textObject.Y)
 	elseif xAlign == "center" then
-		textOffset.X = textOffset.X/2
+		textOffset = Vector.new(textOffset.X/2, textObject.Y)
 	elseif xAlign == "right" then
 	end
 
 	if yAlign == "top" then
-		textOffset.Y = 0
+		textOffset = Vector.new(textOffset.X, 0)
 	elseif yAlign == "center" then
-		textOffset.Y = textOffset.Y/2
+		textOffset = Vector.new(textOffset.X, textOffset.Y/2)
 	elseif xAlign == "bottom" then
 	end
 

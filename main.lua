@@ -27,6 +27,7 @@ Instance = require("Classes.Instances.Instance")
 Scene = require("Classes.Instances.Scene")
 Frame = require("Classes.Instances.Frame")
 Button = require("Classes.Instances.Button")
+TextLabel = require("Classes.Instances.TextLabel")
 
 Serializer = require("Utilities.Serializer")
 
