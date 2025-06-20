@@ -11,7 +11,7 @@ module.new = function(r,g,b, a)
 	}, module)
 end
 
-module.From255 = function(r,g,b,a)
+module.from255 = function(r,g,b,a)
 	r=r or 255
 	g=g or 255
 	b=b or 255
@@ -28,7 +28,7 @@ end
 	return p
 end
 
-module.FromHSV = function(h, s, l, a)
+module.fromHSV = function(h, s, l, a)
     local r, g, b
 
     h = (h / 255)

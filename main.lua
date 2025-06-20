@@ -5,68 +5,67 @@ typeof = function(value)
 	end
 	return t
 end
+warn = function(...)
+	print(...)
+end
 
 math = require("Utilities.Math")
 table = require("Utilities.Table")
 string = require("Utilities.String")
 require("Utilities.Graphics")
 
-Vector = require("Classes.Vector")
-Color = require("Classes.Color")
 
-NumberSequence = require("Classes.NumberSequence")
-ColorSequence = require("Classes.ColorSequence")
-NumberRange = require("Classes.NumberRange")
-UDim = require("Classes.UDim")
-UDim2 = require("Classes.UDim2")
+do -- DataTypes
+	Vector = require("Classes.DataTypes.Vector")
+	
+	Color = require("Classes.DataTypes.Color")
+	ColorSequence = require("Classes.DataTypes.ColorSequence")
+	
+	NumberRange = require("Classes.DataTypes.NumberRange")
+	NumberSequence = require("Classes.DataTypes.NumberSequence")
+	
+	UDim = require("Classes.DataTypes.UDim")
+	UDim2 = require("Classes.DataTypes.UDim2")
+	
+	Maid = require("Classes.DataTypes.Maid")
+	Signal = require("Classes.DataTypes.Signal")
+end
 
-Maid = require("Classes.Maid")
-Signal = require("Classes.Signal")
+Instance = require("Classes.Instance")
 
-Instance = require("Classes.Instances.Instance")
-Scene = require("Classes.Instances.Scene")
-Frame = require("Classes.Instances.Frame")
-Button = require("Classes.Instances.Button")
-TextLabel = require("Classes.Instances.TextLabel")
+do -- load all instances
+	local function load(path, list)
+		for index, value in pairs(list) do
+			if type(index) == "string" then
+				load(path.."/"..index, value)
+			else
+				require(path.."/"..value)
+			end
+		end
+	end
 
-Serializer = require("Utilities.Serializer")
+	load("Classes/Instances", {
+		"BaseInstance", "Button", "Frame", "ImageLabel", "Scene", "TextLabel",
+		Services = {
 
-GuiInputBegan = Signal.new()
-InputBegan = Signal.new()
-GuiInputEnded = Signal.new()
-InputEnded = Signal.new()
-_GP = false
+		},
+	})
+end
+
+
+Game = Instance.new("Scene"):Enable():Unpause()
 
 function love.load()
-	Game = require("Game.main")
+	love.graphics.setDefaultFilter("nearest", "nearest")
 
-	function love.mousepressed(_, _, button)
-		GuiInputBegan:Fire(button)
-		InputBegan:Fire(button, _GP)
-		_GP = false
-	end
-	function love.mousereleased(_, _, button)
-		GuiInputEnded:Fire(button)
-		InputEnded:Fire(button)
-	end
-
-
-	function love.keypressed(button)
-		GuiInputBegan:Fire(button)
-		InputBegan:Fire(button, _GP)
-		_GP = false
-	end
-	function love.keyreleased(button)
-		GuiInputEnded:Fire(button)
-		InputEnded:Fire(button)
-	end
+	require("Game.main")
 
 	function love.update(dt)
-		Instance.UpdateOrphanedInstances(dt)
-		Scene.UpdateAll(dt)
+		Game.UpdateOrphanedInstances(dt)
+		Game:Update(dt)
 	end
 
 	function love.draw()
-		Scene.DrawAll()
+		Game:Draw()
 	end
 end

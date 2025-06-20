@@ -22,6 +22,10 @@ function module:Update(dt)
 	if self._text ~= self.Text or self._font ~= self.Font then
 		self._text = self.Text
 		self._font = self.Font
+		if self._textObject then
+			self._textObject:release()
+			self._textObject = nil
+		end
 		self._textObject = love.graphics.newText(self.Font or DefaultFont, self.Text)
 
 		self._changed = true
@@ -40,4 +44,4 @@ function module:Draw()
 	module.Base.Draw(self)
 end
 
-return module
+return Instance.RegisterClass(module)

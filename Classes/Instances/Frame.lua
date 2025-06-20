@@ -1,5 +1,5 @@
 local module = {}
-module.Base = require("Classes.Instances.Instance")
+module.Base = require("Classes.Instances.BaseInstance")
 module.__index = module
 module.__type = "Frame"
 setmetatable(module, module.Base)
@@ -10,7 +10,7 @@ module.new = function()
 	self.Size = UDim2.new(0, 200, 0, 50)
 	self.Position = UDim2.new(0, 0, 0, 0)
 	self.AnchorPoint = Vector.new(0, 0)
-	self.Color = Color.From255(255, 255, 255, 255)
+	self.Color = Color.from255(255, 255, 255, 255)
 
 	self.RenderSize = Vector.zero
 	self.RenderPosition = Vector.zero
@@ -34,7 +34,7 @@ function module:Update(dt)
 
 		local scene = self:GetScene()
 		if scene then
-			scene._guiNeedsUpdate = true
+			scene._canvasNeedsUpdate = true
 		end
 	end
 	module.Base.Update(self, dt)
@@ -65,4 +65,4 @@ function module:UpdateRender()
 	end
 end
 
-return module
+return Instance.RegisterClass(module)

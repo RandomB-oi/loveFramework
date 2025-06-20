@@ -1,16 +1,24 @@
 local module = {}
-module.Base = require("Classes.Instances.Instance")
+module.Base = require("Classes.Instances.BaseInstance")
 module.__index = module
 module.__type = "Scene"
 setmetatable(module, module.Base)
 
+local Services = {}
+for _, service in pairs({
+	require("Classes.Instances.Services.InputService"),
+}) do
+	Services[service.__type] = service
+end
+
 module.new = function(size)
+	local size = size or Vector.new(1, 1)
 	local self = setmetatable(module.Base.new(), module)
+	self.Parent = nil
 
 	self.IsPaused = false
 	self.Enabled = true
 
-	self.GuiCanvas = love.graphics.newCanvas(size.X, size.Y)
 	self.Canvas = love.graphics.newCanvas(size.X, size.Y)
 	self.Size = size
 
@@ -18,22 +26,8 @@ module.new = function(size)
 	self.DrawSignal = self.Maid:Add(Signal.new())
 
 	self.Maid:GiveTask(function()
-		self.GuiCanvas:release()
 		self.Canvas:release()
 	end)
-
-	-- self.Maid.GuiInputBegan = GuiInputBegan:Connect(function(...)
-	-- 	self.GuiInputBegan:Fire(...)
-	-- end)
-	-- self.Maid.GuiInputEnded = GuiInputEnded:Connect(function(...)
-	-- 	self.GuiInputEnded:Fire(...)
-	-- end)
-	-- self.Maid.InputBegan = InputBegan:Connect(function(...)
-	-- 	self.InputBegan:Fire(...)
-	-- end)
-	-- self.Maid.InputEnded = InputEnded:Connect(function(...)
-	-- 	self.InputEnded:Fire(...)
-	-- end)
 
 	-- self.Camera = Instance.new("camera", self)
 	-- self.Maid:GiveTask(self.camera)
@@ -41,24 +35,42 @@ module.new = function(size)
 	return self
 end
 
+function module:GetService(name)
+	return Services[name]
+end
+
 function module:Update(dt)
-	module.Base.Update(self, dt)
+	self:CheckParent()
+
+	if not (self.Enabled and not self.IsPaused) then return end
+
 	self.UpdateSignal:Fire(dt)
+	for _, child in ipairs(self:GetChildren()) do
+		child:Update(dt)
+	end
 end
 
 function module:Draw()
-	module.Base.Draw(self)
+	if not (self.Enabled) then return end
+
 	self.DrawSignal:Fire()
 
-	for _, child in ipairs(self:GetChildren()) do
-		if child:IsA("Frame") then
-			love.graphics.setCanvas(self.GuiCanvas)
-		else
-			love.graphics.setCanvas(self.Canvas)
-		end
-		child:Draw()
-	end
-	love.graphics.setCanvas()
+	-- if self._canvasNeedsUpdate then
+	-- 	self._canvasNeedsUpdate = false
+
+	-- 	local scene = self.Parent and self.Parent:GetScene()
+	-- 	if scene then
+	-- 		scene._canvasNeedsUpdate = true
+	-- 	end
+
+		love.graphics.setCanvas(self.Canvas)
+		love.graphics.clear()
+		self:DrawChildren()
+		love.graphics.setCanvas()
+	-- end
+
+	Color.White:Apply()
+	love.graphics.draw(self.Canvas, 0, 0)
 end
 
 function module:Pause()
@@ -78,32 +90,4 @@ function module:Disable()
 	return self
 end
 
-function module.UpdateAll(dt)
-	for name, scene in pairs(module.All) do
-		if scene.Enabled and not scene.IsPaused then
-			scene:Update(dt)
-		end
-	end
-end
-
-function module.DrawAll()
-	for name, scene in pairs(module.All) do
-		if scene.Enabled then
-			if scene._guiNeedsUpdate then
-				scene._guiNeedsUpdate = false
-				scene:Draw()
-			end
-			Color.White:Apply()
-			love.graphics.draw(scene.Canvas, 0, 0)
-		end
-	end
-
-	for name, scene in pairs(module.All) do
-		if scene.Enabled then
-			Color.White:Apply()
-			love.graphics.draw(scene.GuiCanvas, 0, 0)
-		end
-	end
-end
-
-return module
+return Instance.RegisterClass(module)

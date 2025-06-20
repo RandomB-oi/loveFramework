@@ -1,45 +1,27 @@
 local module = {}
+module.__index = module
 module.__type = "Vector"
 
 local function isNumber(x)
-	return type(x) == "number"
-end
-
-function module:__index(index)
-	if index == "Magnitude" then
-		return math.sqrt(self.__x^2 + self.__y^2)
-	elseif index == "Unit" then
-		return self/self.Magnitude
-	elseif index == "X" then
-		return self.__x
-	elseif index == "Y" then
-		return self.__y
-	end
-
-	local selfHas = rawget(self, index)
-	if selfHas ~= nil then
-		return selfHas
-	end
-
-	return rawget(module, index)
-end
-function module:__newindex(i,v)
-	if i == "X" or i == "Y" then
-		return
-	end
-
-	rawset(self, i, v)
+	return type(x) == "number" and x == x
 end
 
 module.new = function(x, y)
-	if x and not isNumber(x) or not x then
+	if not isNumber(x) then
 		x = 0
 	end
-	if y and not isNumber(y) or not y then
+	if not isNumber(y) then
 		y = 0
 	end
-	local self = setmetatable({__x = x, __y = y}, module)
+	local self = setmetatable({X = x, Y = y}, module)
 	return self
+end
+
+function module:Normalized()
+	return self/self:Length()
+end
+function module:Length()
+	return math.sqrt(self.X^2 + self.Y^2)
 end
 
 module.FromAngle = function(angle) -- in radians

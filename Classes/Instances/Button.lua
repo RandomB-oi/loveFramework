@@ -4,17 +4,18 @@ module.__index = module
 module.__type = "Button"
 setmetatable(module, module.Base)
 
+local InputService = Game:GetService("InputService")
+
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 
 	self.Activated = self.Maid:Add(Signal.new())
-	self.Maid:GiveTask(GuiInputBegan:Connect(function(input)
-		if input == 1 then
+	self.Maid:GiveTask(InputService.InputBegan:Connect(function(input)
+		if input.MouseButton == 1 then
 			local scene = self:GetScene()
 
 			if self._hovering and scene.Enabled and not scene.IsPaused then
 				self.Activated:Fire()
-				_GP = true
 			end
 		end
 	end))
@@ -44,4 +45,4 @@ function module:Draw()
 	module.Base.Draw(self)
 end
 
-return module
+return Instance.RegisterClass(module)

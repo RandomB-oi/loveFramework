@@ -18,6 +18,7 @@ module.new = function()
 	self.Name = "Instance"
 	self._children = {}
 	self.Parent = nil
+	self.ZIndex = 0
 
 	module.All[self.ID] = self
 	self.Maid:GiveTask(function()
@@ -30,18 +31,43 @@ module.new = function()
 	return self
 end
 
-function module:Update(dt)
+function module:CheckParent()
 	if self.Parent ~= self._parent then
 		self:_setParent(self.Parent)
 	end
+end
+
+function module:DrawChildren()
+	local zIndices = {}
+	local layers = {}
+	for _, child in ipairs(self:GetChildren()) do
+		local zIndex = child.ZIndex or 0
+		if not layers[zIndex] then
+			layers[zIndex] = {}
+			table.insert(zIndices, zIndex)
+		end
+		table.insert(layers[zIndex], child)
+	end
+	table.sort(zIndices) -- could be costly
+
+	for _, layerNumber in ipairs(zIndices) do
+		for _, child in ipairs(layers[layerNumber]) do
+			child:Draw()
+		end
+	end
+	-- for _, child in ipairs() do
+	-- 	child:Draw()
+	-- end
+end
+
+function module:Update(dt)
+	self:CheckParent()
 	for _, child in ipairs(self:GetChildren()) do
 		child:Update(dt)
 	end
 end
 function module:Draw()
-	for _, child in ipairs(self:GetChildren()) do
-		child:Draw()
-	end
+	self:DrawChildren()
 end
 
 function module:GetScene()
@@ -86,6 +112,11 @@ function module:_setParent(newParent)
 	self._parent = newParent
 	if newParent then
 		newParent._children[self.ID] = self
+		
+		local scene = newParent:GetScene()
+		if scene then
+			scene._canvasNeedsUpdate = true
+		end
 	end
 end
 
@@ -95,10 +126,10 @@ end
 
 function module.UpdateOrphanedInstances(dt)
 	for _, instance in pairs(module.All) do
-		if not instance._parent and not instance:IsA("Scene") then
+		if not instance._parent and instance ~= Game then
 			instance:Update(dt)
 		end
 	end
 end
 
-return module
+return Instance.RegisterClass(module)
