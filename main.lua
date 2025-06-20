@@ -47,7 +47,10 @@ do -- load all instances
 	load("Classes/Instances", {
 		"BaseInstance", "Button", "Frame", "ImageLabel", "Scene", "TextLabel",
 		Services = {
+			-- "BaseService",
 
+			-- input doesnt work if you require it from here
+			-- "InputService",
 		},
 	})
 end

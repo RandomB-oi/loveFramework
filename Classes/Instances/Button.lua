@@ -4,13 +4,12 @@ module.__index = module
 module.__type = "Button"
 setmetatable(module, module.Base)
 
-local InputService = Game:GetService("InputService")
-
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 
 	self.Activated = self.Maid:Add(Signal.new())
-	self.Maid:GiveTask(InputService.InputBegan:Connect(function(input)
+	
+	self.Maid:GiveTask(Game:GetService("InputService").InputBegan:Connect(function(input)
 		if input.MouseButton == 1 then
 			local scene = self:GetScene()
 
