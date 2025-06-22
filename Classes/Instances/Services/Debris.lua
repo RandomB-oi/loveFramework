@@ -1,30 +1,34 @@
 local module = {}
-module.Base = require("Classes.Instances.Services.BaseService")
+module.Derives = "BaseService"
 module.__index = module
 module.__type = "Debris"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
 
-local function new()
+module.new = function ()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
 	self.Objects = {}
-	self.MaxItems = 1000
-
-	Game.Updated:Connect(function()
-		local t = os.clock()
-		local amount = 0
-		
-		for object, removeAt in pairs(self.Objects) do
-			amount = amount + 1
-			
-			if removeAt <= t or amount > self.MaxItems then
-				object:Destroy()
-				self.Objects[object] = nil
-			end
-		end
-	end)
-
+	
+	self:CreateProperty("MaxItems", "number", 1000)
+	
 	return self
+end
+
+function module:Updated(dt)
+	module.Base.Updated(self, dt)
+
+	local t = os.clock()
+	local amount = 0
+	
+	for object, removeAt in pairs(self.Objects) do
+		amount = amount + 1
+		
+		if removeAt <= t or amount > self.MaxItems then
+			object:Destroy()
+			self.Objects[object] = nil
+		end
+	end
 end
 
 function module:AddItem(item, lifeTime, dontUpdate)
@@ -40,4 +44,4 @@ function module:Cancel(item)
 	return item
 end
 
-return new
+return module

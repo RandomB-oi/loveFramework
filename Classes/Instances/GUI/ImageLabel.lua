@@ -1,36 +1,29 @@
 local module = {}
-module.Base = require("Classes.Instances.GUI.Frame")
+module.Derives = "Frame"
 module.__index = module
 module.__type = "ImageLabel"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
+
+module.FrameRendering = false
+
+local cachedImages = {}
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
-	self.Image = ""
+	self:CreateProperty("Image", "string", "")
+
+	self:GetPropertyChangedSignal("Image"):Connect(function(newImage)
+		if newImage then
+			self._imageObject = cachedImages[newImage] or love.graphics.newImage(newImage)
+			cachedImages[newImage] = self._imageObject
+		end
+		self._changed = true
+	end)
 
 	return self
 end
-
-function module:Update(dt)
-	if self._image ~= self.Image then
-		self._image = self.Image
-
-		if self._imageObject then
-			self._imageObject:release()
-			self._imageObject = nil
-		end
-
-		if self._image and self._image ~= "" then
-			self._imageObject = love.graphics.newImage(self._image)
-		end
-
-		self._changed = true
-	end
-
-	module.Base.Update(self, dt)
-end
-
 function module:Draw()
 	if not self.Visible then return end
 	self.Color:Apply()
@@ -43,4 +36,4 @@ function module:Draw()
 	module.Base.Draw(self)
 end
 
-return Instance.RegisterClass(module)
+return module

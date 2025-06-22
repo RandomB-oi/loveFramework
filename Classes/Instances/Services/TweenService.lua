@@ -3,14 +3,14 @@ local TweenService = {}
 local TweenClass = {}
 do
 	local module = TweenClass
-	module.Base = require("Classes.Instances.BaseInstance")
+	module.Derives = "BaseInstance"
 	module.__index = module
 	module.__type = "Tween"
-	setmetatable(module, module.Base)
+	Instance.RegisterClass(module)
 
 	module.new = function(object, tweenInfo, properties)
 		local self = setmetatable(module.Base.new(), module)
-
+		self.Name = self.__type
 		self.Object = object
 		self.TweenInfo = tweenInfo -- {Time = 3, Style, Direction}
 		self.Properties = properties
@@ -76,12 +76,12 @@ end
 
 
 local module = TweenService
-module.Base = require("Classes.Instances.Services.BaseService")
+module.Derives = "BaseService"
 module.__index = module
 module.__type = "TweenService"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
 
-local function new()
+module.new = function ()
 	local self = setmetatable(module.Base.new(), module)
 	
 	return self
@@ -95,4 +95,4 @@ function module:Create(object, tweenInfo, properties)
 	return TweenClass.new(object, tweenInfo, properties)
 end
 
-return new
+return module

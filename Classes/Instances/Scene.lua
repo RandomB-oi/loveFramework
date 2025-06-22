@@ -1,28 +1,21 @@
 local module = {}
-module.Base = require("Classes.Instances.BaseInstance")
+module.Derives = "BaseInstance"
 module.__index = module
 module.__type = "Scene"
-setmetatable(module, module.Base)
-
-local ServiceCreators = {
-	InputService = require("Classes.Instances.Services.InputService"),
-	Debris = require("Classes.Instances.Services.Debris"),
-	TweenService = require("Classes.Instances.Services.TweenService"),
-	CollectionService = require("Classes.Instances.Services.CollectionService"),
-}
+Instance.RegisterClass(module)
 
 local LoadedServices = {}
 
 module.new = function(size)
-	local size = size or Vector.new(1, 1)
 	local self = setmetatable(module.Base.new(), module)
 	self.Parent = nil
 
-	self.IsPaused = false
-	self.Enabled = true
+	self.Name = "Scene"
+	self:CreateProperty("IsPaused", "boolean", false)
+	self:CreateProperty("Enabled", "boolean", true)
 
-	self.Canvas = love.graphics.newCanvas(size.X, size.Y)
-	self.Size = size
+	self:CreateProperty("Size", "Vector", size or Vector.one)
+	self.Canvas = love.graphics.newCanvas(self.Size.X, self.Size.Y)
 
 	self.Updated = self.Maid:Add(Signal.new())
 	self.Drawn = self.Maid:Add(Signal.new())
@@ -38,14 +31,21 @@ module.new = function(size)
 end
 
 function module:GetService(name)
-	if not LoadedServices[name] and ServiceCreators[name] then
-		LoadedServices[name] = ServiceCreators[name]()
+	if not LoadedServices[name] then
+		local serviceClass = Instance.GetClass(name)
+		if rawget(serviceClass, "Derives") ~= "BaseService" then
+			return
+		end
+
+		local newService = Instance.new(name)
+		newService.Parent = Game
+		LoadedServices[name] = newService
 	end
 	return LoadedServices[name]
 end
 
 function module:Update(dt)
-	self:CheckParent()
+	self:CheckProperties()
 
 	if not (self.Enabled and not self.IsPaused) then return end
 
@@ -95,4 +95,4 @@ function module:Disable()
 	return self
 end
 
-return Instance.RegisterClass(module)
+return module

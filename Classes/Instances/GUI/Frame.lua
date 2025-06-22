@@ -1,23 +1,36 @@
 local module = {}
-module.Base = require("Classes.Instances.BaseInstance")
+module.Derives = "BaseInstance"
 module.__index = module
 module.__type = "Frame"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
+
+module.FrameRendering = true
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
-	self.Size = UDim2.new(0, 200, 0, 50)
-	self.Position = UDim2.new(0, 0, 0, 0)
-	self.AnchorPoint = Vector.new(0, 0)
-	self.Color = Color.from255(255, 255, 255, 255)
-	self.Rotation = 0
+	self:CreateProperty("Size", "UDim2", UDim2.new(0, 200, 0, 50))
+	self:CreateProperty("Position", "UDim2", UDim2.new(0, 0, 0, 0))
+	self:CreateProperty("AnchorPoint", "Vector", Vector.new(0, 0))
+	self:CreateProperty("Color", "Color", Color.from255(255, 255, 255, 255))
+	self:CreateProperty("Rotation", "number", 0)
 
 	self.RenderSize = Vector.zero
 	self.RenderPosition = Vector.zero
 	self.RenderRotation = 0
 
 	return self
+end
+
+function module:MouseHovering()
+	return self:IsHovering(Game:GetService("InputService"):GetMouseLocation())
+end
+
+function module:IsHovering(position)
+	return
+		position.X >= self.RenderPosition.X and position.X <= self.RenderPosition.X + self.RenderSize.X and
+		position.Y >= self.RenderPosition.Y and position.Y <= self.RenderPosition.Y + self.RenderSize.Y
 end
 
 function module:Update(dt)
@@ -62,7 +75,7 @@ end
 
 function module:Draw()
 	if not self.Visible then return end
-	if self.__type == "Frame" then
+	if self.FrameRendering then
 		self:DrawFrame()
 	end
 
@@ -72,18 +85,28 @@ end
 function module:UpdateRender()
 	if self.Parent then
 		local parentSize, parentPosition, parentRotation
+		local layout = self.Parent:FindFirstChildWhichIsA("UILayoutBase")
+
 		if self.Parent:IsA("Frame") then
 			parentSize, parentPosition, parentRotation = self.Parent:UpdateRender()
+			if self.Parent.CanvasPosition then
+				parentPosition = parentPosition - self.Parent.CanvasPosition
+			end
 		elseif self.Parent:IsA("Scene") then
 			parentSize, parentPosition, parentRotation = self.Parent.Size, Vector.zero, 0
 		end
 		if (parentSize and parentPosition) then
-			self.RenderSize = self.Size:Calculate(parentSize)
-			self.RenderPosition = parentPosition + self.Position:Calculate(parentSize) - self.RenderSize * self.AnchorPoint
-			self.RenderRotation = parentRotation + self.Rotation
+			if layout then
+				self.RenderSize, self.RenderPosition, self.RenderRotation = layout:Resolve(self, parentSize, parentPosition, parentRotation)
+			else
+				self.RenderSize = self.Size:Calculate(parentSize)
+				self.RenderPosition = parentPosition + self.Position:Calculate(parentSize) - self.RenderSize * self.AnchorPoint
+				self.RenderRotation = parentRotation + self.Rotation
+			end
+
 			return self.RenderSize, self.RenderPosition, self.RenderRotation
 		end
 	end
 end
 
-return Instance.RegisterClass(module)
+return module

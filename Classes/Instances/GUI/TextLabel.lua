@@ -1,19 +1,23 @@
 local module = {}
-module.Base = require("Classes.Instances.GUI.Frame")
+module.Derives = "Frame"
 module.__index = module
 module.__type = "TextLabel"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
 
 local DefaultFont = love.graphics.newFont(64,"normal")
 
+module.FrameRendering = false
+
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
-	self.Text = ""
-	self.Font = nil -- you can set it as a font if you want
-	self.TextStretch = false
-	self.XAlignment = "center"
-	self.YAlignment = "center"
+	self:CreateProperty("Text", "string", "Text")
+	self:CreateProperty("Font", nil, nil)
+	self:CreateProperty("TextStretch", "boolean", false)
+
+	self:CreateProperty("XAlignment", "string", "center")
+	self:CreateProperty("YAlignment", "string", "center")
 
 	return self
 end
@@ -45,4 +49,4 @@ function module:Draw()
 	module.Base.Draw(self)
 end
 
-return Instance.RegisterClass(module)
+return module

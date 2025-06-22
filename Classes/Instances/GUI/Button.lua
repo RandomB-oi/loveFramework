@@ -1,11 +1,14 @@
 local module = {}
-module.Base = require("Classes.Instances.GUI.Frame")
+module.Derives = "Frame"
 module.__index = module
 module.__type = "Button"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
+
+module.FrameRendering = false
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
 	self.Activated = self.Maid:Add(Signal.new())
 
@@ -23,8 +26,7 @@ module.new = function()
 end
 
 function module:Update(dt)
-	local mouseX, mouseY = love.mouse.getPosition()
-	local hovering = mouseX >= self.RenderPosition.X and mouseX <= self.RenderPosition.X + self.RenderSize.X and mouseY >= self.RenderPosition.Y and mouseY <= self.RenderPosition.Y + self.RenderSize.Y
+	local hovering = self:MouseHovering()
 	if self._hovering ~= hovering then
 		self._hovering = hovering
 		self._changed = true
@@ -45,4 +47,4 @@ function module:Draw()
 	module.Base.Draw(self)
 end
 
-return Instance.RegisterClass(module)
+return module

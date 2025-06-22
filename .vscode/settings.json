@@ -9,7 +9,8 @@
 		"deprecated",
 		"lowercase-global",
 		"duplicate-set-field",
-		"discard-returns"
+		"discard-returns",
+		"need-check-nil"
 	],
 	"Lua.runtime.version": "LuaJIT",
 	"Lua.runtime.special": {

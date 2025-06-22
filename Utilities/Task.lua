@@ -80,7 +80,7 @@ function task.delay(seconds, func, ...)
     table.insert(task._tasks, {
         co = co,
 		args = {...},
-        runAt = task._time + seconds,
+        runAt = task._time + (seconds or 0),
         handle = handle
     })
     return handle
@@ -94,7 +94,7 @@ function task.wait(seconds)
         coroutine.resume(co, os.clock() - begin)
     end
 
-    task.delay(seconds, resumeLater)
+    task.delay(seconds or 0, resumeLater)
 
     return coroutine.yield()
 end

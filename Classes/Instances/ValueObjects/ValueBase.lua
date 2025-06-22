@@ -1,8 +1,8 @@
 local module = {}
-module.Base = require("Classes.Instances.BaseInstance")
+module.Derives = "BaseInstance"
 module.__index = module
 module.__type = "ValueBase"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
@@ -10,6 +10,7 @@ module.new = function()
 
 	self.Value = nil
 	self._value = nil
+	self.Name = "Value"
 
 	return self
 end
@@ -25,4 +26,4 @@ function module:Update(dt)
 	module.Base.Update(self, dt)
 end
 
-return Instance.RegisterClass(module)
+return module

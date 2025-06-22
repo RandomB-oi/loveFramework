@@ -1,14 +1,15 @@
 local module = {}
-module.Base = require("Classes.Instances.Services.BaseService")
+module.Derives = "BaseService"
 module.__index = module
 module.__type = "InputService"
-setmetatable(module, module.Base)
+Instance.RegisterClass(module)
 
-local function new()
+module.new = function ()
 	local self = setmetatable(module.Base.new(), module)
-
+	self.Name = self.__type
 	self.InputBegan = self.Maid:Add(Signal.new())
 	self.InputEnded = self.Maid:Add(Signal.new())
+	self.Scrolled = self.Maid:Add(Signal.new())
 
 	self.PressedKeyboardButtons = {}
 	self.PressedMouseButtons = {}
@@ -43,6 +44,10 @@ local function new()
 		})
 	end
 
+	function love.wheelmoved(x, y)
+		self.Scrolled:Fire(y)
+	end
+
 	return self
 end
 
@@ -58,4 +63,4 @@ function module:IsMouseButtonPressed(key)
 	return not not self.PressedMouseButtons[key]
 end
 
-return new
+return module

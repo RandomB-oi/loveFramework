@@ -1,11 +1,12 @@
 local module = {}
-module.Base = require("Classes.Instances.Services.BaseService")
+module.Derives = "BaseService"
 module.__index = module
-module.__type = "Debris"
-setmetatable(module, module.Base)
+module.__type = "CollectionService"
+Instance.RegisterClass(module)
 
-local function new()
+module.new = function ()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
 	self.Tagged = {}
 
@@ -77,4 +78,4 @@ function module:GetTags(object)
 	return tags
 end
 
-return new
+return module

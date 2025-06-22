@@ -1,3 +1,15 @@
+-- local ogRequire = require
+-- local alreadyRequired = {}
+-- function require(path)
+-- 	path = path:gsub("%/",".")
+
+-- 	if alreadyRequired[path] then
+-- 		return
+-- 	end
+-- 	alreadyRequired[path] = true
+-- 	ogRequire(path)
+-- end
+
 typeof = function(value)
 	local t = type(value)
 	if t == "table" then
@@ -31,7 +43,6 @@ do -- DataTypes
 	Maid = require("Classes.DataTypes.Maid")
 	Signal = require("Classes.DataTypes.Signal")
 
-	
 	TweenInfo = require("Classes.DataTypes.TweenInfo")
 end
 
@@ -49,29 +60,38 @@ do -- load all instances
 	end
 
 	load("Classes/Instances", {
-		"BaseInstance", "Scene",
 		GUI = {
-			"Frame", "Button", "ImageLabel", "TextLabel",
+			Layouts = {
+				"UIListLayout", "UILayoutBase"
+			},
+			"Frame", "Button", "ImageLabel", "TextLabel", "ScrollingFrame",
+		},
+		Services = {
+			"BaseService", "InputService", "TweenService", "Debris", "CollectionService",
 		},
 		ValueObjects = {
 			"ValueBase", "NumberValue", "IntValue",
 		},
-		Services = {
-			"BaseService", "InputService", "TweenService", "Debris",
-		},
+		"BaseInstance", "Scene",
 	})
 end
 
 
 Game = Instance.new("Scene"):Enable():Unpause()
+Game.Name = "Game"
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
-	require("Game.main")
+	require("Game/main")
+	require("Editor/main")
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
+		local title = "Game" .. tostring(math.round(1/(dt)))
+		-- Game.Name = title
+		love.window.setTitle(title)
+
 		task.update(dt)
 
 		Game.UpdateOrphanedInstances(dt)
