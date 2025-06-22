@@ -19,6 +19,10 @@ module.new = function()
 	self._children = {}
 	self.Parent = nil
 	self.ZIndex = 0
+	self.Visible = true
+
+	self.Attributes = {}
+	self.AttributeSignals = {}
 
 	self.AncestryChanged = self.Maid:Add(Signal.new())
 	self.ChildAdded = self.Maid:Add(Signal.new())
@@ -35,6 +39,47 @@ module.new = function()
 	return self
 end
 
+function module:GetAttributeChangedSignal(name)
+	if not self.AttributeSignals[name] then
+		self.AttributeSignals[name] = self.Maid:Add(Signal.new())
+	end
+	return self.AttributeSignals[name]
+end
+
+function module:SetAttribute(name, value)
+	if self.Attributes[name] ~= value then
+		self.Attributes[name] = value
+
+		local signal = self.AttributeSignals[name]
+		if signal then
+			signal:Fire(value)
+		end
+	end
+	return self
+end
+
+function module:GetAttribute(name)
+	return self.Attributes[name]
+end
+
+function module:GetAttributes()
+	return table.shallowCopy(self.Attributes)
+end
+
+function module:AddTag(tag)
+	Game:GetService("CollectionService"):AddTag(self, tag)
+	return self
+end
+
+function module:RemoveTag(tag)
+	Game:GetService("CollectionService"):RemoveTag(self, tag)
+	return self
+end
+
+function module:GetTags()
+	return Game:GetService("CollectionService"):GetTags(self)
+end
+
 function module:CheckParent()
 	if self.Parent ~= self._parent then
 		self:_setParent(self.Parent)
@@ -42,6 +87,7 @@ function module:CheckParent()
 end
 
 function module:DrawChildren()
+	if not self.Visible then return end
 	local zIndices = {}
 	local layers = {}
 	for _, child in ipairs(self:GetChildren()) do
@@ -71,6 +117,7 @@ function module:Update(dt)
 	end
 end
 function module:Draw()
+	if not self.Visible then return end
 	self:DrawChildren()
 end
 

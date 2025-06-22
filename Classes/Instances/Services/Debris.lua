@@ -20,7 +20,6 @@ local function new()
 			if removeAt <= t or amount > self.MaxItems then
 				object:Destroy()
 				self.Objects[object] = nil
-				print("its gone")
 			end
 		end
 	end)

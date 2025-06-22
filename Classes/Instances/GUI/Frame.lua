@@ -43,18 +43,25 @@ function module:Update(dt)
 	module.Base.Update(self, dt)
 end
 
-function module:DrawFrame()
-	self.Color:Apply()
+function module:Translate()
 	love.graphics.push()
-
 	local anchorSize = self.RenderSize * self.AnchorPoint
 	love.graphics.translate(self.RenderPosition.X+anchorSize.X, self.RenderPosition.Y+anchorSize.Y)
 	love.graphics.rotate(math.rad(self.RenderRotation))
+
+	return anchorSize
+end
+
+function module:DrawFrame()
+	self.Color:Apply()
+
+	local anchorSize = self:Translate()
 	love.graphics.rectangle("fill", -anchorSize.X, -anchorSize.Y, self.RenderSize.X, self.RenderSize.Y)
 	love.graphics.pop()
 end
 
 function module:Draw()
+	if not self.Visible then return end
 	if self.__type == "Frame" then
 		self:DrawFrame()
 	end

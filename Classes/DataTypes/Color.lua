@@ -52,6 +52,14 @@ module.fromHSV = function(h, s, l, a)
 end
 
 function module:__mul(other)
+	if type(other) == "number" then
+		return module.new(
+			self.R * other,
+			self.G * other,
+			self.B * other,
+			self.A * other
+		)	
+	end
 	return module.new(
 		self.R * other.R,
 		self.G * other.G,

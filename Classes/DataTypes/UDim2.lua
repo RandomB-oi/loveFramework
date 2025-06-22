@@ -35,6 +35,25 @@ function module:__sub(other)
 	)
 end
 
+function module:__mul(other)
+	if type(other) == "number" then
+		return module.new(
+			self.X.Scale * other,
+			self.X.Offset * other,
+			
+			self.Y.Scale * other,
+			self.Y.Offset * other
+		)
+	end
+	return module.new(
+		self.X.Scale * other.X.Scale,
+		self.X.Offset * other.X.Offset,
+
+		self.Y.Scale * other.Y.Scale,
+		self.Y.Offset * other.Y.Offset
+	)
+end
+
 function module:Calculate(size)
 	return Vector.new(
 		size.X * self.X.Scale + self.X.Offset,

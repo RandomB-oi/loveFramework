@@ -1,5 +1,5 @@
 local module = {}
-module.Base = require("Classes.Instances.Frame")
+module.Base = require("Classes.Instances.GUI.Frame")
 module.__index = module
 module.__type = "TextLabel"
 setmetatable(module, module.Base)
@@ -35,11 +35,12 @@ function module:Update(dt)
 end
 
 function module:Draw()
+	if not self.Visible then return end
 	self.Color:Apply()
 
-	love.graphics.cleanDrawText(self._textObject, self.RenderPosition, self.RenderSize, self.TextStretch, self.XAlignment, self.YAlignment)
-	
-	-- love.graphics.rectangle("fill", self.RenderPosition.X, self.RenderPosition.Y, self.RenderSize.X, self.RenderSize.Y)
+	local anchorSize = self:Translate()
+	love.graphics.cleanDrawText(self._textObject, -anchorSize, self.RenderSize, self.TextStretch, self.XAlignment, self.YAlignment)
+	love.graphics.pop()
 
 	module.Base.Draw(self)
 end

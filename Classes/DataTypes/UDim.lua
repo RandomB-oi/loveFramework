@@ -9,4 +9,31 @@ module.new = function(scale, offset)
 	}, module)
 end
 
+
+function module:__add(other)
+	return module.new(
+		self.Scale + other.Scale,
+		self.Offset + other.Offset
+	)
+end
+function module:__sub(other)
+	return module.new(
+		self.Scale - other.Scale,
+		self.Offset - other.Offset
+	)
+end
+
+function module:__mul(other)
+	if type(other) == "number" then
+		return module.new(
+			self.Scale * other,
+			self.Offset * other
+		)
+	end
+	return module.new(
+		self.Scale * other.Scale,
+		self.Offset * other.Offset
+	)
+end
+
 return module

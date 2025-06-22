@@ -7,6 +7,8 @@ setmetatable(module, module.Base)
 local ServiceCreators = {
 	InputService = require("Classes.Instances.Services.InputService"),
 	Debris = require("Classes.Instances.Services.Debris"),
+	TweenService = require("Classes.Instances.Services.TweenService"),
+	CollectionService = require("Classes.Instances.Services.CollectionService"),
 }
 
 local LoadedServices = {}

@@ -30,6 +30,9 @@ do -- DataTypes
 
 	Maid = require("Classes.DataTypes.Maid")
 	Signal = require("Classes.DataTypes.Signal")
+
+	
+	TweenInfo = require("Classes.DataTypes.TweenInfo")
 end
 
 Instance = require("Classes.Instance")
@@ -46,12 +49,15 @@ do -- load all instances
 	end
 
 	load("Classes/Instances", {
-		"BaseInstance", "Button", "Frame", "ImageLabel", "Scene", "TextLabel",
+		"BaseInstance", "Scene",
+		GUI = {
+			"Frame", "Button", "ImageLabel", "TextLabel",
+		},
+		ValueObjects = {
+			"ValueBase", "NumberValue", "IntValue",
+		},
 		Services = {
-			-- "BaseService",
-
-			-- input doesnt work if you require it from here
-			-- "InputService",
+			"BaseService", "InputService", "TweenService", "Debris",
 		},
 	})
 end
@@ -66,7 +72,8 @@ function love.load()
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
-		task.UpdateDelayedThreads()
+		task.update(dt)
+
 		Game.UpdateOrphanedInstances(dt)
 		Game:Update(dt)
 	end

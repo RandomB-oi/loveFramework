@@ -9,11 +9,7 @@ module.new = function(className, ...)
 end
 
 function module.RegisterClass(class)
-	local __type = rawget(class, "__type")
-	if Classes[__type] then
-		print(__type.." is an already registered class")
-	end
-	Classes[__type] = class
+	Classes[rawget(class, "__type")] = class
 	return class
 end
 

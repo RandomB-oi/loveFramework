@@ -9,6 +9,34 @@ module.find = function(tbl, value)
 	end
 end
 
+module.copy = function(tbl)
+	if type(tbl) == "table" then
+		local new = {}
+		
+		for index, value in pairs(tbl) do
+			new[module.copy(index)]	= module.copy(value)
+		end
+
+		return new
+	end
+
+	return tbl
+end
+
+module.shallowCopy = function(tbl)
+	if type(tbl) == "table" then
+		local new = {}
+
+		for index, value in pairs(tbl) do
+			new[index]	= value
+		end
+
+		return new
+	end
+
+	return tbl
+end
+
 module.unpack = unpack
 
 for i,v in pairs(table) do

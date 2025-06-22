@@ -1,5 +1,5 @@
 local module = {}
-module.Base = require("Classes.Instances.Frame")
+module.Base = require("Classes.Instances.GUI.Frame")
 module.__index = module
 module.__type = "ImageLabel"
 setmetatable(module, module.Base)
@@ -32,8 +32,13 @@ function module:Update(dt)
 end
 
 function module:Draw()
+	if not self.Visible then return end
 	self.Color:Apply()
-	love.graphics.cleanDrawImage(self._imageObject, self.RenderPosition, self.RenderSize)
+	if self._imageObject then
+		local anchorSize = self:Translate()
+		love.graphics.cleanDrawImage(self._imageObject, -anchorSize, self.RenderSize)
+		love.graphics.pop()
+	end
 
 	module.Base.Draw(self)
 end

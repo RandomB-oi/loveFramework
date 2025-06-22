@@ -1,5 +1,5 @@
 local module = {}
-module.Base = require("Classes.Instances.Frame")
+module.Base = require("Classes.Instances.GUI.Frame")
 module.__index = module
 module.__type = "Button"
 setmetatable(module, module.Base)
@@ -34,6 +34,7 @@ function module:Update(dt)
 end
 
 function module:Draw()
+	if not self.Visible then return end
 	if self._hovering then
 		(self.Color-Color.new(.2,.2,.2,0)):Apply()
 	else
