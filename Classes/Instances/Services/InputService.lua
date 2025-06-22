@@ -46,6 +46,10 @@ local function new()
 	return self
 end
 
+function module:GetMouseLocation()
+	return Vector.new(love.mouse.getPosition())
+end
+
 function module:IsKeyPressed(key)
 	return not not self.PressedKeyboardButtons[key]
 end
@@ -54,4 +58,4 @@ function module:IsMouseButtonPressed(key)
 	return not not self.PressedMouseButtons[key]
 end
 
-return new()
+return new

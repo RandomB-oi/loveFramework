@@ -20,11 +20,15 @@ module.new = function()
 	self.Parent = nil
 	self.ZIndex = 0
 
+	self.AncestryChanged = self.Maid:Add(Signal.new())
+	self.ChildAdded = self.Maid:Add(Signal.new())
+	self.ChildRemoved = self.Maid:Add(Signal.new())
+
 	module.All[self.ID] = self
 	self.Maid:GiveTask(function()
 		module.All[self.ID] = nil
 		if self.Parent then
-			self:SetParent(nil)
+			self:_setParent(nil)
 		end
 	end)
 
@@ -102,7 +106,9 @@ end
 
 function module:_setParent(newParent)
 	if self._parent then
+
 		self._parent._children[self.ID] = nil
+		self._parent.ChildRemoved:Fire(self)
 		self._parent = nil
 	end
 
@@ -112,12 +118,15 @@ function module:_setParent(newParent)
 	self._parent = newParent
 	if newParent then
 		newParent._children[self.ID] = self
+		newParent.ChildAdded:Fire(self)
 		
 		local scene = newParent:GetScene()
 		if scene then
 			scene._canvasNeedsUpdate = true
 		end
 	end
+
+	self.AncestryChanged:Fire()
 end
 
 function module:Destroy()

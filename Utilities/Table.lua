@@ -9,6 +9,8 @@ module.find = function(tbl, value)
 	end
 end
 
+module.unpack = unpack
+
 for i,v in pairs(table) do
 	if not module[i] then
 		module[i] = v

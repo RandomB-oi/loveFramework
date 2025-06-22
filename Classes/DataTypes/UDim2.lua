@@ -9,11 +9,30 @@ module.new = function(xscale, xoffset, yscale, yoffset)
 	}, module)
 end
 
-module.FromScale = function(x,y)
+module.fromScale = function(x,y)
 	return module.new(x, 0, y, 0)
 end
-module.FromOffset = function(x,y)
+module.fromOffset = function(x,y)
 	return module.new(0, x, 0, y)
+end
+
+function module:__add(other)
+	return module.new(
+		self.X.Scale + other.X.Scale,
+		self.X.Offset + other.X.Offset,
+
+		self.Y.Scale + other.Y.Scale,
+		self.Y.Offset + other.Y.Offset
+	)
+end
+function module:__sub(other)
+	return module.new(
+		self.X.Scale - other.X.Scale,
+		self.X.Offset - other.X.Offset,
+
+		self.Y.Scale - other.Y.Scale,
+		self.Y.Offset - other.Y.Offset
+	)
 end
 
 function module:Calculate(size)

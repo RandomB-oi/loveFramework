@@ -8,7 +8,8 @@
 	"Lua.diagnostics.disable": [
 		"deprecated",
 		"lowercase-global",
-		"duplicate-set-field"
+		"duplicate-set-field",
+		"discard-returns"
 	],
 	"Lua.runtime.version": "LuaJIT",
 	"Lua.runtime.special": {

@@ -32,6 +32,13 @@ function module:GetAngle()
 	return math.atan2(-self.Y, self.X)
 end
 
+function module:Dot(other)
+	return self.X * other.X + self.Y * other.Y
+end
+function module:Dot(other)
+	return self.X * other.Y - self.Y * other.X
+end
+
 function module:__add(other)
 	if type(self) == "number" then
 		return other + self

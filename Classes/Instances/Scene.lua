@@ -4,12 +4,12 @@ module.__index = module
 module.__type = "Scene"
 setmetatable(module, module.Base)
 
-local Services = {}
-for _, service in pairs({
-	require("Classes.Instances.Services.InputService"),
-}) do
-	Services[service.__type] = service
-end
+local ServiceCreators = {
+	InputService = require("Classes.Instances.Services.InputService"),
+	Debris = require("Classes.Instances.Services.Debris"),
+}
+
+local LoadedServices = {}
 
 module.new = function(size)
 	local size = size or Vector.new(1, 1)
@@ -22,8 +22,8 @@ module.new = function(size)
 	self.Canvas = love.graphics.newCanvas(size.X, size.Y)
 	self.Size = size
 
-	self.UpdateSignal = self.Maid:Add(Signal.new())
-	self.DrawSignal = self.Maid:Add(Signal.new())
+	self.Updated = self.Maid:Add(Signal.new())
+	self.Drawn = self.Maid:Add(Signal.new())
 
 	self.Maid:GiveTask(function()
 		self.Canvas:release()
@@ -36,7 +36,10 @@ module.new = function(size)
 end
 
 function module:GetService(name)
-	return Services[name]
+	if not LoadedServices[name] and ServiceCreators[name] then
+		LoadedServices[name] = ServiceCreators[name]()
+	end
+	return LoadedServices[name]
 end
 
 function module:Update(dt)
@@ -44,7 +47,7 @@ function module:Update(dt)
 
 	if not (self.Enabled and not self.IsPaused) then return end
 
-	self.UpdateSignal:Fire(dt)
+	self.Updated:Fire(dt)
 	for _, child in ipairs(self:GetChildren()) do
 		child:Update(dt)
 	end
@@ -53,7 +56,7 @@ end
 function module:Draw()
 	if not (self.Enabled) then return end
 
-	self.DrawSignal:Fire()
+	self.Drawn:Fire()
 
 	-- if self._canvasNeedsUpdate then
 	-- 	self._canvasNeedsUpdate = false
