@@ -89,7 +89,6 @@ function module:UpdateScales()
 	end
 
 	self.Size = UDim2.new(1, 0, 0, CellHeight+height)
-	print("update")
 end
 
 function module:Update(dt)
