@@ -16,7 +16,7 @@ module.new = function()
 	self.Maid:GiveTask(Game:GetService("InputService").InputBegan:Connect(function(input)
 		if input.MouseButton == 1 then
 			local scene = self:GetScene()
-
+			
 			if self._hovering and scene.Enabled and not scene.IsPaused then
 				self.Activated:Fire()
 			end

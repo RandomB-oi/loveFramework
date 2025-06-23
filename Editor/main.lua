@@ -1,7 +1,10 @@
 load("Editor", {
 	Classes = {},
 	Instances = {
-		"Widget", "Explorer", "ExplorerObject"
+		"Widget",
+		
+		"Explorer", "ExplorerObject",
+		"Properties", "PropertyFrame",
 	},
 	Scenes = {},
 })

@@ -4,10 +4,13 @@ module.__index = module
 module.__type = "ExplorerObject"
 Instance.RegisterClass(module)
 
+local Selection = Game:GetService("Selection")
+local InputService = Game:GetService("InputService")
+
 local CellHeight = 20
 
 module.new = function(object, depth)
-	if object:IsA("ExplorerObject") then return end
+	if (object:IsA("ExplorerObject") or object:IsA("PropertyFrame") or object:IsA("Widget")) then return end
 
 	local self = setmetatable(module.Base.new(), module)
 
@@ -16,17 +19,26 @@ module.new = function(object, depth)
 	self.Depth = depth or 0
 
 	self.Size = UDim2.new(1, 0, 0, CellHeight)
-	self.Color = Color.from255(30, 30, 30, 255)
+	self.Color = Color.new(0.1, 0.1, 0.1, 1)
+	
+	self.Button = self.Maid:Add(Instance.new("Button"))
+	self.Button.Size = UDim2.new(1, -CellHeight*2, 0, CellHeight)
+	self.Button.Color = Color.new(0, 0, 0, 0)
+	self.Button.Position = UDim2.new(0, CellHeight*2, 0, 0)
+	self.Button.ZIndex = 0
+	self.Button.Parent = self
 
 	self.ToggleButton = self.Maid:Add(Instance.new("Button"))
 	self.ToggleButton.Size = UDim2.fromOffset(CellHeight, CellHeight)
 	self.ToggleButton.Color = Color.new(0, 0, 0, 0)
+	self.ToggleButton.ZIndex = 1
 	self.ToggleButton.Parent = self
 
 	self.ToggleButtonImage = self.Maid:Add(Instance.new("ImageLabel"))
 	self.ToggleButtonImage.Size = UDim2.fromOffset(16,16)
 	self.ToggleButtonImage.Position = UDim2.fromScale(0.5, 0.5)
 	self.ToggleButtonImage.AnchorPoint = Vector.new(0.5, 0.5)
+	self.ToggleButtonImage.ZIndex = 1
 	self.ToggleButtonImage.Parent = self.ToggleButton
 
 	self.Title = self.Maid:Add(Instance.new("TextLabel"))
@@ -34,6 +46,7 @@ module.new = function(object, depth)
 	self.Title.Position = UDim2.new(0, CellHeight*2, 0, 0)
 	self.Title.Text = object.Name
 	self.Title.XAlignment = "left"
+	self.Title.ZIndex = 1
 	self.Title.Parent = self
 
 	self.Line = self.Maid:Add(Instance.new("Frame"))
@@ -48,6 +61,7 @@ module.new = function(object, depth)
 	self.Icon.Position = UDim2.new(0, CellHeight+CellHeight/2, 0, CellHeight/2)
 	self.Icon.Text = object.Name
 	self.Icon.Parent = self
+	self.Icon.ZIndex = 1
 	self.Icon.Image = object.ClassIcon
 
 	self.ChildrenList = self.Maid:Add(Instance.new("Frame"))
@@ -92,7 +106,39 @@ module.new = function(object, depth)
 		self:UpdateScales()
 	end)
 
+	self.Button.Activated:Connect(function()
+		task.spawn(function()
+			if InputService:IsKeyPressed("lctrl") then
+				if Selection:IsSelected(self.Object) then
+					Selection:Remove(self.Object)
+				else
+					Selection:Add(self.Object)
+				end
+			else
+				if #Selection:Get() == 1 and select(2, next(Selection.Selection)) == self.Object then
+					Selection:Set()
+				else
+					Selection:Set({self.Object})
+				end
+			end
+		end)
+	end)
+
+	self:UpdateSelected()
+	self.Maid:GiveTask(Selection.SelectionChanged:Connect(function()
+		self:UpdateSelected()
+	end))
+
 	return self
+end
+
+function module:UpdateSelected()
+	local Selection = Game:GetService("Selection")
+	if Selection:IsSelected(self.Object) then
+		self.Button.Color = Color.from255(70, 70, 70, 255)
+	else
+		self.Button.Color = Color.new(0.1, 0.1, 0.1, 1)
+	end
 end
 
 function module:CalculateDeepestDepth(depth)

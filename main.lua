@@ -55,7 +55,7 @@ do -- load all instances
 			"Frame", "Button", "ImageLabel", "TextLabel", "ScrollingFrame",
 		},
 		Services = {
-			"BaseService", "InputService", "TweenService", "Debris", "CollectionService",
+			"BaseService", "InputService", "TweenService", "Debris", "CollectionService", "Selection"
 		},
 		ValueObjects = {
 			"ValueBase", "NumberValue", "IntValue",

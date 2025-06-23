@@ -1,16 +1,19 @@
 local newScene = Instance.new("Scene", Vector.new(800, 600))
 newScene.Parent = Game
+newScene.Name = "Editor"
 newScene.ZIndex = 10
 
-local newFrame = Instance.new("Frame")
-newFrame.Position = UDim2.new(0, 6, 0, 6)
-newFrame.AnchorPoint = Vector.zero
-newFrame.Size = UDim2.new(.5,-12, 1,-12)
-newFrame.Color = Color.new(1,1,1, 0.5)
-newFrame.Parent = newScene
-
 local widget = Instance.new("Explorer")
-widget.Parent = newFrame
+widget.Position = UDim2.new(0, 6, 0, 6)
+widget.AnchorPoint = Vector.zero
+widget.Size = UDim2.new(.25,-6, 1,-12)
+widget.Parent = newScene
+
+local widget = Instance.new("Properties")
+widget.Position = UDim2.new(1, -6, 0, 6)
+widget.AnchorPoint = Vector.new(1, 0)
+widget.Size = UDim2.new(.25,-6, 1,-12)
+widget.Parent = newScene
 
 -- local layout = Instance.new("UIListLayout")
 -- layout.Parent = newFrame

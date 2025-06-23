@@ -54,6 +54,14 @@ module.new = function()
 	return self
 end
 
+function module:GetProperties()
+	local list = {}
+	for name in pairs(self._properties) do
+		list[name] = self[name]
+	end
+	return list
+end
+
 function module:CreateProperty(name, propType, defaultValue)
 	self[name] = defaultValue
 
@@ -234,6 +242,25 @@ function module:FindFirstChildWhichIsA(name, recursive)
 	end, recursive)
 end
 
+local function SearchAncestors(self, predicate)
+	if not self or predicate(self) then
+		return self
+	end
+
+	return SearchAncestors(self.Parent, predicate)
+end
+
+function module:FindFirstAncestor(name)
+	return SearchAncestors(self.Parent, function(ancestor)
+		return ancestor.Name == name
+	end)
+end
+function module:FindFirstAncestorWhichIsA(className)
+	return SearchAncestors(self.Parent, function(ancestor)
+		return ancestor:IsA(className)
+	end)
+end
+
 function module:WaitForChild(name, timeout, recursive)
 	local begin = os.clock()
 
@@ -291,7 +318,7 @@ end
 
 function module.UpdateOrphanedInstances(dt)
 	for _, instance in pairs(module.All) do
-		if not instance._parent and instance ~= Game then
+		if not instance._properties.Parent.CurrentValue and instance ~= Game then
 			instance:Update(dt)
 		end
 	end

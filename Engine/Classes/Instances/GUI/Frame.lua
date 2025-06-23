@@ -28,10 +28,19 @@ function module:MouseHovering()
 	return self:IsHovering(Game:GetService("InputService"):GetMouseLocation())
 end
 
-function module:IsHovering(position)
+local function mouseInsideFrame(self, position)
 	return
 		position.X >= self.RenderPosition.X and position.X <= self.RenderPosition.X + self.RenderSize.X and
 		position.Y >= self.RenderPosition.Y and position.Y <= self.RenderPosition.Y + self.RenderSize.Y
+end
+
+function module:IsHovering(position)
+	local scrollingFrame = self:FindFirstAncestorWhichIsA("ScrollingFrame")
+	if scrollingFrame and not mouseInsideFrame(scrollingFrame, position) then
+		return
+	end
+	
+	return mouseInsideFrame(self, position)
 end
 
 function module:Update(dt)
