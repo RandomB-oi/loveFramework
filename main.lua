@@ -1,15 +1,3 @@
--- local ogRequire = require
--- local alreadyRequired = {}
--- function require(path)
--- 	path = path:gsub("%/",".")
-
--- 	if alreadyRequired[path] then
--- 		return
--- 	end
--- 	alreadyRequired[path] = true
--- 	ogRequire(path)
--- end
-
 typeof = function(value)
 	local t = type(value)
 	if t == "table" then
@@ -21,45 +9,45 @@ warn = function(...)
 	print(...)
 end
 
-math = require("Utilities.Math")
-table = require("Utilities.Table")
-string = require("Utilities.String")
-task = require("Utilities.Task")
-require("Utilities.Graphics")
+math = require("Engine.Utilities.Math")
+table = require("Engine.Utilities.Table")
+string = require("Engine.Utilities.String")
+task = require("Engine.Utilities.Task")
+require("Engine.Utilities.Graphics")
 
 
 do -- DataTypes
-	Vector = require("Classes.DataTypes.Vector")
+	Vector = require("Engine.Classes.DataTypes.Vector")
 
-	Color = require("Classes.DataTypes.Color")
-	ColorSequence = require("Classes.DataTypes.ColorSequence")
+	Color = require("Engine.Classes.DataTypes.Color")
+	ColorSequence = require("Engine.Classes.DataTypes.ColorSequence")
 
-	NumberRange = require("Classes.DataTypes.NumberRange")
-	NumberSequence = require("Classes.DataTypes.NumberSequence")
+	NumberRange = require("Engine.Classes.DataTypes.NumberRange")
+	NumberSequence = require("Engine.Classes.DataTypes.NumberSequence")
 
-	UDim = require("Classes.DataTypes.UDim")
-	UDim2 = require("Classes.DataTypes.UDim2")
+	UDim = require("Engine.Classes.DataTypes.UDim")
+	UDim2 = require("Engine.Classes.DataTypes.UDim2")
 
-	Maid = require("Classes.DataTypes.Maid")
-	Signal = require("Classes.DataTypes.Signal")
+	Maid = require("Engine.Classes.DataTypes.Maid")
+	Signal = require("Engine.Classes.DataTypes.Signal")
 
-	TweenInfo = require("Classes.DataTypes.TweenInfo")
+	TweenInfo = require("Engine.Classes.DataTypes.TweenInfo")
 end
 
-Instance = require("Classes.Instance")
+Instance = require("Engine.Classes.Instance")
 
 do -- load all instances
 	function load(path, list)
 		for index, value in pairs(list) do
 			if type(index) == "string" then
-				load(path.."/"..index, value)
+				load(path.."."..index, value)
 			else
-				require(path.."/"..value)
+				require(path.."."..value)
 			end
 		end
 	end
 
-	load("Classes/Instances", {
+	load("Engine.Classes.Instances", {
 		GUI = {
 			Layouts = {
 				"UIListLayout", "UILayoutBase"
@@ -72,7 +60,7 @@ do -- load all instances
 		ValueObjects = {
 			"ValueBase", "NumberValue", "IntValue",
 		},
-		"BaseInstance", "Scene",
+		"BaseInstance", "Scene", "Folder",
 	})
 end
 
@@ -83,13 +71,14 @@ Game.Name = "Game"
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
-	require("Game/main")
-	require("Editor/main")
+	require("Game.main")
+	require("Editor.main")
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
 		local title = "Game" .. tostring(math.round(1/(dt)))
-		-- Game.Name = title
+		-- local title = "Game"..tostring(#Game:GetChildren(true))
+		Game.Name = title
 		love.window.setTitle(title)
 
 		task.update(dt)
