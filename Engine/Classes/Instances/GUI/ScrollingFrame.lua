@@ -20,7 +20,7 @@ module.new = function()
 	local InputService = Game:GetService("InputService")
 	self.Maid:Add(InputService.Scrolled:Connect(function(dir)
 		if not self:MouseHovering() then return end
-		local horizontal = InputService:IsKeyPressed("lshift") or InputService:IsKeyPressed("rshift")
+		local horizontal = InputService:IsKeyPressed(Enum.KeyCode.LeftShift) or InputService:IsKeyPressed(Enum.KeyCode.RightShift)
 		local scrollAxis = horizontal and Vector.xAxis or Vector.yAxis
 		task.spawn(function()
 			for i = 1, 3 do
@@ -54,7 +54,7 @@ function module:Update(dt)
 			self.Canvas = nil
 		end
 
-		if self.RenderSize:Length() > 0.1 then
+		if self.RenderSize:Length() > 0.1 and self.RenderSize.X > 0 and self.RenderSize.Y > 0 then
 			self.Canvas = love.graphics.newCanvas(self.RenderSize.X, self.RenderSize.Y)
 		end
 	end

@@ -54,6 +54,10 @@ function module:Fire(...)
 	end
 end
 
+function module:ToLua()
+	return "Signal.new()"
+end
+
 function module:Destroy()
 	self._connections = {}
 end

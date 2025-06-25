@@ -10,7 +10,8 @@ local InputService = Game:GetService("InputService")
 local CellHeight = 20
 
 module.new = function(object, depth)
-	if (object:IsA("ExplorerObject") or object:IsA("PropertyFrame") or object:IsA("Widget")) then return end
+	if object.Name == "EditorScene" then return end
+	if object:FindFirstAncestor("EditorScene") or object:IsA("EditorObject") then return end
 
 	local self = setmetatable(module.Base.new(), module)
 
@@ -45,7 +46,7 @@ module.new = function(object, depth)
 	self.Title.Size = UDim2.new(1, -CellHeight*2, 0, CellHeight)
 	self.Title.Position = UDim2.new(0, CellHeight*2, 0, 0)
 	self.Title.Text = object.Name
-	self.Title.XAlignment = "left"
+	self.Title.XAlignment = Enum.TextXAlignment.Left
 	self.Title.ZIndex = 1
 	self.Title.Parent = self
 
@@ -98,7 +99,6 @@ module.new = function(object, depth)
 		self:Destroy()
 	end))
 
-	self.ScaleChanged = self.Maid:Add(Signal.new())
 	self.ChildrenList:GetPropertyChangedSignal("Visible"):Connect(function(visible)
 		self:UpdateScales()
 	end)
@@ -108,7 +108,7 @@ module.new = function(object, depth)
 
 	self.Button.Activated:Connect(function()
 		task.spawn(function()
-			if InputService:IsKeyPressed("lctrl") then
+			if InputService:IsKeyPressed(Enum.KeyCode.LeftControl) then
 				if Selection:IsSelected(self.Object) then
 					Selection:Remove(self.Object)
 				else
@@ -137,7 +137,7 @@ function module:UpdateSelected()
 	if Selection:IsSelected(self.Object) then
 		self.Button.Color = Color.from255(70, 70, 70, 255)
 	else
-		self.Button.Color = Color.new(0.1, 0.1, 0.1, 1)
+		self.Button.Color = Color.from255(25, 25, 25, 255)
 	end
 end
 
@@ -186,9 +186,6 @@ function module:NewChild(child)
 	local newFrame = Instance.new("ExplorerObject", child, self.Depth + 1)
 	if not newFrame then return end
 	newFrame.Parent = self.ChildrenList
-	newFrame.ScaleChanged:Connect(function()
-		self:UpdateScales()
-	end)
 end
 
 return module

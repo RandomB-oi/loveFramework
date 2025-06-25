@@ -4,7 +4,8 @@ module.__index = module
 module.__type = "TextLabel"
 Instance.RegisterClass(module)
 
-local DefaultFont = love.graphics.newFont(64,"normal")
+local DefaultFont = love.graphics.newFont("Engine/Assets/Fonts/FiraMonoTypewriter-text-regular.ttf", 64)
+-- local DefaultFont = love.graphics.newFont(64, "normal")
 
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/TextLabel.png"
@@ -17,35 +18,49 @@ module.new = function()
 	self:CreateProperty("Font", nil, nil)
 	self:CreateProperty("TextStretch", "boolean", false)
 
-	self:CreateProperty("XAlignment", "string", "center")
-	self:CreateProperty("YAlignment", "string", "center")
+	self:CreateProperty("XAlignment", "TextXAlignment", Enum.TextXAlignment.Center)
+	self:CreateProperty("YAlignment", "TextYAlignment", Enum.TextYAlignment.Center)
+
+	self:GetPropertyChangedSignal("Text"):Connect(function()
+		self:UpdateText()
+	end)
+	self:GetPropertyChangedSignal("Font"):Connect(function()
+		self:UpdateText()
+	end)
 
 	return self
 end
 
-function module:Update(dt)
-	if self._text ~= self.Text or self._font ~= self.Font then
-		self._text = self.Text
-		self._font = self.Font
-		if self._textObject then
-			self._textObject:release()
-			self._textObject = nil
-		end
-		self._textObject = love.graphics.newText(self.Font or DefaultFont, self.Text)
+function module:GetDesiredText()
+	return self.Text
+end
 
-		self._changed = true
+function module:UpdateText()
+	local text = self:GetDesiredText()
+	if (self._currentText == text and self._currentFont == self.Font) then
+		return
+	end
+	self._currentFont = self.Font
+	self._currentText = text
+
+	if self._textObject then
+		self._textObject:release()
+		self._textObject = nil
 	end
 
-	module.Base.Update(self, dt)
+	self._textObject = love.graphics.newText(self.Font or DefaultFont, text)
 end
 
 function module:Draw()
 	if not self.Visible then return end
-	self.Color:Apply()
 
-	local anchorSize = self:Translate()
-	love.graphics.cleanDrawText(self._textObject, -anchorSize, self.RenderSize, self.TextStretch, self.XAlignment, self.YAlignment)
-	love.graphics.pop()
+	if self._textObject then
+		self.Color:Apply()
+
+		local anchorSize = self:Translate()
+		love.graphics.cleanDrawText(self._textObject, -anchorSize, self.RenderSize, self.TextStretch, self.XAlignment, self.YAlignment)
+		love.graphics.pop()
+	end
 
 	module.Base.Draw(self)
 end

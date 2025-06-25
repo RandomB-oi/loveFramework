@@ -103,7 +103,7 @@ function module:UpdateRender()
 				parentPosition = parentPosition - self.Parent.CanvasPosition
 			end
 		elseif self.Parent:IsA("Scene") then
-			parentSize, parentPosition, parentRotation = self.Parent.Size, Vector.zero, 0
+			parentSize, parentPosition, parentRotation = self.Parent.RenderSize, Vector.zero, 0
 		end
 		if (parentSize and parentPosition) then
 			if layout then

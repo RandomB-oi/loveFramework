@@ -94,6 +94,10 @@ function module:__tostring()
 	return tostring(self.X)..", "..tostring(self.Y)
 end
 
+function module:ToLua()
+	return "Vector.new("..tostring(self.X)..", "..tostring(self.Y)..")"
+end
+
 module.zero = module.new(0,0)
 module.xAxis = module.new(1,0)
 module.yAxis = module.new(0,1)

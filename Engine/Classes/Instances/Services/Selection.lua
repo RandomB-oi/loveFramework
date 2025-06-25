@@ -10,8 +10,26 @@ module.new = function ()
 
 	self.Selection = {}
 	self.SelectionChanged = self.Maid:Add(Signal.new())
+	self.ZIndex = 99999999
 	
 	return self
+end
+
+function module:Draw(...)
+	module.Base.Draw(self,...)
+
+	for _, object in pairs(self:Get()) do
+		if object.RenderSize and object.RenderPosition then
+			love.graphics.drawOutline(object.RenderPosition, object.RenderSize, object.RenderRotation, object.AnchorPoint)
+			-- local objectCenter = (object.RenderPosition+object.RenderSize/2)
+			-- local offset = Vector.one * 10
+
+			-- local upVec = objectCenter + Vector.FromAngle(math.rad(object.RenderRotation)) * offset
+			-- local rightVec = objectCenter + Vector.FromAngle(math.rad(object.RenderRotation+90)) * offset
+			-- love.graphics.circle("fill", upVec.X, upVec.Y, 4)
+			-- love.graphics.circle("fill", rightVec.X, rightVec.Y, 4)
+		end
+	end
 end
 
 function module:Get()

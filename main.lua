@@ -9,6 +9,7 @@ warn = function(...)
 	print(...)
 end
 
+Enum = require("Engine.Classes.DataTypes.Enum")
 math = require("Engine.Utilities.Math")
 table = require("Engine.Utilities.Table")
 string = require("Engine.Utilities.String")
@@ -52,7 +53,7 @@ do -- load all instances
 			Layouts = {
 				"UIListLayout", "UILayoutBase"
 			},
-			"Frame", "Button", "ImageLabel", "TextLabel", "ScrollingFrame",
+			"Frame", "Button", "ImageLabel", "TextLabel", "TextBox", "ScrollingFrame",
 		},
 		Services = {
 			"BaseService", "InputService", "TweenService", "Debris", "CollectionService", "Selection"

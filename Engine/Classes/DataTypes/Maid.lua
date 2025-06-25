@@ -31,6 +31,10 @@ module.__index = function(self, i)
 	return self._tasks[i]
 end
 
+function module:ToLua()
+	return "Maid.new()"
+end
+
 module.__newindex = function(self, i, v)
 	if rawequal(self, module) then
 		rawset(module, i, v)

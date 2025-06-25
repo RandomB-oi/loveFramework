@@ -15,16 +15,19 @@ module.new = function(size)
 	self:CreateProperty("IsPaused", "boolean", false)
 	self:CreateProperty("Enabled", "boolean", true)
 
-	self:CreateProperty("Size", "Vector", size or Vector.one)
-	self.Canvas = love.graphics.newCanvas(self.Size.X, self.Size.Y)
+	self:CreateProperty("Size", "Vector", size or -Vector.one)
+	self.RenderSize = Vector.one
 
 	self.Updated = self.Maid:Add(Signal.new())
 	self.Drawn = self.Maid:Add(Signal.new())
 
 	self.Maid:GiveTask(function()
-		self.Canvas:release()
+		if self.Canvas then
+			self.Canvas:release()
+			self.Canvas = nil
+		end
 	end)
-
+	
 	-- self.Camera = Instance.new("camera", self)
 	-- self.Maid:GiveTask(self.camera)
 
@@ -59,6 +62,28 @@ end
 function module:Draw()
 	if not (self.Enabled) then return end
 
+	local desiredSize = self.Size
+	if desiredSize == -Vector.one then
+		desiredSize = Vector.new(love.graphics.getDimensions())
+	end
+	local canvasX, canvasY
+	if self.Canvas then
+		canvasX, canvasY = self.Canvas:getDimensions()
+	end
+
+	if desiredSize.X ~= canvasX or desiredSize.Y ~= canvasY then
+		if self.Canvas then
+			self.Canvas:release()
+			self.Canvas = nil
+		end
+
+		self.RenderSize = desiredSize
+		if desiredSize.X > 0 and desiredSize.Y > 0 then
+			self.Canvas = love.graphics.newCanvas(desiredSize.X, desiredSize.Y)
+		end
+	end
+
+	if not self.Canvas then return end
 	self.Drawn:Fire()
 
 	-- if self._canvasNeedsUpdate then

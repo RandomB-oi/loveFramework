@@ -11,6 +11,18 @@ function module.Get(id)
 end
 
 local function propertyTypeMatches(value, desiredType)
+	if desiredType then
+		if desiredType == "Instance" then
+			if type(value) == "table" and value.IsA then
+				return true
+			end
+			return false
+		end
+
+		local t = typeof(value)
+
+		return t == desiredType
+	end
 	return true
 end
 
@@ -36,6 +48,9 @@ module.new = function()
 	self.AncestryChanged = self.Maid:Add(Signal.new())
 	self.ChildAdded = self.Maid:Add(Signal.new())
 	self.ChildRemoved = self.Maid:Add(Signal.new())
+	self.DescendantAdded = self.Maid:Add(Signal.new())
+	self.DescendantRemoved = self.Maid:Add(Signal.new())
+
 	self.Changed = self.Maid:Add(Signal.new())
 
 	module.All[self.ID] = self
@@ -70,6 +85,7 @@ function module:CreateProperty(name, propType, defaultValue)
 			-- Changed = Signal.new(),
 			CurrentValue = defaultValue,
 			PropType = propType,
+			DefaultValue = defaultValue,
 		}
 	end
 end
@@ -278,6 +294,16 @@ function module:SearchPath(path)
 		if not root then return nil end
 	end
 	return root
+end
+
+function module:GetFullName()
+	local path = {}
+	local object = self
+	while object do
+		table.insert(path, object.Name)
+		object = object.Parent
+	end
+	return table.concat(table.reverse(path),".")
 end
 
 function module:_setParent(newParent)

@@ -83,6 +83,7 @@ Instance.RegisterClass(module)
 
 module.new = function ()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 	
 	return self
 end

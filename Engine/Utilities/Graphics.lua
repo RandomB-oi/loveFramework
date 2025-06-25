@@ -8,18 +8,18 @@ love.graphics.cleanDrawText = function(textObject, renderPosition, renderSize, s
 		scale = Vector.new(smallest, smallest)
 	end
 	local textOffset = renderSize - textSize * scale
-	if xAlign == "left" then
+	if xAlign == Enum.TextXAlignment.Left then
 		textOffset = Vector.new(0, textObject.Y)
-	elseif xAlign == "center" then
+	elseif xAlign == Enum.TextXAlignment.Center then
 		textOffset = Vector.new(textOffset.X/2, textObject.Y)
-	elseif xAlign == "right" then
+	elseif xAlign == Enum.TextXAlignment.Right then
 	end
 
-	if yAlign == "top" then
+	if yAlign == Enum.TextYAlignment.Top then
 		textOffset = Vector.new(textOffset.X, 0)
-	elseif yAlign == "center" then
+	elseif yAlign == Enum.TextYAlignment.Center then
 		textOffset = Vector.new(textOffset.X, textOffset.Y/2)
-	elseif xAlign == "bottom" then
+	elseif xAlign == Enum.TextYAlignment.Bottom then
 	end
 
 	local pos = renderPosition + textOffset
@@ -46,7 +46,18 @@ love.graphics.newImage = function(path)
 end
 
 
+love.graphics.drawOutline = function(position, size, rotation, anchorPoint)
+	local rotation = rotation or 0
+	local anchorPoint = anchorPoint or Vector.zero
 
+	local anchorSize = size * anchorPoint
+	love.graphics.setColor(1,1,1,(math.sin(os.clock()*10)+1)/4+.5)
+	love.graphics.push()
+	love.graphics.translate(position.X+anchorSize.X, position.Y+anchorSize.Y)
+	love.graphics.rotate(math.rad(rotation))
+	love.graphics.rectangle("line", -anchorSize.X, -anchorSize.Y, size.X, size.Y)
+	love.graphics.pop()
+end
 
 
 local letterWidth, letterHeight = 6, 14

@@ -11,6 +11,14 @@ module.split = function(inputstr, sep)
 	return t
 end
 
+module.toArray = function(str)
+	local list = {}
+	for i = 1, str:len() do
+		list[i] = str:sub(i,i)
+	end
+	return list
+end
+
 for i,v in pairs(string) do
 	if not module[i] then
 		module[i] = v

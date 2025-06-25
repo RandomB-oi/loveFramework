@@ -4,6 +4,24 @@ module.__index = module
 module.__type = "InputService"
 Instance.RegisterClass(module)
 
+local cachedEnums = {}
+local function ScanCodeToKeyCode(scancode)
+	if cachedEnums[scancode] then
+		return cachedEnums[scancode]
+	end
+
+	for keyName, enum in pairs(Enum.KeyCode) do
+		if enum.ScanCode == scancode then
+			cachedEnums[scancode] = enum
+			return enum
+		end
+	end
+end
+
+local function GetMouseButton(number)
+	return Enum.MouseButton["MouseButton"..tostring(number)]
+end
+
 module.new = function ()
 	local self = setmetatable(module.Base.new(), module)
 	self.Name = self.__type
@@ -15,32 +33,44 @@ module.new = function ()
 	self.PressedMouseButtons = {}
 
 	function love.mousepressed(_, _, button)
-		self.PressedMouseButtons[button] = true
+		local enumItem = GetMouseButton(button)
+		if not enumItem then return end
+
+		self.PressedMouseButtons[enumItem] = true
 		self.InputBegan:Fire({
-			MouseButton = button,
-			Key = nil,
+			MouseButton = enumItem,
+			KeyCode = nil,
 		})
 	end
 	function love.mousereleased(_, _, button)
-		self.PressedMouseButtons[button] = false
+		local enumItem = GetMouseButton(button)
+		if not enumItem then return end
+
+		self.PressedMouseButtons[enumItem] = false
 		self.InputEnded:Fire({
-			MouseButton = button,
-			Key = nil,
+			MouseButton = enumItem,
+			KeyCode = nil,
 		})
 	end
 
 	function love.keypressed(button)
-		self.PressedKeyboardButtons[button] = true
+		local enumItem = ScanCodeToKeyCode(button)
+		if not enumItem then return end
+
+		self.PressedKeyboardButtons[enumItem] = true
 		self.InputBegan:Fire({
 			MouseButton = nil,
-			Key = button,
+			KeyCode = enumItem,
 		})
 	end
 	function love.keyreleased(button)
-		self.PressedKeyboardButtons[button] = false
+		local enumItem = ScanCodeToKeyCode(button)
+		if not enumItem then return end
+
+		self.PressedKeyboardButtons[enumItem] = false
 		self.InputEnded:Fire({
 			MouseButton = nil,
-			Key = button,
+			KeyCode = enumItem,
 		})
 	end
 

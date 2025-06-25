@@ -22,7 +22,7 @@ module.new = function()
 	self.GameFrame.Parent = self.ExplorerList
 
 	self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
-		self.ExplorerList.CanvasSize = UDim2.fromOffset(size.X or 0, size.Y or 0)
+		self.ExplorerList.CanvasSize = UDim2.fromOffset(size.X, size.Y)
 	end)
 
 	return self

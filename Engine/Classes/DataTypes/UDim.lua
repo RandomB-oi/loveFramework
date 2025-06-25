@@ -36,4 +36,8 @@ function module:__mul(other)
 	)
 end
 
+function module:ToLua()
+	return "UDim.new("..tostring(self.Scale)..", "..tostring(self.Offset)..")"
+end
+
 return module

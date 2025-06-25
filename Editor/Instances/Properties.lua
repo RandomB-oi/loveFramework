@@ -42,23 +42,18 @@ function module:UpdateProperties()
 		self.PropertyFrames[propName] = nil
 	end
 
+	local object = Selection:Get()[1]
+	if not object then return end
 
-	local propsToShow = {}
-	for _, object in ipairs(Selection:Get()) do
-		for propName, info in pairs(object._properties) do
-			propsToShow[propName] = {
-				PropType = info.PropType,
-				Value = object[propName],
-			}
-		end
-	end
-
-
-	for propName, info in pairs(propsToShow) do
+	for propName, info in pairs(object._properties) do
 		local newFrame = Instance.new("PropertyFrame", propName, info.PropType)
 		newFrame.Parent = self.List
-		newFrame:SetValue(info.Value)
+		newFrame:SetValue(object[propName])
 		self.PropertyFrames[propName] = newFrame
+
+		newFrame.Maid:GiveTask(object:GetPropertyChangedSignal(propName):Connect(function()
+			newFrame:SetValue(object[propName])
+		end))
 
 		newFrame.PropertyChanged:Connect(function(newValue)
 			for _, object in ipairs(Selection:Get()) do

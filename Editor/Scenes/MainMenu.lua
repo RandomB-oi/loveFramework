@@ -1,6 +1,6 @@
-local newScene = Instance.new("Scene", Vector.new(800, 600))
+local newScene = Instance.new("Scene")
 newScene.Parent = Game
-newScene.Name = "Editor"
+newScene.Name = "EditorScene"
 newScene.ZIndex = 10
 
 local widget = Instance.new("Explorer")

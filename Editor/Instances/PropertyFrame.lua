@@ -6,6 +6,69 @@ Instance.RegisterClass(module)
 
 local CellHeight = 20
 
+local stringRound = function(value)
+	if type(value) == "number" then
+		return tostring(math.round(value*1000)/1000)
+	end
+	return tostring(value)
+end
+
+local PropConverters = {
+	UDim2 = {
+		tostring = function(value)
+			return stringRound(value.X.Scale)..", "..tostring(math.round(value.X.Offset))..", "..stringRound(value.Y.Scale)..", "..tostring(math.round(value.Y.Offset))
+		end,
+		tovalue = function(str)
+			local split = string.split(str, ",")
+
+			return UDim2.new(
+				tonumber(split[1]) or 0,
+				tonumber(split[2]) or 0,
+				tonumber(split[3]) or 0,
+				tonumber(split[4]) or 0
+			)
+		end
+	},
+
+	Color = {
+		tostring = function(value)
+			return tostring(math.round(value.R*255))..", "..tostring(math.round(value.G*255))..", "..tostring(math.round(value.B*255))..", "..tostring(math.round(value.A*255))
+		end,
+		tovalue = function(str)
+			local split = string.split(str, ",")
+
+			return Color.new(
+				(tonumber(split[1]) or 0)/255,
+				(tonumber(split[2]) or 0)/255,
+				(tonumber(split[3]) or 0)/255,
+				(tonumber(split[4]) or 255)/255
+			)
+		end
+	},
+	
+	Vector = {
+		tostring = function(value)
+			return stringRound(value.X)..", "..stringRound(value.Y)
+		end,
+		tovalue = function(str)
+			local split = string.split(str, ",")
+
+			return Vector.new(
+				tonumber(split[1]) or 0,
+				tonumber(split[2]) or 0
+			)
+		end
+	},
+	number = {
+		tostring = stringRound,
+		tovalue = tonumber,
+	},
+	string = {
+		tostring = tostring,
+		tovalue = tostring,
+	},
+}
+
 module.new = function(propertyName, propertyType)
 	local self = setmetatable(module.Base.new(), module)
 
@@ -21,7 +84,7 @@ module.new = function(propertyName, propertyType)
 	self.Title = self.Maid:Add(Instance.new("TextLabel"))
 	self.Title.Size = UDim2.fromScale(0.5, 1)
 	self.Title.Text = propertyName
-	self.Title.XAlignment = "left"
+	self.Title.XAlignment = Enum.TextXAlignment.Left
 	self.Title.ZIndex = 1
 	self.Title.Parent = self
 
@@ -61,6 +124,20 @@ module.new = function(propertyName, propertyType)
 			else
 				icon.Image = "Editor/Assets/EmptyCheckBox.png"
 			end
+		end)
+	elseif PropConverters[propertyType] then
+		local textbox = self.Maid:Add(Instance.new("TextBox"))
+		textbox.Size = UDim2.fromScale(1, 1)
+		textbox.XAlignment = Enum.TextXAlignment.Left
+		textbox.Parent = self.InteractArea
+
+		textbox.FocusLost:Connect(function()
+			local value = PropConverters[propertyType].tovalue(textbox.Text)
+			self:SetValue(value)
+		end)
+
+		self.PropertyChanged:Connect(function(newValue)
+			textbox.Text = PropConverters[propertyType].tostring(newValue)
 		end)
 	end
 
