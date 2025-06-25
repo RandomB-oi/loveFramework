@@ -72,13 +72,14 @@ Game.Name = "Game"
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
-	require("Game.main")
+	-- require("Game.main")
 	require("Editor.main")
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
 		local title = "Game" .. tostring(math.round(1/(dt)))
 		-- local title = "Game"..tostring(#Game:GetChildren(true))
+		Game:Unpause():Enable().Visible = true
 		Game.Name = title
 		love.window.setTitle(title)
 
