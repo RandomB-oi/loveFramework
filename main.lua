@@ -89,8 +89,8 @@ function love.load()
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
-		local title = "Game" .. tostring(math.round(1/(dt)))
-		-- local title = "Game"..tostring(#Engine:GetChildren(true))
+		-- local title = "Game" .. tostring(math.round(1/(dt)))
+		local title = GameScene.Name.." - "..tostring(#GameScene:GetChildren(true).. " instances")
 		Engine:Unpause():Enable().Visible = true
 		Engine.Name = title
 		love.window.setTitle(title)
