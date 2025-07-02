@@ -4,7 +4,7 @@ module.__index = module
 module.__type = "Explorer"
 Instance.RegisterClass(module)
 
-module.new = function()
+module.new = function(directory)
 	local self = setmetatable(module.Base.new(), module)
 	self:SetTitle("Explorer")
 
@@ -16,10 +16,11 @@ module.new = function()
 	self:AttachGui(self.ExplorerList)
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
-	self.Layout.Parent = self.ExplorerList
+	self.Layout.SortMode = Enum.SortMode.Name
+	self.Layout:SetParent(self.ExplorerList)
 
-	self.GameFrame = self.Maid:Add(Instance.new("ExplorerObject", Game))
-	self.GameFrame.Parent = self.ExplorerList
+	self.GameFrame = self.Maid:Add(Instance.new("ExplorerObject", directory))
+	self.GameFrame:SetParent(self.ExplorerList)
 
 	self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
 		self.ExplorerList.CanvasSize = UDim2.fromOffset(size.X, size.Y)

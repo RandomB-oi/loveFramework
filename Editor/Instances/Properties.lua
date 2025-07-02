@@ -4,7 +4,7 @@ module.__index = module
 module.__type = "Properties"
 Instance.RegisterClass(module)
 
-local Selection = Game:GetService("Selection")
+local Selection = Engine:GetService("Selection")
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
@@ -19,14 +19,15 @@ module.new = function()
 	self.PropertyFrames = {}
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
+	self.Layout.SortMode = Enum.SortMode.Name
 	self.Layout.Padding = UDim2.fromOffset(0, 0)
-	self.Layout.Parent = self.List
+	self.Layout:SetParent(self.List)
 
 	self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
 		self.List.CanvasSize = UDim2.fromOffset(size.X or 0, size.Y or 0)
 	end)
 
-	local Selection = Game:GetService("Selection")
+	local Selection = Engine:GetService("Selection")
 	self.Maid:GiveTask(Selection.SelectionChanged:Connect(function()
 		self:UpdateProperties()
 	end))
@@ -47,7 +48,8 @@ function module:UpdateProperties()
 
 	for propName, info in pairs(object._properties) do
 		local newFrame = Instance.new("PropertyFrame", propName, info.PropType)
-		newFrame.Parent = self.List
+		newFrame.Name = propName
+		newFrame:SetParent(self.List)
 		newFrame:SetValue(object[propName])
 		self.PropertyFrames[propName] = newFrame
 

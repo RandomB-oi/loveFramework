@@ -6,6 +6,9 @@ local function NewEnum(enumName)
 		local enumItemMeta = {}
 		enumItemMeta.__index = enumItemMeta
 		enumItemMeta.__type = enumName
+		enumItemMeta.__tostring = function(self)
+			return self:ToLua()
+		end
 		enumItemMeta.Serial = 0
 		function enumItemMeta:ToLua()
 			return "Enum."..enumName.."."..self.Name
@@ -20,6 +23,13 @@ local function NewEnum(enumName)
 	}, meta)
 end
 
+local EnumListMeta = {}
+EnumListMeta.__index = EnumListMeta
+EnumListMeta.__type = "Enum"
+EnumListMeta.__tostring = function(self)
+	return "Enum."..self.__type
+end
+
 local function NewKeyCode(scanCode)
 	local enumItem = NewEnum("KeyCode")
 	enumItem.ScanCode = scanCode
@@ -32,7 +42,7 @@ local function NewMouseButton(scanCode)
 	return enumItem
 end
 
-local module = {
+local EngineEnums = {
 	MouseButton = {
 		MouseButton1 = NewMouseButton(1),
 		MouseButton2 = NewMouseButton(2),
@@ -50,6 +60,11 @@ local module = {
 		Up = NewEnum("TextYAlignment"),
 		Center = NewEnum("TextYAlignment"),
 		Bottom = NewEnum("TextYAlignment"),
+	},
+	
+	SortMode = {
+		LayoutOrder = NewEnum("SortMode"),
+		Name = NewEnum("SortMode"),
 	},
 
 	KeyCode = {
@@ -166,11 +181,19 @@ local module = {
 	},
 }
 
-for categoryName, list in pairs(module) do
-	for name, enumItem in pairs(list) do
-		enumItem.Name = name
-		enumItem.EnumType = list
-	end
+local module = setmetatable({}, {__index = {
+	AddEnum = function(self, categoryName, list)
+		for name, enumItem in pairs(list) do
+			enumItem.Name = name
+			enumItem.EnumType = list
+		end
+		self[categoryName] = setmetatable(list, EnumListMeta)
+	end,
+	NewEnum = NewEnum,
+}})
+
+for categoryName, list in pairs(EngineEnums) do
+	module:AddEnum(categoryName, list)
 end
 
 return module

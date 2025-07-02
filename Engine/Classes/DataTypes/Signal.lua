@@ -39,13 +39,10 @@ function module:Wait()
 	return coroutine.yield()
 end
 
-local unknownOrder = 25
-local doOrderedSignals = true
-
 function module:Fire(...)
 	local args = {...}
 
-	for _, connection in pairs(self._connections) do
+	for _, connection in pairs(table.shallowCopy(self._connections)) do
 		if type(connection) == "table" then
 			xpcall(coroutine.wrap(connection._callback), function(err)
 				warn(err, debug.traceback())

@@ -16,6 +16,7 @@ module.new = function()
 	self:CreateProperty("AnchorPoint", "Vector", Vector.new(0, 0))
 	self:CreateProperty("Color", "Color", Color.from255(255, 255, 255, 255))
 	self:CreateProperty("Rotation", "number", 0)
+	self:CreateProperty("LayoutOrder", "number", 0)
 
 	self.RenderSize = Vector.zero
 	self.RenderPosition = Vector.zero
@@ -25,7 +26,7 @@ module.new = function()
 end
 
 function module:MouseHovering()
-	return self:IsHovering(Game:GetService("InputService"):GetMouseLocation())
+	return self:IsHovering(Engine:GetService("InputService"):GetMouseLocation())
 end
 
 local function mouseInsideFrame(self, position)
@@ -44,15 +45,15 @@ function module:IsHovering(position)
 end
 
 function module:Update(dt)
-	if self._size ~= self.Size or self._position ~= self.Position or self._anchorPoint ~= self.AnchorPoint or self._color ~= self.Color or self._rotation ~= self.Rotation then
-		self._size = self.Size
-		self._position = self.Position
-		self._anchorPoint = self.AnchorPoint
-		self._color = self.Color
-		self._rotation = self.Rotation
+	-- if self._size ~= self.Size or self._position ~= self.Position or self._anchorPoint ~= self.AnchorPoint or self._color ~= self.Color or self._rotation ~= self.Rotation then
+	-- 	self._size = self.Size
+	-- 	self._position = self.Position
+	-- 	self._anchorPoint = self.AnchorPoint
+	-- 	self._color = self.Color
+	-- 	self._rotation = self.Rotation
 
-		self._changed = true
-	end
+	-- 	self._changed = true
+	-- end
 
 	-- if self._changed then
 		self._changed = false
@@ -93,17 +94,27 @@ function module:Draw()
 end
 
 function module:UpdateRender()
-	if self.Parent then
+	local isScene = self:IsA("Scene")
+	if self.Parent or isScene then
 		local parentSize, parentPosition, parentRotation
-		local layout = self.Parent:FindFirstChildWhichIsA("UILayoutBase")
+		local layout = self.Parent and self.Parent:FindFirstChildWhichIsA("UILayoutBase")
 
-		if self.Parent:IsA("Frame") then
-			parentSize, parentPosition, parentRotation = self.Parent:UpdateRender()
-			if self.Parent.CanvasPosition then
+		if self.Parent and self.Parent:IsA("Frame") or not self.Parent and isScene then
+			if self.Parent then
+				parentSize, parentPosition, parentRotation = self.Parent:UpdateRender()
+			end
+
+			if not (parentSize and parentPosition and parentRotation) and isScene then
+				parentSize = Vector.new(love.graphics.getDimensions())
+				parentPosition = Vector.zero
+				parentRotation = 0
+			end
+
+			if parentPosition and self.Parent and self.Parent.CanvasPosition then
 				parentPosition = parentPosition - self.Parent.CanvasPosition
 			end
-		elseif self.Parent:IsA("Scene") then
-			parentSize, parentPosition, parentRotation = self.Parent.RenderSize, Vector.zero, 0
+		-- elseif self.Parent:IsA("Scene") then
+		-- 	parentSize, parentPosition, parentRotation = self.Parent.RenderSize, self.Parent.RenderPosition or Vector.zero, 0
 		end
 		if (parentSize and parentPosition) then
 			if layout then
@@ -117,6 +128,7 @@ function module:UpdateRender()
 			return self.RenderSize, self.RenderPosition, self.RenderRotation
 		end
 	end
+	-- return Vector.new(love.graphics.getDimensions()), Vector.zero, 0
 end
 
 return module

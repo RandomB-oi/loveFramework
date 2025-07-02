@@ -15,14 +15,14 @@ do
 		self.TweenInfo = tweenInfo -- {Time = 3, Style, Direction}
 		self.Properties = properties
 
-		self.TimePosition = 0
-		self.Playing = false
+		self:CreateProperty("TimePosition", "number", 1)
+		self:CreateProperty("Playing", "boolean", false)
 		self.OriginalProperties = {}
 
 		self.Completed = self.Maid:Add(Signal.new())
 
-		self.Parent = self.Object
-		
+		self:SetParent(self.Object)
+
 		return self
 	end
 

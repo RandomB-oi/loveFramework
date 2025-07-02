@@ -11,14 +11,19 @@ module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	self.Name = self.__type
 
-	self.Activated = self.Maid:Add(Signal.new())
+	self.LeftClicked = self.Maid:Add(Signal.new())
+	self.RightClicked = self.Maid:Add(Signal.new())
 
-	self.Maid:GiveTask(Game:GetService("InputService").InputBegan:Connect(function(input)
-		if input.MouseButton == Enum.MouseButton.MouseButton1 then
+	self.Maid:GiveTask(Engine:GetService("InputService").InputBegan:Connect(function(input)
+		if input.MouseButton == Enum.MouseButton.MouseButton1 or input.MouseButton == Enum.MouseButton.MouseButton2 then
 			local scene = self:GetScene()
 			
-			if self._hovering and scene.Enabled and not scene.IsPaused then
-				self.Activated:Fire()
+			if self._hovering and scene.Enabled and not scene.IsPaused and self:IsVisible() then
+				if input.MouseButton == Enum.MouseButton.MouseButton1 then
+					self.LeftClicked:Fire()
+				elseif input.MouseButton == Enum.MouseButton.MouseButton2 then
+					self.RightClicked:Fire()
+				end
 			end
 		end
 	end))

@@ -26,6 +26,12 @@ local function propertyTypeMatches(value, desiredType)
 	return true
 end
 
+local TypeCleaners = {
+	Int = function(value)
+		return math.round(value)
+	end,
+}
+
 module.ClassIcon = "Engine/Assets/InstanceIcons/Unknown.png"
 
 module.new = function()
@@ -57,13 +63,12 @@ module.new = function()
 	self.Maid:GiveTask(function()
 		module.All[self.ID] = nil
 		if self.Parent then
-			self.Parent = nil
-			self:_setParent(nil)
+			self:SetParent(nil)
 		end
 	end)
 
 	self:GetPropertyChangedSignal("Parent"):Connect(function(newParent)
-		self:_setParent(newParent)
+		self:SetParent(newParent)
 	end)
 
 	return self
@@ -77,7 +82,7 @@ function module:GetProperties()
 	return list
 end
 
-function module:CreateProperty(name, propType, defaultValue)
+function module:CreateProperty(name, propType, defaultValue, cleaner)
 	self[name] = defaultValue
 
 	if not self._properties[name] then
@@ -86,6 +91,7 @@ function module:CreateProperty(name, propType, defaultValue)
 			CurrentValue = defaultValue,
 			PropType = propType,
 			DefaultValue = defaultValue,
+			TypeCleaner = cleaner,
 		}
 	end
 end
@@ -93,6 +99,9 @@ end
 function module:CheckProperties()
 	for propName, info in pairs(self._properties) do
 		local newValue = self[propName]
+		if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
+			newValue = TypeCleaners[info.TypeCleaner](newValue)
+		end
 		if newValue ~= info.CurrentValue then
 			if propertyTypeMatches(newValue, info.PropType) then
 				info.CurrentValue = newValue
@@ -148,17 +157,17 @@ function module:GetAttributes()
 end
 
 function module:AddTag(tag)
-	Game:GetService("CollectionService"):AddTag(self, tag)
+	Engine:GetService("CollectionService"):AddTag(self, tag)
 	return self
 end
 
 function module:RemoveTag(tag)
-	Game:GetService("CollectionService"):RemoveTag(self, tag)
+	Engine:GetService("CollectionService"):RemoveTag(self, tag)
 	return self
 end
 
 function module:GetTags()
-	return Game:GetService("CollectionService"):GetTags(self)
+	return Engine:GetService("CollectionService"):GetTags(self)
 end
 
 function module:DrawChildren()
@@ -306,9 +315,12 @@ function module:GetFullName()
 	return table.concat(table.reverse(path),".")
 end
 
-function module:_setParent(newParent)
+function module:SetParent(newParent)
+	if self.Parent == newParent then return end
+
 	self.Maid.RemoveParent = nil
-	if newParent == self then self.Parent = nil return end
+	if newParent == self then newParent = nil return end
+	self.Parent = newParent
 
 	if newParent then
 		newParent._children[self.ID] = self
@@ -328,9 +340,15 @@ function module:_setParent(newParent)
 	self.AncestryChanged:Fire(newParent)
 end
 
+function module:IsVisible()
+	if self.Parent and not self.Parent:IsVisible() then
+		return false
+	end
+	return self.Visible
+end
+
 function module:Destroy()
-	self.Parent = nil
-	self:_setParent(nil)
+	self:SetParent(nil)
 
 	self.Maid:Destroy()
 
@@ -344,7 +362,7 @@ end
 
 function module.UpdateOrphanedInstances(dt)
 	for _, instance in pairs(module.All) do
-		if not instance._properties.Parent.CurrentValue and instance ~= Game then
+		if not instance._properties.Parent.CurrentValue and instance ~= Engine then
 			instance:Update(dt)
 		end
 	end

@@ -9,17 +9,18 @@ love.graphics.cleanDrawText = function(textObject, renderPosition, renderSize, s
 	end
 	local textOffset = renderSize - textSize * scale
 	if xAlign == Enum.TextXAlignment.Left then
-		textOffset = Vector.new(0, textObject.Y)
+		textOffset = Vector.new(0, textOffset.Y)
 	elseif xAlign == Enum.TextXAlignment.Center then
-		textOffset = Vector.new(textOffset.X/2, textObject.Y)
+		textOffset = Vector.new(textOffset.X/2, textOffset.Y)
 	elseif xAlign == Enum.TextXAlignment.Right then
+		
 	end
 
-	if yAlign == Enum.TextYAlignment.Top then
+	if yAlign == Enum.TextYAlignment.Up then
 		textOffset = Vector.new(textOffset.X, 0)
 	elseif yAlign == Enum.TextYAlignment.Center then
 		textOffset = Vector.new(textOffset.X, textOffset.Y/2)
-	elseif xAlign == Enum.TextYAlignment.Bottom then
+	elseif yAlign == Enum.TextYAlignment.Bottom then
 	end
 
 	local pos = renderPosition + textOffset

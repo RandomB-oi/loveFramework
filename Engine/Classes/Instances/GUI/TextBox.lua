@@ -34,7 +34,7 @@ module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	self.Name = self.__type
 
-	local InputService = Game:GetService("InputService")
+	local InputService = Engine:GetService("InputService")
 
 	self:CreateProperty("PlaceholderText", "string", "")
 	self:CreateProperty("CursorPosition", "number", -1)

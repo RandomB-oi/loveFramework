@@ -5,6 +5,7 @@ module.__type = "PropertyFrame"
 Instance.RegisterClass(module)
 
 local CellHeight = 20
+local existingDropdown
 
 local stringRound = function(value)
 	if type(value) == "number" then
@@ -86,35 +87,35 @@ module.new = function(propertyName, propertyType)
 	self.Title.Text = propertyName
 	self.Title.XAlignment = Enum.TextXAlignment.Left
 	self.Title.ZIndex = 1
-	self.Title.Parent = self
+	self.Title:SetParent(self)
 
 	self.Line = self.Maid:Add(Instance.new("Frame"))
 	self.Line.Size = UDim2.new(0, 1, 1, 0)
 	self.Line.Position = UDim2.fromScale(0.5, 0.5)
 	self.Line.Color = Color.new(0.3, 0.3, 0.3, 1)
 	self.Line.AnchorPoint = Vector.one/2
-	self.Line.Parent = self
+	self.Line:SetParent(self)
 
 	self.InteractArea = self.Maid:Add(Instance.new("Frame"))
 	self.InteractArea.Size = UDim2.fromScale(0.5, 1)
 	self.InteractArea.Position = UDim2.fromScale(1, 0)
 	self.InteractArea.Color = Color.new(0, 0, 0, 0)
 	self.InteractArea.AnchorPoint = Vector.xAxis
-	self.InteractArea.Parent = self
+	self.InteractArea:SetParent(self)
 
 	if propertyType == "boolean" then
 		local boolFrame = self.Maid:Add(Instance.new("Button"))
 		boolFrame.Size = UDim2.fromOffset(CellHeight, CellHeight)
 		boolFrame.Color = Color.new(0, 0, 0, 0)
-		boolFrame.Parent = self.InteractArea
+		boolFrame:SetParent(self.InteractArea)
 
 		local icon = self.Maid:Add(Instance.new("ImageLabel"))
 		icon.Position = UDim2.fromScale(0.5, 0.5)
 		icon.AnchorPoint = Vector.one/2
 		icon.Size = UDim2.fromOffset(20, 20)
-		icon.Parent = boolFrame
+		icon:SetParent(boolFrame)
 
-		boolFrame.Activated:Connect(function()
+		boolFrame.LeftClicked:Connect(function()
 			self:SetValue(not self:GetValue())
 		end)
 
@@ -125,11 +126,46 @@ module.new = function(propertyName, propertyType)
 				icon.Image = "Editor/Assets/EmptyCheckBox.png"
 			end
 		end)
+	elseif Enum[propertyType] then
+		local button = self.Maid:Add(Instance.new("Button"))
+		button.Size = UDim2.fromScale(1, 1)
+		button.Color = Color.new(.5, .5, .5, 1)
+		button:SetParent(self.InteractArea)
+
+		local textLabel = self.Maid:Add(Instance.new("TextLabel"))
+		textLabel.Size = UDim2.fromScale(1, 1)
+		textLabel.XAlignment = Enum.TextXAlignment.Left
+		textLabel:SetParent(button)
+		
+		self.PropertyChanged:Connect(function(newValue)
+			textLabel.Text = newValue.Name
+		end)
+
+		button.LeftClicked:Connect(function()
+			if existingDropdown then
+				existingDropdown:Destroy()
+				existingDropdown = nil
+			end
+			
+			local enumAsList = {}
+			for name, enumItem in pairs(Enum[propertyType]) do
+				enumAsList[enumItem.Value] = name
+			end
+			local dropdown = Instance.new("Dropdown", enumAsList)
+			dropdown.AnchorPoint = Vector.xAxis
+			dropdown.Position = UDim2.fromOffset(button.RenderPosition.X, button.RenderPosition.Y)
+			dropdown:SetParent(EditorScene)
+			dropdown.Visible = true
+			dropdown.ValueSelected:Connect(function(value)
+				self:SetValue(Enum[propertyType][value])
+			end)
+			existingDropdown = dropdown
+		end)
 	elseif PropConverters[propertyType] then
 		local textbox = self.Maid:Add(Instance.new("TextBox"))
 		textbox.Size = UDim2.fromScale(1, 1)
 		textbox.XAlignment = Enum.TextXAlignment.Left
-		textbox.Parent = self.InteractArea
+		textbox:SetParent(self.InteractArea)
 
 		textbox.FocusLost:Connect(function()
 			local value = PropConverters[propertyType].tovalue(textbox.Text)

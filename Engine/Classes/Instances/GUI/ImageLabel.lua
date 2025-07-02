@@ -7,7 +7,6 @@ Instance.RegisterClass(module)
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/ImageLabel.png"
 
-local cachedImages = {}
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
@@ -17,8 +16,7 @@ module.new = function()
 
 	self:GetPropertyChangedSignal("Image"):Connect(function(newImage)
 		if newImage then
-			self._imageObject = cachedImages[newImage] or love.graphics.newImage(newImage)
-			cachedImages[newImage] = self._imageObject
+			self._imageObject = love.graphics.newImage(newImage)
 		end
 		self._changed = true
 	end)

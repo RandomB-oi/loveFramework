@@ -66,30 +66,44 @@ do -- load all instances
 end
 
 
-Game = Instance.new("Scene"):Enable():Unpause()
-Game.Name = "Game"
+Engine = Instance.new("Scene"):Enable():Unpause()
+Engine.Name = "Engine"
 
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
-	-- require("Game.main")
-	require("Editor.main")
+	local ID = tostring(os.time())
+	local fileName = "ExportedInstances/AutoSave"..ID..".lua"
+	
+	-- local GameScene = require("ExportedInstances.SavedGame")()
+	local GameScene = require("Game.main")
+	task.spawn(function()
+		while task.wait(30) do
+			print("autoSave")
+			Instance.CreateScript(GameScene, fileName)
+		end
+	end)
+	
+	require("Editor.main"):Open(GameScene)
+
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
 		local title = "Game" .. tostring(math.round(1/(dt)))
-		-- local title = "Game"..tostring(#Game:GetChildren(true))
-		Game:Unpause():Enable().Visible = true
-		Game.Name = title
+		-- local title = "Game"..tostring(#Engine:GetChildren(true))
+		Engine:Unpause():Enable().Visible = true
+		Engine.Name = title
 		love.window.setTitle(title)
-
+		
 		task.update(dt)
-
-		Game.UpdateOrphanedInstances(dt)
-		Game:Update(dt)
+		
+		Engine.UpdateOrphanedInstances(dt)
+		Engine:Update(dt)
 	end
 
 	function love.draw()
-		Game:Draw()
+		Engine:Draw()
 	end
 end
+
+return Engine

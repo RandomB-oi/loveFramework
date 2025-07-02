@@ -1,22 +1,22 @@
 local module = {}
-module.Derives = "BaseInstance"
+module.Derives = "Frame"
 module.__index = module
 module.__type = "Scene"
 Instance.RegisterClass(module)
 
 local LoadedServices = {}
 module.ClassIcon = "Engine/Assets/InstanceIcons/Workspace.png"
+module.FrameRendering = false
 
-module.new = function(size)
+module.new = function()
 	local self = setmetatable(module.Base.new(), module)
-	self.Parent = nil
+	self:SetParent(nil)
 
 	self.Name = "Scene"
 	self:CreateProperty("IsPaused", "boolean", false)
 	self:CreateProperty("Enabled", "boolean", true)
 
-	self:CreateProperty("Size", "Vector", size or -Vector.one)
-	self.RenderSize = Vector.one
+	self.Size = UDim2.fromScale(1,1)
 
 	self.Updated = self.Maid:Add(Signal.new())
 	self.Drawn = self.Maid:Add(Signal.new())
@@ -42,7 +42,7 @@ function module:GetService(name)
 		end
 
 		local newService = Instance.new(name)
-		newService.Parent = Game
+		newService:SetParent(Engine)
 		LoadedServices[name] = newService
 	end
 	return LoadedServices[name]
@@ -50,7 +50,6 @@ end
 
 function module:Update(dt)
 	self:CheckProperties()
-
 	if not (self.Enabled and not self.IsPaused) then return end
 
 	self.Updated:Fire(dt)
@@ -61,47 +60,49 @@ end
 
 function module:Draw()
 	if not (self.Enabled) then return end
+	self:UpdateRender()
 
-	local desiredSize = self.Size
-	if desiredSize == -Vector.one then
-		desiredSize = Vector.new(love.graphics.getDimensions())
-	end
-	local canvasX, canvasY
-	if self.Canvas then
-		canvasX, canvasY = self.Canvas:getDimensions()
-	end
-
-	if desiredSize.X ~= canvasX or desiredSize.Y ~= canvasY then
-		if self.Canvas then
-			self.Canvas:release()
-			self.Canvas = nil
-		end
-
-		self.RenderSize = desiredSize
-		if desiredSize.X > 0 and desiredSize.Y > 0 then
-			self.Canvas = love.graphics.newCanvas(desiredSize.X, desiredSize.Y)
-		end
-	end
-
-	if not self.Canvas then return end
-	self.Drawn:Fire()
-
-	-- if self._canvasNeedsUpdate then
-	-- 	self._canvasNeedsUpdate = false
-
-	-- 	local scene = self.Parent and self.Parent:GetScene()
-	-- 	if scene then
-	-- 		scene._canvasNeedsUpdate = true
-	-- 	end
-
-		love.graphics.setCanvas(self.Canvas)
-		love.graphics.clear()
-		self:DrawChildren()
-		love.graphics.setCanvas()
+	-- local desiredSize = self.RenderSize
+	-- local renderPosition = self.RenderPosition or Vector.zero
+	
+	-- if not desiredSize then
+	-- 	desiredSize = Vector.new(love.graphics.getDimensions())
 	-- end
 
-	Color.White:Apply()
-	love.graphics.draw(self.Canvas, 0, 0)
+	-- local canvasX, canvasY
+	-- if self.Canvas then
+	-- 	canvasX, canvasY = self.Canvas:getDimensions()
+	-- end
+
+	-- if desiredSize.X ~= canvasX or desiredSize.Y ~= canvasY then
+	-- 	if self.Canvas then
+	-- 		self.Canvas:release()
+	-- 		self.Canvas = nil
+	-- 	end
+
+	-- 	if desiredSize.X >= 1 and desiredSize.Y >= 1 then
+	-- 		self.Canvas = love.graphics.newCanvas(desiredSize.X, desiredSize.Y)
+	-- 	end
+	-- end
+
+	-- if not self.Canvas then return end
+	self.Drawn:Fire()
+
+	-- local parentPos = self.Parent and self.Parent.RenderPosition or Vector.zero
+
+	-- love.graphics.push()
+	-- love.graphics.setCanvas(self.Canvas)
+	-- love.graphics.translate(-self.RenderPosition.X, -self.RenderPosition.Y)
+	-- love.graphics.clear()
+	self:DrawChildren()
+	-- love.graphics.setCanvas()
+	-- love.graphics.pop()
+
+	-- Color.White:Apply()
+	-- love.graphics.push()
+	-- love.graphics.translate(self.RenderPosition.X, self.RenderPosition.Y)
+	-- love.graphics.draw(self.Canvas, 0,0)
+	-- love.graphics.pop()
 end
 
 function module:Pause()

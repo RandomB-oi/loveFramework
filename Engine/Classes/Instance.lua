@@ -101,7 +101,7 @@ function module.CreateScript(object, directory, env, parentVar)
 	end
 
 	if parentVar then
-		table.insert(env.Lines, variableName..".Parent = "..parentVar)
+		table.insert(env.Lines, variableName..":SetParent("..parentVar..")")
 	end
 
 	if not parentVar then
