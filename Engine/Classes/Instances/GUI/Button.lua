@@ -18,7 +18,7 @@ module.new = function()
 		if input.MouseButton == Enum.MouseButton.MouseButton1 or input.MouseButton == Enum.MouseButton.MouseButton2 then
 			local scene = self:GetScene()
 			
-			if self._hovering and scene.Visible and not scene.IsPaused and self:IsVisible() then
+			if self._hovering and scene.Visible and not scene.Paused and self:IsVisible() then
 				if input.MouseButton == Enum.MouseButton.MouseButton1 then
 					self.LeftClicked:Fire()
 				elseif input.MouseButton == Enum.MouseButton.MouseButton2 then

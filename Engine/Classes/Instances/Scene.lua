@@ -13,7 +13,7 @@ module.new = function()
 	self:SetParent(nil)
 
 	self.Name = "Scene"
-	self:CreateProperty("IsPaused", "boolean", false)
+	self:CreateProperty("Paused", "boolean", false)
 
 	self.Size = UDim2.fromScale(1,1)
 
@@ -49,7 +49,7 @@ end
 
 function module:Update(dt)
 	self:CheckProperties()
-	if not (self.Visible and not self.IsPaused) then return end
+	if not (self.Visible and not self.Paused) then return end
 
 	self.Updated:Fire(dt)
 	for _, child in ipairs(self:GetChildren()) do
@@ -105,11 +105,11 @@ function module:Draw()
 end
 
 function module:Pause()
-	self.IsPaused = true
+	self.Paused = true
 	return self
 end
 function module:Unpause()
-	self.IsPaused = false
+	self.Paused = false
 	return self
 end
 function module:Enable()
