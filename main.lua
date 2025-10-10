@@ -1,5 +1,13 @@
 local EngineScene = require("Engine.main")
 
+local RunService = EngineScene:GetService("RunService")
+
+do
+	RunService._editor = true
+	RunService._running = false
+	RunService.TimeScale = 1/10
+end
+
 function love.load()
 	love.graphics.setDefaultFilter("nearest", "nearest")
 
@@ -8,32 +16,42 @@ function love.load()
 	
 	-- local GameScene = require("ExportedInstances.SavedGame")()
 	local GameScene = require("Game.main")
-	task.spawn(function()
-		while task.wait(30) do
-			print("autoSave")
-			Instance.CreateScript(GameScene, fileName)
-		end
-	end)
-	
-	require("Editor.main"):Open(GameScene)
+
+	if RunService:IsEditor() then
+		Editor = require("Editor.main"):Open(GameScene)
+
+		task.spawn(function()
+			print("do auto save loop")
+			while task.wait(30) do
+				if not RunService:IsRunning() then
+					print("autoSave")
+					Instance.CreatePrefab(GameScene, fileName)
+				end
+			end
+		end)
+	else
+		GameScene:SetParent(EngineScene)
+	end
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
+		dt = dt * RunService.TimeScale
+		RunService.ElapsedTime = RunService.ElapsedTime + dt
 		-- local title = "Game" .. tostring(math.round(1/(dt)))
 		local title = GameScene.Name.." - "..tostring(#GameScene:GetChildren(true).. " instances")
-		Engine:Unpause():Enable().Visible = true
-		Engine.Name = title
+		EngineScene:Unpause():Enable()
+		EngineScene.Name = title
 		love.window.setTitle(title)
 		
 		task.update(dt)
 		
-		Engine.UpdateOrphanedInstances(dt)
-		Engine:Update(dt)
+		EngineScene.UpdateOrphanedInstances(dt)
+		EngineScene:Update(dt)
 	end
 
 	function love.draw()
-		Engine:Draw()
+		EngineScene:Draw()
 	end
 end
 
-return Engine
+return EngineScene

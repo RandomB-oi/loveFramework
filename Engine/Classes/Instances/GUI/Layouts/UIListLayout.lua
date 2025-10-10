@@ -83,7 +83,7 @@ function module:UpdateOrder()
 	local array = {}
 	local lookup = {}
 	for _, child in ipairs(self.Parent:GetChildren()) do
-		if child:IsA("Frame") and child:IsVisible() then
+		if child:IsA("Frame") and child:IsEnabled() then
 			local order = 0
 			if self.SortMode == Enum.SortMode.LayoutOrder then
 				order = child.LayoutOrder or 9999

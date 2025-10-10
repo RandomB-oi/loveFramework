@@ -1,11 +1,16 @@
 local module = {}
+module.Derives = "BaseInstance"
 module.__index = module
 module.__type = "Battle"
 Instance.RegisterClass(module)
 
+module.ClassIcon = "Engine/Assets/InstanceIcons/ImageButton.png"
+
+
 local Debris = Engine:GetService("Debris")
 local TweenService = Engine:GetService("TweenService")
 local CollectionService = Engine:GetService("CollectionService")
+local RunService = Engine:GetService("RunService")
 
 local function ClearProjectiles()
 	repeat
@@ -19,28 +24,28 @@ end
 local _lastHurt = -math.huge
 local immunityFrames = 1/2
 local function Hurt(amount)
-	if os.clock() - _lastHurt < immunityFrames then
+	if RunService.ElapsedTime - _lastHurt < immunityFrames then
 		return
 	end
-	_lastHurt = os.clock()
-
+	_lastHurt = RunService.ElapsedTime
 	GameVariables.Health.Value = math.clamp(GameVariables.Health.Value - amount, 0, GameVariables.MaxHealth.Value)
 end
 
-
-module.new = function(soulMode, turnLength)
-	local self = setmetatable({}, module)
+module.new = function()
+	local self = setmetatable(module.Base.new(), module)
 	self.Maid = Maid.new()
 	self.Done = Signal.new()
 
 	self.Scene = GameScene:WaitForChild("BattleScene")
 
 	self.BattleBox = require("Game.Prefabs.BattleBox")()
+	Instance.BulkSetProperties(self.BattleBox, {Archivable = false})
 	self.BattleBox:SetParent(self.Scene)
 
 	self.BattleArea = self.BattleBox:FindFirstChild("BattleArea", true)
 	
 	self.HealthBarPanel = require("Game.Prefabs.HealthBarPanel")()
+	Instance.BulkSetProperties(self.HealthBarPanel, {Archivable = false})
 	self.HealthBarPanel:SetParent(self.Scene)
 
 	self.HPLabel = self.HealthBarPanel:FindFirstChild("HPLabel", true)
@@ -50,7 +55,23 @@ module.new = function(soulMode, turnLength)
 
 
 	self:ScaleHealth()
-	
+
+	self.Maid:GiveTask(self.Scene.Updated:Connect(function(dt)
+		-- self:NewProjectile()
+		self:ScaleHealth()
+		if not self.Heart then return end
+		
+		local touching, tpAmount = self.Heart:TouchingProjectile()
+		if touching then
+			touching:Destroy()
+			Hurt(1)
+		end
+	end))
+
+	return self
+end
+
+function module:BeginBattle(soulMode, turnLength)
 	self.Maid:GiveTask(task.delay(turnLength, self.Destroy, self))
 	self.Maid:GiveTask(function()
 		ClearProjectiles()
@@ -69,22 +90,7 @@ module.new = function(soulMode, turnLength)
 		self.Heart.SoulMode = soulMode
 	end
 	self.Heart:SetParent(self.BattleArea)
-
-	self.Maid:GiveTask(self.Scene.Updated:Connect(function(dt)
-		-- self:NewProjectile()
-		self:ScaleHealth()
-		
-		local touching, tpAmount = self.Heart:TouchingProjectile()
-		if touching then
-			touching:Destroy()
-			Hurt(1)
-		end
-	end))
-
-	return self
 end
-
-
 
 function module:ScaleHealth()
 	self.HealthLabel.Text = tostring(GameVariables.Health.Value).."/"..tostring(GameVariables.MaxHealth.Value)
@@ -95,10 +101,10 @@ end
 
 
 function module:NewProjectile()
-	if os.clock() - (self._lastProjectile or 0) < 1/10 then
+	if RunService.ElapsedTime - (self._lastProjectile or 0) < 1/10 then
 		return
 	end
-	self._lastProjectile = os.clock()
+	self._lastProjectile = RunService.ElapsedTime
 
 	local angle = math.rad(math.random(1, 360))
 	local dir = Vector.FromAngle(angle) * -2000

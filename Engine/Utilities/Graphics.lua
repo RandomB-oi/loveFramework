@@ -52,7 +52,7 @@ love.graphics.drawOutline = function(position, size, rotation, anchorPoint)
 	local anchorPoint = anchorPoint or Vector.zero
 
 	local anchorSize = size * anchorPoint
-	love.graphics.setColor(1,1,1,(math.sin(os.clock()*10)+1)/4+.5)
+	love.graphics.setColor(1,1,1,(math.sin(Engine:GetService("RunService").ElapsedTime*10)+1)/4+.5)
 	love.graphics.push()
 	love.graphics.translate(position.X+anchorSize.X, position.Y+anchorSize.Y)
 	love.graphics.rotate(math.rad(rotation))

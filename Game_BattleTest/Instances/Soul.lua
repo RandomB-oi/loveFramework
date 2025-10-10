@@ -77,13 +77,17 @@ function module:Update(dt)
 	module.Base.Update(self, dt)
 
 	if not self.Parent then return end
+	
+	self.Image = "Game/Assets/Souls/"..self.SoulMode.Name..".png"
 
+	if not Engine:GetService("RunService"):IsRunning() then return end
 	local InputService = Engine:GetService("InputService")
 
 	local xDir = (InputService:IsKeyPressed(Enum.KeyCode.D) and 1 or 0) - (InputService:IsKeyPressed(Enum.KeyCode.A) and 1 or 0)
 	local yDir = (InputService:IsKeyPressed(Enum.KeyCode.S) and 1 or 0) - (InputService:IsKeyPressed(Enum.KeyCode.W) and 1 or 0)
 
 	local scene = self:GetScene()
+	if not scene then return end
 
 	local parentScale = self.Parent.RenderSize/scene.RenderSize
 	local heartScale = self.RenderSize/self.Parent.RenderSize
@@ -96,7 +100,6 @@ function module:Update(dt)
 
 	local positionAdd
 
-	self.Image = "Game/Assets/Souls/"..self.SoulMode.Name..".png"
 
 	if self.SoulMode == Enum.SoulMode.Integrity then
 		local moveAxis = Vector.FromAngle(math.rad((self.Rotation+90)%360))

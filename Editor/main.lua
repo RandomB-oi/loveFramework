@@ -8,12 +8,31 @@ load("Editor", {
 		
 		"Explorer", "ExplorerObject",
 		"Properties", "PropertyFrame",
+		"EditorInstance"
 	},
 	Scenes = {},
 })
 
 function EditorScene:Open(scene)
-	local newEditor = require("Editor.Prefabs.Editor")(scene)
+	local newEditor = require("Editor.Prefabs.Editor")()
+
+	local explorer = newEditor:FindFirstChild("Explorer", true)
+	-- explorer.RootObject = scene
+	explorer.RootObject = Engine
+
+	newEditor.BannerButtons.Run.LeftClicked:Connect(function()
+		explorer.RootObject = Engine:GetService("RunService"):Run()
+		
+		newEditor.BannerButtons.Stop.Enabled = true
+		newEditor.BannerButtons.Run.Enabled = false
+	end)
+
+	newEditor.BannerButtons.Stop.LeftClicked:Connect(function()
+		explorer.RootObject = Engine:GetService("RunService"):Stop()
+		
+		newEditor.BannerButtons.Stop.Enabled = false
+		newEditor.BannerButtons.Run.Enabled = true
+	end)
 
 	scene:SetParent(newEditor:FindFirstChild("Viewport", true))
 
@@ -44,7 +63,7 @@ local function CreateDropdown(options, selected)
 end
 
 function EditorScene:CreateContextMenu(object)
-	local dropdown = CreateDropdown({"Insert", "Export", "Delete"}, function(value)
+	local dropdown = CreateDropdown({"Insert", "Export", "Duplicate", "Delete"}, function(value)
 		if value == "Insert" then
 			local classList = {}
 			for className in pairs(Instance.Classes) do
@@ -58,7 +77,12 @@ function EditorScene:CreateContextMenu(object)
 			return true
 		elseif value == "Export" then
 			local pathName = object:GetFullName():gsub("%.", "_")
-			Instance.CreateScript(object, "ExportedInstances/"..pathName..".lua")
+			Instance.CreatePrefab(object, "ExportedInstances/"..pathName..".lua")
+			return true
+		elseif value == "Duplicate" then
+			local new = object:Clone(true)
+			new.Name = new.Name
+			new:SetParent(object.Parent)
 			return true
 		elseif value == "Delete" then
 			object:Destroy()

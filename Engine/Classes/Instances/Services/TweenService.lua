@@ -14,6 +14,7 @@ do
 		self.Object = object
 		self.TweenInfo = tweenInfo -- {Time = 3, Style, Direction}
 		self.Properties = properties
+		self.Archivable = false
 
 		self:CreateProperty("TimePosition", "number", 1)
 		self:CreateProperty("Playing", "boolean", false)

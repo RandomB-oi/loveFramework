@@ -11,6 +11,7 @@ module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	self.Name = self.__type
 
+	self:CreateProperty("ZIndex", "number", 0)
 	self:CreateProperty("Size", "UDim2", UDim2.new(0, 200, 0, 50))
 	self:CreateProperty("Position", "UDim2", UDim2.new(0, 0, 0, 0))
 	self:CreateProperty("AnchorPoint", "Vector", Vector.new(0, 0))
@@ -85,7 +86,7 @@ function module:DrawFrame()
 end
 
 function module:Draw()
-	if not self.Visible then return end
+	if not self.Enabled then return end
 	if self.FrameRendering then
 		self:DrawFrame()
 	end

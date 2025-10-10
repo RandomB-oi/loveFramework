@@ -38,6 +38,23 @@ end
 
 Instance = require("Engine.Classes.Instance")
 
+function CreateScript(name, directory)
+	local new = Instance.new("Script")
+	new.Name = name
+
+	local file = io.open(directory, "r")
+	if file then
+   		local t = file:read("*all")
+	    file:close()
+
+		new.Source = t
+	else
+		new.Source = ""
+	end
+
+	return new
+end
+
 do -- load all instances
 	function load(path, list)
 		for index, value in pairs(list) do
@@ -57,16 +74,22 @@ do -- load all instances
 			"Frame", "Button", "ImageLabel", "TextLabel", "TextBox", "ScrollingFrame",
 		},
 		Services = {
-			"BaseService", "InputService", "TweenService", "Debris", "CollectionService", "Selection"
+			"BaseService", "InputService", "TweenService", "Debris", "CollectionService", "Selection","RunService"
 		},
 		ValueObjects = {
 			"ValueBase", "NumberValue", "IntValue",
 		},
-		"BaseInstance", "Scene", "Folder",
+		"BaseInstance", "Scene", "Folder","Script",
 	})
 end
 
 Engine = Instance.new("Scene"):Enable():Unpause()
 Engine.Name = "Engine"
+
+for className, info in pairs(Instance.Classes) do
+	if info:IsA("BaseService") then
+		Engine:GetService(className)
+	end
+end
 
 return Engine

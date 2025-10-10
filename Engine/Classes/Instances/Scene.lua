@@ -49,7 +49,7 @@ end
 
 function module:Update(dt)
 	self:CheckProperties()
-	if not (self.Visible and not self.Paused) then return end
+	if not (self.Enabled and not self.Paused) then return end
 
 	self.Updated:Fire(dt)
 	for _, child in ipairs(self:GetChildren()) do
@@ -58,7 +58,7 @@ function module:Update(dt)
 end
 
 function module:Draw()
-	if not (self.Visible) then return end
+	if not (self.Enabled) then return end
 	self:UpdateRender()
 
 	-- local desiredSize = self.RenderSize
@@ -113,11 +113,11 @@ function module:Unpause()
 	return self
 end
 function module:Enable()
-	self.Visible = true
+	self.Enabled = true
 	return self
 end
 function module:Disable()
-	self.Visible = false
+	self.Enabled = false
 	return self
 end
 

@@ -14,34 +14,31 @@ module.new = function()
 	self:SetParent(nil)
 
 	self.Name = "Script"
-	self:CreateProperty("Source", "string", "")
-	self.Source = "print(\"Hello World\")"
+	self:CreateProperty("Value", "number", 0)
 
-	self:GetPropertyChangedSignal("Source"):Connect(function()
-		self.Maid.ScriptMaid = nil
-		self:Run(self.Source)
-	end)
+	if Engine:GetService("RunService"):IsRunning() then
+		task.spawn(function()
+			self:ScriptInit()
+			self._scriptInitDone = true
+		end)
+	end
 
 	return self
 end
 
-function module:Run(code)
-	task.spawn(function()
-		local callback = loadstring(code)
-		if not callback then return end
+function module:ScriptInit()
+	print("Hello World!")
+end
 
-		local cleanupMaid = Maid.new()
-		self.Maid.ScriptMaid = cleanupMaid
-		
-		local env = getfenv(callback)
-		env.ScriptMaid = cleanupMaid
-		env.print = function(...)
-			warn("in game print", ...)
-		end
-		setfenv(callback, env)
+function module:ScriptUpdate(dt)
+	self.Value = self.Value + dt
+end
 
-		callback()
-	end)
+function module:Update(...)
+	if not Engine:GetService("RunService"):IsRunning() then return end
+	if not self._scriptInitDone then return end
+
+	self:ScriptUpdate(...)
 end
 
 return module

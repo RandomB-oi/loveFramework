@@ -18,7 +18,7 @@ module.new = function()
 		if input.MouseButton == Enum.MouseButton.MouseButton1 or input.MouseButton == Enum.MouseButton.MouseButton2 then
 			local scene = self:GetScene()
 			
-			if self._hovering and scene.Visible and not scene.Paused and self:IsVisible() then
+			if self._hovering and scene.Enabled and not scene.Paused and self:IsEnabled() then
 				if input.MouseButton == Enum.MouseButton.MouseButton1 then
 					self.LeftClicked:Fire()
 				elseif input.MouseButton == Enum.MouseButton.MouseButton2 then
@@ -42,7 +42,7 @@ function module:Update(dt)
 end
 
 function module:Draw()
-	if not self.Visible then return end
+	if not self.Enabled then return end
 	if self._hovering then
 		(self.Color-Color.new(.2,.2,.2,0)):Apply()
 	else

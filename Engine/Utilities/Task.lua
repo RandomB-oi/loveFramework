@@ -1,35 +1,3 @@
---[[local module = {}
-
-module.spawn = function(func, ...)
-	coroutine.wrap(func)(...)
-end
-
-local delayedThreads = {}
-module.delay = function(delayAmount, func, ...)
-	table.insert(delayedThreads, {
-		resumeTime = os.clock() + delayAmount,
-		callback = func,
-		args = {...}
-	})
-end
-
-module.UpdateDelayedThreads = function()
-	for i = #delayedThreads, 1, -1 do
-		local thread = delayedThreads[i]
-
-		if thread.resumeTime < os.clock() then
-			table.remove(delayedThreads, i)
-
-			module.spawn(thread.callback, table.unpack(thread.args))
-		end
-	end
-end
-
-return module]]
-
-
-
-
 local task = {
     _tasks = {},
     _time = 0
@@ -89,9 +57,10 @@ end
 function task.wait(seconds)
     local co = coroutine.running()
 
-	local begin = os.clock()
+    local run = Engine:GetService("RunService")
+	local begin = run.ElapsedTime
     local function resumeLater()
-        coroutine.resume(co, os.clock() - begin)
+        coroutine.resume(co, run.ElapsedTime - begin)
     end
 
     task.delay(seconds or 0, resumeLater)

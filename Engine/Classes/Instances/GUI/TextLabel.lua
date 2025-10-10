@@ -52,7 +52,7 @@ function module:UpdateText()
 end
 
 function module:Draw()
-	if not self.Visible then return end
+	if not self.Enabled then return end
 
 	if self._textObject then
 		self.Color:Apply()

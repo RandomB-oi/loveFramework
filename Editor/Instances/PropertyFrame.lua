@@ -1,5 +1,5 @@
 local module = {}
-module.Derives = "Frame"
+module.Derives = "EditorInstance"
 module.__index = module
 module.__type = "PropertyFrame"
 Instance.RegisterClass(module)
@@ -155,7 +155,7 @@ module.new = function(propertyName, propertyType)
 			dropdown.AnchorPoint = Vector.xAxis
 			dropdown.Position = UDim2.fromOffset(button.RenderPosition.X, button.RenderPosition.Y)
 			dropdown:SetParent(EditorScene)
-			dropdown.Visible = true
+			dropdown.Enabled = true
 			dropdown.ValueSelected:Connect(function(value)
 				self:SetValue(Enum[propertyType][value])
 			end)

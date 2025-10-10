@@ -18,8 +18,9 @@ Scene:SetParent(GameScene)
 -- backdrop:SetParent(Scene)
 
 function Scene:BeginBattle(soulMode, turnLength, battleBoxSize)
-	local battle = Instance.new("Battle", soulMode, turnLength)
-	battle:ScaleBox(1, battleBoxSize or Vector.one*300, 0)
+	local battle = Instance.new("Battle")
+	-- battle:BeginBattle(soulMode, turnLength)
+	-- battle:ScaleBox(1, battleBoxSize or Vector.one*300, 0)
 	battle.Done:Wait()
 end
 

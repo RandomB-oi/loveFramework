@@ -1,4 +1,4 @@
-return function(chosenScene)
+return function()
 	local newScene = Instance.new("Scene")
 	newScene.Name = "EditorScene"
 	newScene:SetParent(EditorScene)
@@ -20,7 +20,7 @@ return function(chosenScene)
 
 	newScene.BannerButtons = {}
 
-	do
+	local function newTopButton(image)
 		local runButton = Instance.new("Button")
 		runButton.Size = UDim2.new(0, bannerSize, 0, bannerSize)
 		runButton.Color = Color.new(0, 0, 0, 0)
@@ -34,11 +34,17 @@ return function(chosenScene)
 		buttonBackdrop:SetParent(runButton)
 
 		local runIcon = Instance.new("ImageLabel")
-		runIcon.Image = "Editor/Assets/Collapsed.png"
+		runIcon.Image = image
 		runIcon.Size = UDim2.fromScale(1, 1)
 		runIcon:SetParent(buttonBackdrop)
 
-		newScene.BannerButtons.Run = runButton
+		return runButton
+	end
+
+	do
+		newScene.BannerButtons.Run = newTopButton("Editor/Assets/Collapsed.png")
+		newScene.BannerButtons.Stop = newTopButton("Editor/Assets/Expanded.png")
+		newScene.BannerButtons.Stop.Enabled = false
 	end
 
 
@@ -48,9 +54,31 @@ return function(chosenScene)
 	area.Size = UDim2.new(1, 0, 1, -bannerSize)
 	area:SetParent(newScene)
 
-	
+	local viewportWidget = Instance.new("Widget")
+	viewportWidget.Position = UDim2.new(.5, 0, .5, 0)
+	viewportWidget.AnchorPoint = Vector.new(.5, .5)
+	viewportWidget.Size = UDim2.new(.5, 0, 1, 0)
+	viewportWidget:SetParent(area)
+	viewportWidget:SetTitle("Editor")
 
-	local explorer = Instance.new("Explorer", chosenScene)
+	local viewportHolder = Instance.new("Frame")
+	viewportHolder.Size = UDim2.fromScale(1, 1)
+	viewportHolder.Position = UDim2.fromScale(0.5, 0.5)
+	viewportHolder.Color = Color.new(0,0,0, 1)
+	viewportHolder.AnchorPoint = Vector.one/2
+	viewportHolder.Name = "ViewportHolder"
+	viewportWidget:AttachGui(viewportHolder)
+
+	local viewport = Instance.new("Scene")
+	-- viewport.Size = UDim2.fromScale(1, 1)
+	-- viewport.Position = UDim2.fromScale(0.5, 0.5)
+	-- viewport.Color = Color.new(0,0,0, 1)
+	-- viewport.AnchorPoint = Vector.one/2
+	viewport:Enable():Unpause()
+	viewport.Name = "Viewport"
+	viewport:SetParent(viewportHolder)
+
+	local explorer = Instance.new("Explorer")
 	explorer.Position = UDim2.new(0, 0, 0, 0)
 	explorer.AnchorPoint = Vector.zero
 	explorer.Size = UDim2.new(.25, 0, 1, 0)
@@ -61,21 +89,6 @@ return function(chosenScene)
 	properties.AnchorPoint = Vector.new(1, 0)
 	properties.Size = UDim2.new(.25, 0, 1, 0)
 	properties:SetParent(area)
-
-	local viewportWidget = Instance.new("Widget")
-	viewportWidget.Position = UDim2.new(.5, 0, .5, 0)
-	viewportWidget.AnchorPoint = Vector.new(.5, .5)
-	viewportWidget.Size = UDim2.new(.5, 0, 1, 0)
-	viewportWidget:SetParent(area)
-	viewportWidget:SetTitle("Editor")
-
-	local viewport = Instance.new("Frame")
-	viewport.Size = UDim2.fromScale(1, 1)
-	viewport.Position = UDim2.fromScale(0.5, 0.5)
-	viewport.Color = Color.new(0,0,0, 1)
-	viewport.AnchorPoint = Vector.one/2
-	viewport.Name = "Viewport"
-	viewportWidget:AttachGui(viewport)
 
 	return newScene
 end

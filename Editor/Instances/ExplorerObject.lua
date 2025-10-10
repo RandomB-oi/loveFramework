@@ -1,5 +1,5 @@
 local module = {}
-module.Derives = "Frame"
+module.Derives = "EditorInstance"
 module.__index = module
 module.__type = "ExplorerObject"
 Instance.RegisterClass(module)
@@ -10,6 +10,7 @@ local InputService = Engine:GetService("InputService")
 local CellHeight = 20
 
 module.new = function(object, depth, parentExplorerObject)
+	if object:IsA("EditorInstance") then return end
 	local self = setmetatable(module.Base.new(), module)
 
 	self.Name = object.Name
@@ -67,7 +68,7 @@ module.new = function(object, depth, parentExplorerObject)
 	self.ChildrenList.Position = UDim2.new(0, CellHeight, 0, CellHeight)
 	self.ChildrenList.Color = Color.new(0,0,0,0)
 	self.ChildrenList:SetParent(self)
-	self.ChildrenList.Visible = false
+	self.ChildrenList.Enabled = false
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
 	self.Layout.SortMode = Enum.SortMode.Name
@@ -75,7 +76,7 @@ module.new = function(object, depth, parentExplorerObject)
 	self.Layout:SetParent(self.ChildrenList)
 
 	self.ToggleButton.LeftClicked:Connect(function()
-		self.ChildrenList.Visible = not self.ChildrenList.Visible
+		self.ChildrenList.Enabled = not self.ChildrenList.Enabled
 	end)
 
 	self.Maid:GiveTask(self.Object:GetPropertyChangedSignal("Name"):Connect(function()
@@ -100,7 +101,7 @@ module.new = function(object, depth, parentExplorerObject)
 		self:Destroy()
 	end))
 
-	self.ChildrenList:GetPropertyChangedSignal("Visible"):Connect(function()
+	self.ChildrenList:GetPropertyChangedSignal("Enabled"):Connect(function()
 		self:UpdateScales()
 	end)
 	self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
@@ -162,7 +163,7 @@ function module:UpdateScales()
 	local height = self.Layout.AbsoluteContentSize.Y
 	self.ChildrenList.Size = UDim2.new(1, 0, 0, height)
 
-	if not self.ChildrenList.Visible then
+	if not self.ChildrenList.Enabled then
 		height = 0
 	end
 
@@ -178,13 +179,13 @@ function module:Update(dt)
 	module.Base.Update(self, dt)
 
 	if next(self.Object._children) then
-		self.ToggleButton.Visible = true
+		self.ToggleButton.Enabled = true
 	else
-		self.ToggleButton.Visible = false
-		self.ChildrenList.Visible = false
+		self.ToggleButton.Enabled = false
+		self.ChildrenList.Enabled = false
 	end
 
-	if self.ChildrenList.Visible then
+	if self.ChildrenList.Enabled then
 		self.ToggleButtonImage.Image = "Editor/Assets/Expanded.png"
 	else
 		self.ToggleButtonImage.Image = "Editor/Assets/Collapsed.png"

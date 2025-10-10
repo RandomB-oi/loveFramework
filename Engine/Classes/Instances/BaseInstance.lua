@@ -47,9 +47,9 @@ module.new = function()
 	self.AttributeSignals = {}
 
 	self:CreateProperty("Name", "string", "Instance"..self.ID)
-	self:CreateProperty("ZIndex", "number", 0)
-	self:CreateProperty("Visible", "boolean", true)
+	self:CreateProperty("Enabled", "boolean", true)
 	self:CreateProperty("Parent", "Instance", nil)
+	self:CreateProperty("Archivable", "boolean", true)
 
 	self.AncestryChanged = self.Maid:Add(Signal.new())
 	self.ChildAdded = self.Maid:Add(Signal.new())
@@ -171,7 +171,7 @@ function module:GetTags()
 end
 
 function module:DrawChildren()
-	if not self.Visible then return end
+	if not self.Enabled then return end
 	local zIndices = {}
 	local layers = {}
 	for _, child in ipairs(self:GetChildren()) do
@@ -201,7 +201,7 @@ function module:Update(dt)
 	end
 end
 function module:Draw()
-	if not self.Visible then return end
+	if not self.Enabled then return end
 	self:DrawChildren()
 end
 
@@ -287,13 +287,14 @@ function module:FindFirstAncestorWhichIsA(className)
 end
 
 function module:WaitForChild(name, timeout, recursive)
-	local begin = os.clock()
+	local run = Engine:GetService("RunService")
+	local begin = run.ElapsedTime
 
 	repeat
 		local child = self:FindFirstChild(name, recursive)
 		if child then return child end
 		task.wait()
-	until (os.clock() - begin) > (timeout or math.huge)
+	until (run.ElapsedTime - begin) > (timeout or math.huge)
 end
 
 function module:SearchPath(path)
@@ -316,6 +317,7 @@ function module:GetFullName()
 end
 
 function module:SetParent(newParent)
+	if not newParent then newParent = nil end
 	if self.Parent == newParent then return end
 
 	self.Maid.RemoveParent = nil
@@ -340,11 +342,52 @@ function module:SetParent(newParent)
 	self.AncestryChanged:Fire(newParent)
 end
 
-function module:IsVisible()
-	if self.Parent and not self.Parent:IsVisible() then
+function module:IsEnabled()
+	if self.Parent and not self.Parent:IsEnabled() then
 		return false
 	end
-	return self.Visible
+	return self.Enabled
+end
+
+function module:Clone(ignoreArchivable, _instanceMap, _toSet)
+	if not ignoreArchivable and not self.Archivable then return end
+
+	local first = not _instanceMap
+	local _instanceMap = _instanceMap or {}
+	local _toSet = _toSet or {}
+
+	local new = Instance.new(self.__type)
+
+	_instanceMap[self] = new
+	for prop, propInfo in pairs(self._properties) do
+		if propInfo.PropType == "Instance" then
+			_toSet[new] = _toSet[new] or {}
+			_toSet[new][prop] = {self[prop]} -- to get nil values
+		else
+			new[prop] = self[prop]
+		end
+	end
+
+	for _, child in pairs(self:GetChildren()) do
+		child:Clone(ignoreArchivable, _instanceMap, _toSet)
+	end
+
+	if first then
+		_toSet[new].Parent = nil
+		for object, props in pairs(_toSet) do
+			for name, value in pairs(props) do
+				local chosenValue = value[1] and _instanceMap[value[1]] or value[1]
+
+				if name == "Parent" then
+					object:SetParent(chosenValue)
+				else
+					object[name] = chosenValue
+				end
+			end
+		end
+	end
+
+	return new
 end
 
 function module:Destroy()
@@ -355,6 +398,7 @@ function module:Destroy()
 	repeat
 		local key, child = next(self._children)
 		if child then
+			self._children[key] = nil
 			child:Destroy()
 		end
 	until not key

@@ -4,10 +4,9 @@ local Classes = {}
 
 module.Classes = Classes
 module.new = function(className, ...)
-	local class = assert(Classes[className], tostring(className).." is an invalid instance type")
-	if not class.new then return end
+	local new = assert(Classes[className] and Classes[className].new, tostring(className).." is an invalid instance type")
 
-	return class.new(...)
+	return new(...)
 end
 
 module.GetClass = function(className)
@@ -55,7 +54,9 @@ local function ToLua(value)
 	end
 end
 
-function module.CreateScript(object, directory, env, parentVar)
+function module.CreatePrefab(object, directory, env, parentVar)
+	-- if not object.Archivable then return end
+
 	local env = env or {Lines = {}, VariableNames = CreateVariableNames(object)}
 
 	if not parentVar then
@@ -73,7 +74,7 @@ function module.CreateScript(object, directory, env, parentVar)
 
 	if next(object._children) then
 		for _, child in pairs(object:GetChildren()) do
-			module.CreateScript(child, nil, env, variableName)
+			module.CreatePrefab(child, nil, env, variableName)
 		end
 	end
 	for propName, propInfo in pairs(object._properties) do
@@ -125,6 +126,20 @@ function module.CreateScript(object, directory, env, parentVar)
 		end
 		return scriptCode
 	end
+end
+
+function module.BulkSetProperties(instance, properties)
+    for propName, value in pairs(properties) do
+        if propName == "Parent" then
+            instance:SetPArent(value)
+        else
+            instance[propName] = value
+        end
+    end
+
+    for _, child in pairs(instance:GetChildren()) do
+        module.BulkSetProperties(child, properties)
+    end
 end
 
 local function UpdateBases()

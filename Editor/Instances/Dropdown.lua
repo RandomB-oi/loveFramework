@@ -1,5 +1,5 @@
 local module = {}
-module.Derives = "Frame"
+module.Derives = "EditorInstance"
 module.__index = module
 module.__type = "Dropdown"
 Instance.RegisterClass(module)
@@ -13,7 +13,7 @@ module.new = function(list)
 	self.ZIndex = 100
 	self.Color = Color.new(0.5, 0.5, 0.5, 1)
 
-	self.List = self.Maid:Add(Instance.new("Frame"))
+	self.List = self.Maid:Add(Instance.new("ScrollingFrame"))
 	self.List.Size = UDim2.fromScale(1,1)
 	self.List.Color = Color.new(0, 0, 0, 0)
 	self.List:SetParent(self)
@@ -26,7 +26,8 @@ module.new = function(list)
 	self.ValueSelected = self.Maid:Add(Signal.new())
 
 	self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
-		self.Size = UDim2.new(0, 100, 0, size.Y)
+		self.Size = UDim2.new(0, 112, 0, math.min(size.Y, 200))
+		self.List.CanvasSize = UDim2.new(0, 0, 0, size.Y)
 	end)
 
 	self.Maid:GiveTask(Engine:GetService("InputService").InputBegan:Connect(function(input)
@@ -40,7 +41,7 @@ module.new = function(list)
 	for index, name in pairs(list) do
 		local newButton = Instance.new("Button")
 		newButton.Color = Color.new(0.3, 0.3, 0.3, 1)
-		newButton.Size = UDim2.new(1, 0, 0, 20)
+		newButton.Size = UDim2.new(1, -12, 0, 20)
 		newButton.LayoutOrder = index
 		newButton.Name = name
 		newButton:SetParent(self.List)

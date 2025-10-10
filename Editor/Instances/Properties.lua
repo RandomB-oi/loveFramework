@@ -16,16 +16,35 @@ module.new = function()
 	self.List.Color = Color.new(0,0,0,0)
 	self.List.Name = "List"
 	self:AttachGui(self.List)
-	self.PropertyFrames = {}
 
-	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
-	self.Layout.SortMode = Enum.SortMode.Name
-	self.Layout.Padding = UDim2.fromOffset(0, 0)
-	self.Layout:SetParent(self.List)
+	do
+		self.PropertyFrames = {}
+		self.PropertiesList = Instance.new("Frame")
+		self.PropertiesList.Color = Color.new(0,0,0,0)
+		self.PropertiesList:SetParent(self.List)
+		
+		local layout = self.Maid:Add(Instance.new("UIListLayout"))
+		layout.SortMode = Enum.SortMode.Name
+		layout.Padding = UDim2.fromOffset(0, 0)
+		layout:SetParent(self.PropertiesFrame)
 
-	self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
-		self.List.CanvasSize = UDim2.fromOffset(size.X or 0, size.Y or 0)
-	end)
+		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
+			self.PropertiesList.Size = UDim2.fromOffset(size.X or 0, size.Y or 0)
+		end)
+
+
+	end
+
+	do
+		local layout = self.Maid:Add(Instance.new("UIListLayout"))
+		layout.SortMode = Enum.SortMode.Name
+		layout.Padding = UDim2.fromOffset(0, 0)
+		layout:SetParent(self.List)
+
+		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
+			self.List.CanvasSize = UDim2.fromOffset(size.X or 0, size.Y or 0)
+		end)
+	end
 
 	local Selection = Engine:GetService("Selection")
 	self.Maid:GiveTask(Selection.SelectionChanged:Connect(function()
@@ -49,7 +68,7 @@ function module:UpdateProperties()
 	for propName, info in pairs(object._properties) do
 		local newFrame = Instance.new("PropertyFrame", propName, info.PropType)
 		newFrame.Name = propName
-		newFrame:SetParent(self.List)
+		newFrame:SetParent(self.PropertiesList)
 		newFrame:SetValue(object[propName])
 		self.PropertyFrames[propName] = newFrame
 

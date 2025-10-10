@@ -18,7 +18,7 @@ end
 function module:Updated(dt)
 	module.Base.Updated(self, dt)
 
-	local t = os.clock()
+	local t = Engine:GetService("RunService").ElapsedTime
 	local amount = 0
 	
 	for object, removeAt in pairs(self.Objects) do
@@ -35,7 +35,7 @@ function module:AddItem(item, lifeTime, dontUpdate)
 	if dontUpdate and self.Objects[item] then
 		return item
 	end
-	self.Objects[item] = os.clock() + lifeTime
+	self.Objects[item] = Engine:GetService("RunService").ElapsedTime + lifeTime
 	return item
 end
 

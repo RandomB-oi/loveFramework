@@ -24,7 +24,7 @@ module.new = function()
 	return self
 end
 function module:Draw()
-	if not self.Visible then return end
+	if not self.Enabled then return end
 	self.Color:Apply()
 	if self._imageObject then
 		local anchorSize = self:Translate()

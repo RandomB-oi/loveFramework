@@ -1,5 +1,5 @@
 local module = {}
-module.Derives = "Frame"
+module.Derives = "EditorInstance"
 module.__index = module
 module.__type = "Widget"
 Instance.RegisterClass(module)
