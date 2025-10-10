@@ -19,7 +19,7 @@ module.new = function(list)
 	self.List:SetParent(self)
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
-	-- self.Layout.SortMode = Enum.SortMode.Name
+	self.Layout.SortMode = Enum.SortMode.Name
 	self.Layout.Padding = UDim2.fromOffset(1, 1)
 	self.Layout:SetParent(self.List)
 

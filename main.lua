@@ -17,7 +17,6 @@ function love.load()
 	
 	require("Editor.main"):Open(GameScene)
 
-
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
 		-- local title = "Game" .. tostring(math.round(1/(dt)))

@@ -18,7 +18,7 @@ Enum:AddEnum("SoulMode", {
 	Bravery = Enum.NewEnum("SoulMode"),
 })
 
-module.new = function(battleArea, soulMode)
+module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	
 	self.Name = self.__type
@@ -28,19 +28,17 @@ module.new = function(battleArea, soulMode)
 	self.Color = Color.from255(255, 255, 255, 255)
 	self.ZIndex = 2
 
-	self.BattleArea = battleArea
-
 	self.MaxGravity = 400
 	self.GravitySpeed = self.MaxGravity
 	self.JumpVelocity = 350
 	self.HeldJump = false
 
-	self:CreateProperty("SoulMode", "SoulMode", soulMode or Enum.SoulMode.Determination)
+	self:CreateProperty("SoulMode", "SoulMode", Enum.SoulMode.Determination)
 
-	self.Position = UDim2.fromOffset(
-		self.BattleArea.RenderPosition.X + self.BattleArea.RenderSize.X/2,
-		self.BattleArea.RenderPosition.Y + self.BattleArea.RenderSize.Y/2
-	)
+	-- self.Position = UDim2.fromOffset(
+	-- 	self.BattleArea.RenderPosition.X + self.BattleArea.RenderSize.X/2,
+	-- 	self.BattleArea.RenderPosition.Y + self.BattleArea.RenderSize.Y/2
+	-- )
 
 	return self
 end
@@ -78,15 +76,23 @@ end
 function module:Update(dt)
 	module.Base.Update(self, dt)
 
+	if not self.Parent then return end
+
 	local InputService = Engine:GetService("InputService")
 
 	local xDir = (InputService:IsKeyPressed(Enum.KeyCode.D) and 1 or 0) - (InputService:IsKeyPressed(Enum.KeyCode.A) and 1 or 0)
 	local yDir = (InputService:IsKeyPressed(Enum.KeyCode.S) and 1 or 0) - (InputService:IsKeyPressed(Enum.KeyCode.W) and 1 or 0)
-	local moveSpeed = 200 * dt
 
-	local sceneRenderPos = self:GetScene().RenderPosition
-	local minPos = self.BattleArea.RenderPosition+(self.RenderSize/2)-sceneRenderPos
-	local maxPos = self.BattleArea.RenderPosition+self.BattleArea.RenderSize-(self.RenderSize/2)-sceneRenderPos
+	local scene = self:GetScene()
+
+	local parentScale = self.Parent.RenderSize/scene.RenderSize
+	local heartScale = self.RenderSize/self.Parent.RenderSize
+
+	local moveSpeed = (Vector.one*200)/self.Parent.RenderSize * dt --200 * dt
+
+
+	local minPos = heartScale/2
+	local maxPos = Vector.one-minPos
 
 	local positionAdd
 
@@ -130,7 +136,7 @@ function module:Update(dt)
 		end
 		self.GravitySpeed = math.min(self.GravitySpeed + self.MaxGravity*gravMul*dt, self.MaxGravity)
 
-		positionAdd = (inputAxis * moveAxis * moveSpeed) - (gravityAxis * self.GravitySpeed * dt)
+		positionAdd = (inputAxis * moveAxis * moveSpeed) - (gravityAxis * self.GravitySpeed * dt)/self.Parent.RenderSize
 	else
 		if self.SoulMode == Enum.SoulMode.Justice then
 			self.Rotation = 180
@@ -140,9 +146,9 @@ function module:Update(dt)
 		positionAdd = Vector.new(xDir, yDir) * moveSpeed
 	end
 
-	self.Position = UDim2.fromOffset(
-		math.clamp(self.Position.X.Offset + positionAdd.X, minPos.X, maxPos.X),
-		math.clamp(self.Position.Y.Offset + positionAdd.Y, minPos.Y, maxPos.Y)
+	self.Position = UDim2.fromScale(
+		math.clamp(self.Position.X.Scale + positionAdd.X, minPos.X, maxPos.X),
+		math.clamp(self.Position.Y.Scale + positionAdd.Y, minPos.Y, maxPos.Y)
 	)
 end
 

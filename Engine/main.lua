@@ -5,8 +5,9 @@ typeof = function(value)
 	end
 	return t
 end
+local oldPrint = print
 warn = function(...)
-	print(...)
+	oldPrint(...)
 end
 
 Enum = require("Engine.Classes.DataTypes.Enum")

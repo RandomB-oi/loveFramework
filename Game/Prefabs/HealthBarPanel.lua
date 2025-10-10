@@ -1,4 +1,4 @@
-return function()
+return function(parent)
 	local TextLabel1 = Instance.new("TextLabel")
 	local Frame3 = Instance.new("Frame")
 	local TextLabel2 = Instance.new("TextLabel")
@@ -32,5 +32,6 @@ return function()
 	Frame1.Position = UDim2.new(0.5, 0, 1, 0)
 	Frame1.AnchorPoint = Vector.new(0.5, 1)
 	Frame1.Size = UDim2.new(0, 340, 0, 50)
+	if parent then Frame1:SetParent(parent) end
 	return Frame1
 end

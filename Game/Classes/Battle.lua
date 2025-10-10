@@ -35,48 +35,10 @@ module.new = function(soulMode, turnLength)
 
 	self.Scene = GameScene:WaitForChild("BattleScene")
 
-	self.BattleBox = Instance.new("Frame")
-	self.BattleBox.Size = UDim2.new(0, -24, 0, -24)
-	self.BattleBox.Position = UDim2.fromScale(0.5, 0.5)
-	self.BattleBox.AnchorPoint = Vector.one/2
-	self.BattleBox.Color = Color.from255(0, 255, 0, 255)
-	self.BattleBox.ZIndex = -1
+	self.BattleBox = require("Game.Prefabs.BattleBox")()
 	self.BattleBox:SetParent(self.Scene)
 
-	self.BattleArea = Instance.new("Frame")
-	self.BattleArea.Size = UDim2.new(1, -24, 1, -24)
-	self.BattleArea.Position = UDim2.fromScale(0.5, 0.5)
-	self.BattleArea.AnchorPoint = Vector.one/2
-	self.BattleArea.Color = Color.from255(0, 0, 0, 255)
-	self.BattleArea:SetParent(self.BattleBox)
-
-	self.BottomMarker = self.Maid:Add(Instance.new("Frame")):AddTag("BattleGrounded"):SetAttribute("AxisLock", Vector.new(0, 1))
-	self.BottomMarker.Size = UDim2.new(1, 0, 0, 2)
-	self.BottomMarker.Position = UDim2.new(0.5, 0, 1, 0)
-	self.BottomMarker.AnchorPoint = Vector.new(0.5, 0.5)
-	self.BottomMarker.Color = Color.from255(0, 0, 0, 0)
-	self.BottomMarker:SetParent(self.BattleArea)
-
-	self.TopMarker = self.Maid:Add(Instance.new("Frame")):AddTag("BattleGrounded"):SetAttribute("AxisLock", Vector.new(0, -1))
-	self.TopMarker.Size = UDim2.new(1, 0, 0, 2)
-	self.TopMarker.Position = UDim2.new(0.5, 0, 0, 0)
-	self.TopMarker.AnchorPoint = Vector.new(0.5, 0.5)
-	self.TopMarker.Color = Color.from255(0, 0, 0, 0)
-	self.TopMarker:SetParent(self.BattleArea)
-
-	self.LeftMarker = self.Maid:Add(Instance.new("Frame")):AddTag("BattleGrounded"):SetAttribute("AxisLock", Vector.new(-1, 0))
-	self.LeftMarker.Size = UDim2.new(0, 2, 1, 0)
-	self.LeftMarker.Position = UDim2.new(0, 0, 0.5, 0)
-	self.LeftMarker.AnchorPoint = Vector.new(0.5, 0.5)
-	self.LeftMarker.Color = Color.from255(0, 0, 0, 0)
-	self.LeftMarker:SetParent(self.BattleArea)
-
-	self.RightMarker = self.Maid:Add(Instance.new("Frame")):AddTag("BattleGrounded"):SetAttribute("AxisLock", Vector.new(1, 0))
-	self.RightMarker.Size = UDim2.new(0, 2, 1, 0)
-	self.RightMarker.Position = UDim2.new(1, 0, 0.5, 0)
-	self.RightMarker.AnchorPoint = Vector.new(0.5, 0.5)
-	self.RightMarker.Color = Color.from255(0, 0, 0, 0)
-	self.RightMarker:SetParent(self.BattleArea)
+	self.BattleArea = self.BattleBox:FindFirstChild("BattleArea", true)
 	
 	self.HealthBarPanel = require("Game.Prefabs.HealthBarPanel")()
 	self.HealthBarPanel:SetParent(self.Scene)
@@ -86,58 +48,6 @@ module.new = function(soulMode, turnLength)
 	self.HealthBarBackdrop = self.HealthBarPanel:FindFirstChild("HealthBarBackdrop", true)
 	self.HealthBar = self.HealthBarPanel:FindFirstChild("HealthBar", true)
 
-	-- self.HealthBarPanel = Instance.new("Frame")
-	-- self.HealthBarPanel.Size = UDim2.fromOffset(250, 50)
-	-- self.HealthBarPanel.Position = UDim2.fromScale(0.5, 1)
-	-- self.HealthBarPanel.AnchorPoint = Vector.new(0.5, 1)
-	-- self.HealthBarPanel.Color = Color.from255(255, 255, 255, 0)
-	-- self.HealthBarPanel.Name = "HealthBarPanel"
-	-- self.HealthBarPanel:SetParent(self.Scene
-
-
-	-- self.HPLabel = Instance.new("TextLabel")
-	-- self.HPLabel.Size = UDim2.new(0, 50, 1, 0)
-	-- self.HPLabel.Position = UDim2.fromScale(0, 0)
-	-- self.HPLabel.AnchorPoint = Vector.new(0, 0)
-	-- self.HPLabel.Color = Color.from255(255, 255, 255, 255)
-	-- self.HPLabel.XAlignment = Enum.TextXAlignment.Center
-	-- self.HPLabel.YAlignment = Enum.TextYAlignment.Center
-	-- self.HPLabel.Text = "HP"
-	-- self.HPLabel.Name = "HPLabel"
-	-- self.HPLabel:SetParent(self.HealthBarPanel
-
-	-- self.HealthLabel = Instance.new("TextLabel")
-	-- self.HealthLabel.Size = UDim2.new(0, 150, 1, 0)
-	-- self.HealthLabel.Position = UDim2.fromScale(1, 0)
-	-- self.HealthLabel.AnchorPoint = Vector.new(1, 0)
-	-- self.HealthLabel.Color = Color.from255(255, 255, 255, 255)
-	-- self.HealthLabel.XAlignment = Enum.TextXAlignment.Center
-	-- self.HealthLabel.YAlignment = Enum.TextYAlignment.Center
-	-- self.HealthLabel.Text = ""
-	-- self.HealthLabel.Name = "HealthLabel"
-	-- self.HealthLabel:SetParent(self.HealthBarPanel
-
-
-	-- self.HealthBarBackdrop = Instance.new("Frame")
-	-- self.HealthBarBackdrop.Size = UDim2.new(1, -200, 1, 0)
-	-- self.HealthBarBackdrop.Position = UDim2.new(0, 50, 0, 0)
-	-- self.HealthBarBackdrop.AnchorPoint = Vector.new(0, 0)
-	-- self.HealthBarBackdrop.Color = Color.from255(255, 0, 0, 255)
-	-- self.HealthBarBackdrop.Name = "HealthBarBackdrop"
-	-- self.HealthBarBackdrop:SetParent(self.HealthBarPanel
-
-	-- self.HealthBar = Instance.new("Frame")
-	-- self.HealthBar.Size = UDim2.fromScale(0.25, 1)
-	-- self.HealthBar.Position = UDim2.fromScale(0, 0)
-	-- self.HealthBar.AnchorPoint = Vector.new(0, 0)
-	-- self.HealthBar.Color = Color.from255(255, 255, 0, 255)
-	-- self.HealthBar.Name = "HealthBar"
-	-- self.HealthBar:SetParent(self.HealthBarBackdrop
-
-	-- task.delay(1, function()
-	-- 	Instance.CreateScript(self.HealthBarPanel, "Game/HealthBarPanel.lua")
-	-- 	Instance.CreateScript(self.BattleBox, "Game/BattleBox.lua")
-	-- end)
 
 	self:ScaleHealth()
 	
@@ -153,11 +63,15 @@ module.new = function(soulMode, turnLength)
 		self.Done:Fire()
 	end)
 
-	self.Heart = self.Maid:Add(Instance.new("Soul", self.BattleArea, soulMode))
-	self.Heart:SetParent(self.Scene)
+	self.Heart = self.Maid:Add(Instance.new("Soul"))
+	self.Heart.Position = UDim2.fromScale(0.5, 0.5)
+	if soulMode then
+		self.Heart.SoulMode = soulMode
+	end
+	self.Heart:SetParent(self.BattleArea)
 
 	self.Maid:GiveTask(self.Scene.Updated:Connect(function(dt)
-		-- NewProjectile()
+		-- self:NewProjectile()
 		self:ScaleHealth()
 		
 		local touching, tpAmount = self.Heart:TouchingProjectile()
@@ -180,19 +94,23 @@ end
 
 
 
-local _lastProjectile = 0
-local function NewProjectile()
-	if os.clock() - _lastProjectile < 1/10 then
+function module:NewProjectile()
+	if os.clock() - (self._lastProjectile or 0) < 1/10 then
 		return
 	end
-	_lastProjectile = os.clock()
+	self._lastProjectile = os.clock()
 
-	
 	local angle = math.rad(math.random(1, 360))
 	local dir = Vector.FromAngle(angle) * -2000
-	local projectile = Instance.new("Projectile", dir, Scene.Heart):AddTag("Projectile")
-	projectile.Speed = 1500
-	projectile:SetParent(Scene)
+	
+    local diff = (self.Heart.RenderPosition + self.Heart.RenderSize * self.Heart.AnchorPoint-self.Heart:GetScene().RenderPosition) - dir
+	
+	local projectile = Instance.new("Projectile"):AddTag("Projectile")
+	projectile.Speed = 100
+	projectile.Position = UDim2.fromOffset(dir.X, dir.Y)
+    projectile.Rotation = math.deg(math.atan2(diff.Y, diff.X)+math.pi/2)
+	projectile:SetParent(self.Scene)
+	
 
 	Debris:AddItem(projectile, 5)
 end

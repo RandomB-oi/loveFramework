@@ -47,7 +47,7 @@ local function ToLua(value)
 	if type(value) == "table" and value.ToLua then
 		return value:ToLua()
 	elseif type(value) == "string" then
-		return "\""..value.."\""
+		return "[["..value.."]]"
 	elseif type(value) == "boolean" or type(value) == "number" then
 		return tostring(value)
 	else
@@ -59,7 +59,7 @@ function module.CreateScript(object, directory, env, parentVar)
 	local env = env or {Lines = {}, VariableNames = CreateVariableNames(object)}
 
 	if not parentVar then
-		table.insert(env.Lines, "return function()")
+		table.insert(env.Lines, "return function(parent)")
 	end
 	if not env.CreatedInstances then
 		env.CreatedInstances = true
@@ -105,6 +105,7 @@ function module.CreateScript(object, directory, env, parentVar)
 	end
 
 	if not parentVar then
+		table.insert(env.Lines, "if parent then "..variableName..":SetParent(parent) end")
 		table.insert(env.Lines, "return "..variableName)
 		table.insert(env.Lines, "end")
 

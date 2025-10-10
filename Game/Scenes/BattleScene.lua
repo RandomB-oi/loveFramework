@@ -10,7 +10,7 @@ Scene.Name = "BattleScene"
 Scene:SetParent(GameScene)
 -- Scene:Pause()
 
-require("Game.Prefabs.Frame")():SetParent(Scene)
+-- require("Game.Prefabs.Frame")():SetParent(Scene)
 -- local backdrop = Instance.new("Frame")
 -- backdrop.Size = UDim2.fromScale(1,1)
 -- backdrop.Color = Color.new(1,1,1,.25)
