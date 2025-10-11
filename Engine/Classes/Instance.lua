@@ -131,7 +131,7 @@ end
 function module.BulkSetProperties(instance, properties)
     for propName, value in pairs(properties) do
         if propName == "Parent" then
-            instance:SetPArent(value)
+            instance:SetParent(value)
         else
             instance[propName] = value
         end

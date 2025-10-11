@@ -3,7 +3,7 @@
 local module = {}
 module.Derives = "BaseInstance"
 module.__index = module
-module.__type = "Script"
+module.__type = "Script-DEPRECATED"
 Instance.RegisterClass(module)
 
 local LoadedServices = {}

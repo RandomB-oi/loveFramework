@@ -3,6 +3,6 @@ newScene.Name = "MainMenu"
 newScene:SetParent(GameScene)
 
 Instance.new("Hotbar"):SetParent(newScene)
-Instance.new("Script"):SetParent(newScene)
+Instance.new("WorldGenerator"):SetParent(newScene)
 
 return newScene

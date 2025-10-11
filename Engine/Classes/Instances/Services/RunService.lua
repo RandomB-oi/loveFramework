@@ -15,6 +15,8 @@ module.new = function ()
 	self._editor = false
 	self._currentRunningGame = nil
 
+	self:SetAttribute("test attribute", 10)
+
 	return self
 end
 

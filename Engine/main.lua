@@ -66,21 +66,45 @@ do -- load all instances
 		end
 	end
 
-	load("Engine.Classes.Instances", {
-		GUI = {
-			Layouts = {
-				"UIListLayout", "UILayoutBase"
-			},
-			"Frame", "Button", "ImageLabel", "TextLabel", "TextBox", "ScrollingFrame",
-		},
-		Services = {
-			"BaseService", "InputService", "TweenService", "Debris", "CollectionService", "Selection","RunService"
-		},
-		ValueObjects = {
-			"ValueBase", "NumberValue", "IntValue",
-		},
-		"BaseInstance", "Scene", "Folder","Script",
-	})
+	function autoLoad(path, ignoreList)
+		local tbl = {}
+
+		local directories = {}
+		local files = {}
+		
+		for i, fileName in pairs(love.filesystem.getDirectoryItems(path)) do
+			local isDirectory do
+				if love.filesystem.getInfo then
+					isDirectory = love.filesystem.getInfo(path.."/"..fileName).type == "directory"
+				else
+					isDirectory = love.filesystem.isDirectory(path.."/"..fileName)
+				end
+			end
+
+			if isDirectory then
+				table.insert(directories, {name = fileName, path = path.."/"..fileName})
+			elseif fileName:find(".lua") then
+				local objectName = string.split(fileName, ".")[1]
+				local fileDir = path.."/"..objectName
+				if ignoreList and not table.find(ignoreList, fileDir) or not ignoreList then
+					-- tbl[objectName] = require(fileDir)
+					local s, value = pcall(require, fileDir)
+					if s then
+						tbl[objectName] = value
+					end
+					-- rawset(required,"_fileName", objectName)
+				end
+			end
+		end
+
+		for _ , info in ipairs(directories) do
+			tbl[info.name] = autoLoad(info.path)
+		end
+		
+		return tbl
+	end
+
+	autoLoad("Engine/Classes/Instances", {"Engine/main.lua"})
 end
 
 Engine = Instance.new("Scene"):Enable():Unpause()
@@ -91,5 +115,6 @@ for className, info in pairs(Instance.Classes) do
 		Engine:GetService(className)
 	end
 end
+
 
 return Engine

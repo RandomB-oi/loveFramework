@@ -2,12 +2,7 @@ GameScene = Instance.new("Scene")
 GameScene.Name = "Test Game"
 GameScene:SetParent(Engine)
 
-
-load("Game", {
-	Classes = {},
-	Instances = {"Constants", "Hotbar"},
-	Scenes = {},
-})
+autoLoad("Game/Instances")
 
 love.window.setMode(800, 600, {resizable = true})
 

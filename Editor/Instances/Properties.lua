@@ -18,31 +18,47 @@ module.new = function()
 	self:AttachGui(self.List)
 
 	do
+		local layout = self.Maid:Add(Instance.new("UIListLayout"))
+		-- layout.SortMode = Enum.SortMode.Name
+		layout.Padding = UDim2.fromOffset(0, 12)
+		layout:SetParent(self.List)
+
+		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
+			self.List.CanvasSize = UDim2.fromOffset(size.X or 0, size.Y or 0)
+		end)
+	end
+
+	do
 		self.PropertyFrames = {}
 		self.PropertiesList = Instance.new("Frame")
 		self.PropertiesList.Color = Color.new(0,0,0,0)
+		self.PropertiesList.LayoutOrder = 1
 		self.PropertiesList:SetParent(self.List)
 		
 		local layout = self.Maid:Add(Instance.new("UIListLayout"))
 		layout.SortMode = Enum.SortMode.Name
 		layout.Padding = UDim2.fromOffset(0, 0)
-		layout:SetParent(self.PropertiesFrame)
+		layout:SetParent(self.PropertiesList)
 
 		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
-			self.PropertiesList.Size = UDim2.fromOffset(size.X or 0, size.Y or 0)
+			self.PropertiesList.Size = UDim2.new(1, 0, 0, size.Y or 0)
 		end)
-
-
 	end
 
 	do
+		self.AttributeFrames = {}
+		self.AttributesList = Instance.new("Frame")
+		self.AttributesList.Color = Color.new(0,0,0,0)
+		self.AttributesList.LayoutOrder = 2
+		self.AttributesList:SetParent(self.List)
+		
 		local layout = self.Maid:Add(Instance.new("UIListLayout"))
 		layout.SortMode = Enum.SortMode.Name
 		layout.Padding = UDim2.fromOffset(0, 0)
-		layout:SetParent(self.List)
+		layout:SetParent(self.AttributesList)
 
 		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
-			self.List.CanvasSize = UDim2.fromOffset(size.X or 0, size.Y or 0)
+			self.AttributesList.Size = UDim2.new(1, 0, 0, size.Y or 0)
 		end)
 	end
 
@@ -81,6 +97,24 @@ function module:UpdateProperties()
 				if object._properties[propName] then
 					object[propName] = newValue
 				end
+			end
+		end)
+	end
+
+	for attribute, value in pairs(object:GetAttributes()) do
+		local newFrame = Instance.new("PropertyFrame", attribute, typeof(value))
+		newFrame.Name = attribute
+		newFrame:SetParent(self.AttributesList)
+		newFrame:SetValue(value)
+		self.AttributeFrames[attribute] = newFrame
+
+		newFrame.Maid:GiveTask(object:GetAttributeChangedSignal(attribute):Connect(function()
+			newFrame:SetValue(object:GetAttribute(attribute))
+		end))
+
+		newFrame.PropertyChanged:Connect(function(newValue)
+			for _, object in ipairs(Selection:Get()) do
+				object:SetAttribute(attribute, newValue)
 			end
 		end)
 	end

@@ -1,17 +1,13 @@
---DEPRECATED
-
 local module = {}
 module.Derives = "BaseInstance"
 module.__index = module
 module.__type = "Script"
 Instance.RegisterClass(module)
 
-local LoadedServices = {}
 module.ClassIcon = "Engine/Assets/InstanceIcons/Script.png"
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
-	self:SetParent(nil)
 
 	self.Name = "Script"
 	self:CreateProperty("Value", "number", 0)
