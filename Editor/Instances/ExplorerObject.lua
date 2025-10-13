@@ -7,6 +7,7 @@ Instance.RegisterClass(module)
 local Selection = Engine:GetService("Selection")
 local InputService = Engine:GetService("InputService")
 
+local DefaultExpanded = false
 local CellHeight = 20
 
 module.new = function(object, depth, parentExplorerObject)
@@ -68,7 +69,7 @@ module.new = function(object, depth, parentExplorerObject)
 	self.ChildrenList.Position = UDim2.new(0, CellHeight, 0, CellHeight)
 	self.ChildrenList.Color = Color.new(0,0,0,0)
 	self.ChildrenList:SetParent(self)
-	self.ChildrenList.Enabled = false
+	self.ChildrenList.Enabled = not not DefaultExpanded
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
 	self.Layout.SortMode = Enum.SortMode.Name
@@ -97,7 +98,6 @@ module.new = function(object, depth, parentExplorerObject)
 			first = true
 			return
 		end
-		print("ancestry changed")
 		self:Destroy()
 	end))
 

@@ -333,10 +333,10 @@ function module:SetParent(newParent)
 			newParent.ChildRemoved:Fire(self)
 		end
 
-		local scene = newParent:GetScene()
-		if scene then
-			scene._canvasNeedsUpdate = true
-		end
+		-- local scene = newParent:GetScene()
+		-- if scene then
+		-- 	scene._canvasNeedsUpdate = true
+		-- end
 	end
 
 	self.AncestryChanged:Fire(newParent)
@@ -366,6 +366,9 @@ function module:Clone(ignoreArchivable, _instanceMap, _toSet)
 		else
 			new[prop] = self[prop]
 		end
+	end
+	for attribute, value in pairs(self:GetAttributes()) do
+		new:SetAttribute(attribute, value)
 	end
 
 	for _, child in pairs(self:GetChildren()) do

@@ -3,6 +3,8 @@ newScene.Name = "MainMenu"
 newScene:SetParent(GameScene)
 
 Instance.new("Hotbar"):SetParent(newScene)
-Instance.new("WorldGenerator"):SetParent(newScene)
+local worldGenScript = Instance.new("WorldGeneratorScript")
+worldGenScript.Seed = 67
+worldGenScript:SetParent(newScene)
 
 return newScene

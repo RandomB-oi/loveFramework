@@ -73,14 +73,15 @@ function module:Draw()
 	love.graphics.setCanvas(self.Canvas)
 	love.graphics.clear()
 	love.graphics.push()
-	love.graphics.translate(-self.RenderPosition.X, -self.RenderPosition.Y)
+	local renderPosition = self.RenderPosition - self:GetScene().RenderPosition
+	love.graphics.translate(-renderPosition.X, -renderPosition.Y)
 
 	module.Base.Draw(self)
 	
 	love.graphics.pop()
 	Color.White:Apply()
 	love.graphics.setCanvas(prevCanvas)
-	love.graphics.cleanDrawImage(self.Canvas, self.RenderPosition, self.RenderSize)
+	love.graphics.cleanDrawImage(self.Canvas, renderPosition, self.RenderSize)
 
 	local scrollbarThickness = 12
 	if self.RenderSize.Y ~= self.RenderCanvasSize.Y then
@@ -88,8 +89,8 @@ function module:Draw()
 		local scrollbarHeight = self.RenderSize.Y * (self.RenderSize.Y/self.RenderCanvasSize.Y)
 
 		love.graphics.rectangle("fill",
-			self.RenderPosition.X + self.RenderSize.X - scrollbarThickness,
-			self.RenderPosition.Y +  (self.RenderSize.Y - scrollbarHeight) * scrollPercent,
+			renderPosition.X + self.RenderSize.X - scrollbarThickness,
+			renderPosition.Y +  (self.RenderSize.Y - scrollbarHeight) * scrollPercent,
 			scrollbarThickness,
 			scrollbarHeight
 		)
@@ -99,8 +100,8 @@ function module:Draw()
 		local scrollbarHeight = self.RenderSize.X * (self.RenderSize.X/self.RenderCanvasSize.X)
 
 		love.graphics.rectangle("fill",
-		self.RenderPosition.X +  (self.RenderSize.X - scrollbarHeight) * scrollPercent,
-		self.RenderPosition.Y + self.RenderSize.Y - scrollbarThickness,
+		renderPosition.X +  (self.RenderSize.X - scrollbarHeight) * scrollPercent,
+		renderPosition.Y + self.RenderSize.Y - scrollbarThickness,
 			scrollbarHeight,
 			scrollbarThickness
 		)

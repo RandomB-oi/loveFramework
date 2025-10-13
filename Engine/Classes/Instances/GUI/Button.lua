@@ -48,7 +48,8 @@ function module:Draw()
 	else
 		self.Color:Apply()
 	end
-	love.graphics.rectangle("fill", self.RenderPosition.X, self.RenderPosition.Y, self.RenderSize.X, self.RenderSize.Y)
+	local renderPosition = self.RenderPosition - self:GetScene().RenderPosition
+	love.graphics.rectangle("fill", renderPosition.X, renderPosition.Y, self.RenderSize.X, self.RenderSize.Y)
 
 	module.Base.Draw(self)
 end

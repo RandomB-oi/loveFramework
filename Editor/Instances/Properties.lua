@@ -77,6 +77,10 @@ function module:UpdateProperties()
 		frame:Destroy()
 		self.PropertyFrames[propName] = nil
 	end
+	for propName, frame in pairs(self.AttributeFrames) do
+		frame:Destroy()
+		self.AttributeFrames[propName] = nil
+	end
 
 	local object = Selection:Get()[1]
 	if not object then return end
@@ -118,6 +122,21 @@ function module:UpdateProperties()
 			end
 		end)
 	end
+
+	
+	-- local addAttributeButton = Instance.new("Button")
+	-- addAttributeButton:SetParent(self.AttributesList)
+	-- addAttributeButton.Name = "!!!!!"
+	-- addAttributeButton.Size = UDim2.new(1,0,0, 20)
+	-- addAttributeButton.Color = Color.new(.1,.1,.1,1)
+	-- self.AttributeFrames[addAttributeButton] = addAttributeButton
+
+	
+	-- local textLabel = self.Maid:Add(Instance.new("TextLabel"))
+	-- textLabel.Size = UDim2.new(1, 0, 1, 0)
+	-- textLabel.Position = UDim2.new(0, 0, 0, 0)
+	-- textLabel.Text = "Add Attribute"
+	-- textLabel:SetParent(addAttributeButton)
 end
 
 return module

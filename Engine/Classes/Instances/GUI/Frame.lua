@@ -57,13 +57,13 @@ function module:Update(dt)
 	-- end
 
 	-- if self._changed then
-		self._changed = false
+		-- self._changed = false
 		self:UpdateRender()
 
-		local scene = self:GetScene()
-		if scene then
-			scene._canvasNeedsUpdate = true
-		end
+		-- local scene = self:GetScene()
+		-- if scene then
+		-- 	scene._canvasNeedsUpdate = true
+		-- end
 	-- end
 	module.Base.Update(self, dt)
 end
@@ -71,7 +71,8 @@ end
 function module:Translate()
 	love.graphics.push()
 	local anchorSize = self.RenderSize * self.AnchorPoint
-	love.graphics.translate(self.RenderPosition.X+anchorSize.X, self.RenderPosition.Y+anchorSize.Y)
+	local scenePosition = self:GetScene().RenderPosition
+	love.graphics.translate(self.RenderPosition.X+anchorSize.X-scenePosition.X, self.RenderPosition.Y+anchorSize.Y-scenePosition.Y)
 	love.graphics.rotate(math.rad(self.RenderRotation))
 
 	return anchorSize

@@ -24,17 +24,4 @@ function module:GetValue(x)
     end
 end
 
--- module.Start = function()
---     local sequence = module.new({
---         {0, Color.new(0,0,0,1)},
---         {0.333, Color.new(1,0,0,1)},
---         {0.666, Color.new(0,1,0,1)},
---         {1, Color.new(0,0,1,1)},
---     })
-
---     local point = sequence:GetValue(0.5)
-
---     print(point.R, point.G, point.B, point.A)
--- end
-
 return module

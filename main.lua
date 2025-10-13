@@ -5,7 +5,7 @@ local RunService = EngineScene:GetService("RunService")
 do
 	RunService._editor = true
 	RunService._running = false
-	RunService.TimeScale = 1/10
+	RunService.TimeScale = 1
 end
 
 function love.load()
@@ -21,7 +21,6 @@ function love.load()
 		Editor = require("Editor.main"):Open(GameScene)
 
 		task.spawn(function()
-			print("do auto save loop")
 			while task.wait(30) do
 				if not RunService:IsRunning() then
 					print("autoSave")
@@ -51,6 +50,11 @@ function love.load()
 
 	function love.draw()
 		EngineScene:Draw()
+		for _, v in pairs(Instance.GetClass("BaseInstance").All) do
+			-- if v:IsA("Scene") then
+			-- 	love.graphics.drawOutline(v.RenderPosition, v.RenderSize)
+			-- end
+		end
 	end
 end
 

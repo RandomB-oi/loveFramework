@@ -11,8 +11,9 @@ module.FrameRendering = false
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	self:SetParent(nil)
-
+	
 	self.Name = "Scene"
+	self.Canvas = nil
 	self:CreateProperty("Paused", "boolean", false)
 
 	self.Size = UDim2.fromScale(1,1)
@@ -26,9 +27,6 @@ module.new = function()
 			self.Canvas = nil
 		end
 	end)
-	
-	-- self.Camera = Instance.new("camera", self)
-	-- self.Maid:GiveTask(self.camera)
 
 	return self
 end
@@ -51,6 +49,29 @@ function module:Update(dt)
 	self:CheckProperties()
 	if not (self.Enabled and not self.Paused) then return end
 
+
+
+	self:UpdateRender()
+
+	local desiredSize = Vector.new(math.round(self.RenderSize.X), math.round(self.RenderSize.Y))
+	local canvasX, canvasY
+	if self.Canvas then
+		canvasX, canvasY = self.Canvas:getDimensions()
+		canvasX = math.round(canvasX)
+		canvasY = math.round(canvasY)
+	end
+
+	if desiredSize.X ~= canvasX or desiredSize.Y ~= canvasY then
+		if self.Canvas then
+			self.Canvas:release()
+			self.Canvas = nil
+		end
+
+		if desiredSize.X >= 1 and desiredSize.Y >= 1 then
+			self.Canvas = love.graphics.newCanvas(desiredSize.X, desiredSize.Y)
+		end
+	end
+
 	self.Updated:Fire(dt)
 	for _, child in ipairs(self:GetChildren()) do
 		child:Update(dt)
@@ -59,7 +80,6 @@ end
 
 function module:Draw()
 	if not (self.Enabled) then return end
-	self:UpdateRender()
 
 	-- local desiredSize = self.RenderSize
 	-- local renderPosition = self.RenderPosition or Vector.zero
@@ -84,24 +104,24 @@ function module:Draw()
 	-- 	end
 	-- end
 
-	-- if not self.Canvas then return end
+	if not self.Canvas then print("no canvas for ",self.Name) return end
 	self.Drawn:Fire()
 
 	-- local parentPos = self.Parent and self.Parent.RenderPosition or Vector.zero
 
-	-- love.graphics.push()
-	-- love.graphics.setCanvas(self.Canvas)
-	-- love.graphics.translate(-self.RenderPosition.X, -self.RenderPosition.Y)
-	-- love.graphics.clear()
-	self:DrawChildren()
-	-- love.graphics.setCanvas()
-	-- love.graphics.pop()
+	local prevCanvas = love.graphics.getCanvas()
 
-	-- Color.White:Apply()
-	-- love.graphics.push()
-	-- love.graphics.translate(self.RenderPosition.X, self.RenderPosition.Y)
-	-- love.graphics.draw(self.Canvas, 0,0)
-	-- love.graphics.pop()
+	love.graphics.setCanvas(self.Canvas)
+	love.graphics.clear()
+	self:DrawChildren()
+
+	love.graphics.setCanvas(prevCanvas)
+
+	self.Color:Apply()
+	
+	local scene = self:FindFirstAncestorWhichIsA("Scene")
+	local sceneOffset = scene and scene.RenderPosition or Vector.zero
+	love.graphics.cleanDrawImage(self.Canvas, self.RenderPosition-sceneOffset, self.RenderSize)
 end
 
 function module:Pause()

@@ -4,18 +4,12 @@ local function doTask(task)
 		local f = (task.destroy or task.Destroy or task.disconnect or task.Disconnect or task.release or task.close)
 		if f then
 			local s,e = pcall(coroutine.wrap(f), task)
-			-- if not s and e then print(e) end
 		end
 	elseif t == "function" then
 		local s,e = pcall(coroutine.wrap(task))
 		if not s and e then
 			print(e)
 		end
-	-- elseif t == "thread" then
-	-- 	local s,e = pcall(coroutine.yield)
-	-- 	if not s and e then
-	-- 		print(e)
-	-- 	end
 	end
 end
 

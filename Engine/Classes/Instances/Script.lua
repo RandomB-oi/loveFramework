@@ -10,10 +10,12 @@ module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 
 	self.Name = "Script"
-	self:CreateProperty("Value", "number", 0)
 
 	if Engine:GetService("RunService"):IsRunning() then
 		task.spawn(function()
+			if not self.Parent then
+				self:GetPropertyChangedSignal("Parent"):Wait()
+			end
 			self:ScriptInit()
 			self._scriptInitDone = true
 		end)

@@ -141,7 +141,7 @@ function module:Draw()
 	if not self.Enabled then return end
 
 	if self.Focused then
-		love.graphics.drawOutline(self.RenderPosition, self.RenderSize)
+		love.graphics.drawOutline(self.RenderPosition - self:GetScene().RenderPosition, self.RenderSize)
 	end
 
 	module.Base.Draw(self)
