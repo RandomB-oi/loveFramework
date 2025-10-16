@@ -4,6 +4,7 @@ GameScene:SetParent(Engine)
 
 autoLoad("Game/Classes")
 autoLoad("Game/Instances")
+Instance.GetClass("Block").Init()
 
 love.window.setMode(800, 600, {resizable = true})
 

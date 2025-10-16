@@ -3,7 +3,7 @@ return function()
 	newScene.Name = "EditorScene"
 	newScene:SetParent(EditorScene)
 	newScene.ZIndex = 10
-	newScene.Size = UDim2.new(1,-50, 1,-50)
+	newScene.Size = UDim2.new(1, 0, 1, 0)
 	newScene.Rotation = 0
 	newScene.Position = UDim2.fromScale(0.5, 0.5)
 	newScene.AnchorPoint = Vector.one/2

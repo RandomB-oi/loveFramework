@@ -19,6 +19,9 @@ return function(parent)
 	Frame1.AnchorPoint = Vector.new(0.5, 1)
 	Frame1.Archivable = false
 	Frame1.Position = UDim2.new(0.5, 0, 1, 0)
+
+	
+
 	if parent then Frame1:SetParent(parent) end
 	return Frame1
 end

@@ -11,7 +11,7 @@ local DefaultExpanded = false
 local CellHeight = 20
 
 module.new = function(object, depth, parentExplorerObject)
-	if object:IsA("EditorInstance") then return end
+	if object:IsA("EditorInstance") or object.Hidden then return end
 	local self = setmetatable(module.Base.new(), module)
 
 	self.Name = object.Name

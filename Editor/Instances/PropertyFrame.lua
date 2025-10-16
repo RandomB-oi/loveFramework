@@ -60,6 +60,19 @@ local PropConverters = {
 			)
 		end
 	},
+	NumberRange = {
+		tostring = function(value)
+			return stringRound(value.Min)..", "..stringRound(value.Max)
+		end,
+		tovalue = function(str)
+			local split = string.split(str, ",")
+
+			return NumberRange.new(
+				tonumber(split[1]) or 0,
+				tonumber(split[2]) or 0
+			)
+		end
+	},
 	number = {
 		tostring = stringRound,
 		tovalue = tonumber,

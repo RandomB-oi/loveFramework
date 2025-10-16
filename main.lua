@@ -15,6 +15,10 @@ function love.load()
 	local fileName = "ExportedInstances/AutoSave"..ID..".lua"
 	
 	-- local GameScene = require("ExportedInstances.SavedGame")()
+	if not RunService:IsEditor() then
+		RunService._running = true
+	end
+
 	local GameScene = require("Game.main")
 
 	if RunService:IsEditor() then
@@ -36,8 +40,8 @@ function love.load()
 		dt = math.clamp(dt, 0, 1/15)
 		dt = dt * RunService.TimeScale
 		RunService.ElapsedTime = RunService.ElapsedTime + dt
-		-- local title = "Game" .. tostring(math.round(1/(dt)))
-		local title = GameScene.Name.." - "..tostring(#GameScene:GetChildren(true).. " instances")
+		local title = GameScene.Name.." - "..tostring(math.round(1/(dt)))
+		-- local title = GameScene.Name.." - "..tostring(#GameScene:GetChildren(true).. " instances")
 		EngineScene:Unpause():Enable()
 		EngineScene.Name = title
 		love.window.setTitle(title)
