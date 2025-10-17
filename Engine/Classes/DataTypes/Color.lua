@@ -1,7 +1,7 @@
 local module = {}
 module.__index = module
 module.__type = "Color"
-
+--0-1
 module.new = function(r,g,b, a)
 	return setmetatable({
 		R = r or 1,
@@ -28,12 +28,14 @@ end
 	return p
 end
 
+--0-255
 module.fromHSV = function(h, s, l, a)
     local r, g, b
 
     h = (h / 255)
-    s = (s / 100)
-    l = (l / 100)
+    s = (s / 255)
+    l = (l / 255)
+	a = (a / 255)
 
     if s == 0 then
         r, g, b = l, l, l -- achromatic

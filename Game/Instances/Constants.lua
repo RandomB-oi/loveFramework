@@ -8,8 +8,15 @@ module.new = function()
 	local self = setmetatable(module.Base.new(), module)
     self.Name = self.__type
 
-    self:CreateProperty("Health", "number", 0, "Int")
-    self:CreateProperty("WorldSeed", "number", 0, "Int")
+    -- generic movement
+    self:CreateProperty("MoveLeft", "KeyCode", Enum.KeyCode.A)
+    self:CreateProperty("MoveRight", "KeyCode", Enum.KeyCode.D)
+    self:CreateProperty("Jump", "KeyCode", Enum.KeyCode.Space)
+    
+    -- flying
+    self:CreateProperty("MoveUp", "KeyCode", Enum.KeyCode.W)
+    self:CreateProperty("MoveDown", "KeyCode", Enum.KeyCode.S)
+    self:CreateProperty("ToggleFlight", "KeyCode", Enum.KeyCode.H)
 
 	return self
 end

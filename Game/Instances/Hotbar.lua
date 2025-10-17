@@ -10,7 +10,13 @@ module.new = function()
     self.Color = Color.new(0,0,0,0)
     self.Size = UDim2.new(1, 0, 1, 0)
 
-    Instance.BulkSetProperties(require("Game.Prefabs.Hotbar")(self), {Archivable = false})
+    local panel = require("Game.Prefabs.Hotbar")(self)
+    Instance.BulkSetProperties(panel, {Archivable = false})
+
+    local slotPrefab = require("Game.Prefabs.ItemSlot")
+    for i = 1, 5 do
+        Instance.BulkSetProperties(slotPrefab(panel), {Archivable = false})
+    end
 
 
 	return self

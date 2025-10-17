@@ -54,6 +54,15 @@ function module:__mul(other)
 	)
 end
 
+function module:__unm()
+	return module.new(
+		-self.X.Scale,
+		-self.X.Offset,
+		-self.Y.Scale,
+		-self.Y.Offset
+	)
+end
+
 function module:Calculate(size)
 	return Vector.new(
 		size.X * self.X.Scale + self.X.Offset,

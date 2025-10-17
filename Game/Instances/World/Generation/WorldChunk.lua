@@ -37,7 +37,7 @@ function module:Draw()
     for x, row in pairs(self.Blocks) do
         for y, block in pairs(row) do
             if block and blockClass.Blocks[block] then
-                blockClass.Blocks[block]:Render(x-1,y-1, self.World)
+                blockClass.Blocks[block]:Render(x,y, self, self.World)
             end
         end
     end

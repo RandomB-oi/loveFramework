@@ -13,7 +13,11 @@ module.new = function()
 	self:CreateProperty("Seed", "number", 0)
 	self:CreateProperty("ChunkSize", "number", 8, "Int")
 	self:CreateProperty("BlockSize", "number", 20, "Int")
-	self:CreateProperty("Gravity", "Vector", Vector.new(0, 4))
+	self:CreateProperty("Gravity", "Vector", Vector.new(0, 50))
+	self:CreateProperty("LocalPlayer", "Instance", nil)
+
+    
+	self:CreateProperty("Sat_Value", "Vector", Vector.new(50, 50))
 
 	return self
 end
@@ -46,13 +50,22 @@ function module:ScriptInit()
         until not deletedAny
     end)
 
-	self.entityTest = Instance.new("Entity")
-	self.entityTest:SetWorld(self)
+    if self.LocalPlayer then
+        self.LocalPlayer:SetWorld(self)
+    end
+end
+
+
+function module:PushGraphics()
+	local p = self.WorldFrame.RenderPosition - self:GetScene().RenderPosition
+	love.graphics.push()
+	love.graphics.translate(p.X, p.Y)
 end
 
 function module:GetChunkLoaderPositions()
     return {
-        Vector.new(self.entityTest.Position.X.Offset, self.entityTest.Position.Y.Offset)/self.BlockSize
+        Vector.zero,
+        self.LocalPlayer and self.LocalPlayer:GetPosition()
     }
 end
 
@@ -84,29 +97,97 @@ function module:UpdateLoadedChunks()
     end
 end
 
+function module:SetLocalPlayer(player)
+    self.LocalPlayer = player
+    if self.LocalPlayer then
+        if self._scriptInitDone then
+            self.LocalPlayer:SetWorld(self)
+        else
+            self.LocalPlayer:SetParent(self)
+        end
+    end
+end
+
 function module:ScriptUpdate(dt)
     local moveSpeed = 500
-    if Input:IsKeyPressed(Enum.KeyCode.W) then
-        self.WorldFrame.Position = self.WorldFrame.Position + UDim2.fromOffset(0, dt*moveSpeed)
-    end
-    if Input:IsKeyPressed(Enum.KeyCode.S) then
-        self.WorldFrame.Position = self.WorldFrame.Position - UDim2.fromOffset(0, dt*moveSpeed)
-    end
+    -- if Input:IsKeyPressed(Enum.KeyCode.W) then
+    --     self.WorldFrame.Position = self.WorldFrame.Position + UDim2.fromOffset(0, dt*moveSpeed)
+    -- end
+    -- if Input:IsKeyPressed(Enum.KeyCode.S) then
+    --     self.WorldFrame.Position = self.WorldFrame.Position - UDim2.fromOffset(0, dt*moveSpeed)
+    -- end
     
-    if Input:IsKeyPressed(Enum.KeyCode.A) then
-        self.WorldFrame.Position = self.WorldFrame.Position + UDim2.fromOffset(dt*moveSpeed, 0)
-    end
+    -- if Input:IsKeyPressed(Enum.KeyCode.A) then
+    --     self.WorldFrame.Position = self.WorldFrame.Position + UDim2.fromOffset(dt*moveSpeed, 0)
+    -- end
     
-    if Input:IsKeyPressed(Enum.KeyCode.D) then
-        self.WorldFrame.Position = self.WorldFrame.Position - UDim2.fromOffset(dt*moveSpeed, 0)
-    end
+    -- if Input:IsKeyPressed(Enum.KeyCode.D) then
+    --     self.WorldFrame.Position = self.WorldFrame.Position - UDim2.fromOffset(dt*moveSpeed, 0)
+    -- end
 
-    local lmx, lmy = love.mouse.getPosition()
-	local parentPos = self.WorldFrame.RenderPosition
-	local mousePosition = UDim2.fromOffset(lmx - parentPos.X, lmy - parentPos.Y)
-    self.entityTest.Position = mousePosition
+    if self.LocalPlayer then
+        self.WorldFrame.Position = -self.LocalPlayer.Position + UDim2.fromScale(0.5, 0.5)
+    end
 
     self:UpdateLoadedChunks()
+end
+
+function module:GetChunk(x,y)
+	return self.Chunks[x] and self.Chunks[x][y]
+end
+
+function module:RemoveChunk(x,y)
+    local chunk = self:GetChunk(x,y)
+    if not chunk then return end
+    chunk:Destroy()
+
+    self.Chunks[x][y] = nil
+    if not next(self.Chunks[x]) then
+        self.Chunks[x] = nil
+    end
+end
+
+function module:CreateChunk(x,y)
+	if self:GetChunk(x,y) then return end
+    if not self.Chunks[x] then
+        self.Chunks[x] = {}
+    end
+    self.Chunks[x][y] = -1
+    local newChunk = Instance.new("WorldChunk", self, x,y)
+    self.Chunks[x][y] = newChunk
+
+    return newChunk
+end
+
+function module:GetChunkCoordinates(x, y)
+    return math.floor(x/(self.ChunkSize)), math.floor(y/(self.ChunkSize))
+end
+
+function module:WriteBlock(x,y, name)
+    
+end
+
+function module:ReadBlock(x,y)
+    local cx, cy = self:GetChunkCoordinates(x,y)
+    local chunk = self:GetChunk(cx, cy)
+
+    if not chunk or chunk == -1 then
+        return -1
+    end
+
+    return chunk:ReadBlock(chunk:GetChunkCoordinates(x,y))
+end
+
+function module:GetGrassColor(x, y)
+    return Color.new(0,0,0,1)
+end
+
+function module:GenerateChunk(chunk)
+	for x = 0, self.ChunkSize-1 do
+		for y = 0, self.ChunkSize-1 do
+            chunk:WriteBlock(x,y, "dirt_block")
+		end
+	end
 end
 
 function module:RaycastBlocks(origin, direction)
@@ -142,23 +223,23 @@ function module:RaycastBlocks(origin, direction)
 	end
 
 	local totalT = 0
-	local lastNormal = nil
-
-    bx = bx + 1
-    by = by + 1
-
-	-- extend the max travel distance slightly (tiny epsilon)
+	local lastNormal = Vector.yAxis
 	local maxT = length + 1e-6
 
 	while totalT <= maxT do
 		local block = self:ReadBlock(bx, by)
 		if block and block ~= -1 then
 			return {
+                Origin = origin,
+                Direction = direction * length,
+
 				X = bx,
 				Y = by,
 				Block = block,
+
 				HitPos = origin + dir * math.min(totalT, length),
 				Normal = lastNormal,
+
 				Distance = totalT
 			}
 		end
@@ -180,122 +261,10 @@ function module:RaycastBlocks(origin, direction)
 	return nil
 end
 
-
-
--- function module:Draw()
---     module.Base.Draw(self)
-
---     if not self._scriptInitDone then return end
---     love.graphics.push()
---     local translated = self.WorldFrame.RenderPosition - self:GetScene().RenderPosition
---     love.graphics.translate(translated.X, translated.Y)
-
-
---     local lmx, lmy = love.mouse.getPosition()
--- 	local parentPos = self.WorldFrame.RenderPosition
--- 	local mousePosition = Vector.new(lmx - parentPos.X, lmy - parentPos.Y) / self.BlockSize
-
---     local origin = Vector.new(8, -4)
---     local direction = mousePosition - origin
---     local intersection = self:RaycastBlocks(origin, direction)
-
---     local pos = origin * self.BlockSize
---     local dir = direction * self.BlockSize
---     local pos2 = pos + dir
-
---     Color.White:Apply()
---     love.graphics.circle("fill", pos.X, pos.Y, 4)
---     love.graphics.line(pos.X, pos.Y, pos2.X, pos2.Y)
-
---     if intersection then
---         local pos = intersection.HitPos * self.BlockSize
---         local pos2 = pos + intersection.Normal * 20
---         love.graphics.circle("fill", pos.X, pos.Y, 4)
---         love.graphics.line(pos.X, pos.Y,pos2.X, pos2.Y)
---     end
-
---     love.graphics.pop()
-
--- end
-
-
-function module:GetChunk(x,y)
-	return self.Chunks[x] and self.Chunks[x][y]
-end
-
-function module:RemoveChunk(x,y)
-    local chunk = self:GetChunk(x,y)
-    if not chunk then return end
-    chunk:Destroy()
-
-    self.Chunks[x][y] = nil
-    if not next(self.Chunks[x]) then
-        self.Chunks[x] = nil
-    end
-end
-
-function module:CreateChunk(x,y)
-	if self:GetChunk(x,y) then return end
-    if not self.Chunks[x] then
-        self.Chunks[x] = {}
-    end
-    self.Chunks[x][y] = -1
-    local newChunk = Instance.new("WorldChunk", self, x,y)
-    self.Chunks[x][y] = newChunk
-
-    return newChunk
-end
-
-function module:GetChunkCoordinates(x, y)
-    return math.floor((x-1)/(self.ChunkSize)), math.floor((y-1)/(self.ChunkSize))
-end
-
-function module:WriteBlock(x,y, name)
-    
-end
-
-function module:ReadBlock(x,y)
-    local cx, cy = self:GetChunkCoordinates(x,y)
-    local chunk = self:GetChunk(cx, cy)
-
-    if not chunk or chunk == -1 then
-        return -1
-    end
-
-    return chunk:ReadBlock(chunk:GetChunkCoordinates(x,y))
-end
-
-function module:GenerateChunk(chunk)
-    local surfaceLevel = 3
-
-    local seed = self.Seed -- 10, 100
-    
-    local freq, amp = 0.049, 25
-
-	for x = 1, self.ChunkSize do
-        local wx = chunk:GetWorldCoordinates(x)
-
-        local noise = love.math.noise(wx*freq, seed*freq) * amp
-        local height = math.round(surfaceLevel+noise)
-
-		for y = 1, self.ChunkSize do
-            local _, wy = chunk:GetWorldCoordinates(nil, y)
-
-            local block
-            if wy >= height then
-                if wy == height then
-                    block = "grass_block"
-                elseif wy < height+5 then
-                    block = "dirt_block"
-                else
-                    block = "stone_block"
-                end
-            end
-
-
-            chunk:WriteBlock(x,y, block)
-		end
-	end
+function module:GetMouseInBlockSpace()
+    local lmx, lmy = love.mouse.getPosition()
+	local parentPos = self.WorldFrame.RenderPosition
+	return Vector.new(lmx - parentPos.X, lmy - parentPos.Y) / self.BlockSize
 end
 
 return module

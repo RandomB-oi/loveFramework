@@ -4,16 +4,20 @@ module.__index = module
 module.__type = "StoneBlock"
 Instance.RegisterClass(module)
 
+local StoneImage = love.graphics.newImage("Game/Assets/Blocks/StoneBlock.png")
+
 module.new = function(...)
 	local self = setmetatable(module.Base.new(...), module)
 
 	return self
 end
 
-function module:Render(x, y, world)
-    local blockSize = world.BlockSize
-    Color.from255(150, 150, 150, 255):Apply()
-    love.graphics.rectangle("fill", x*blockSize, y*blockSize, blockSize, blockSize)
+function module:Render(x, y, chunk, world)
+    local blockSize = Vector.one * world.BlockSize
+    local pos = Vector.new(x, y) * blockSize
+
+    Color.White:Apply()
+    love.graphics.cleanDrawImage(StoneImage, pos, blockSize)
 end
 
 return module

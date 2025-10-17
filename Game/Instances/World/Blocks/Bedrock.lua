@@ -10,7 +10,7 @@ module.new = function(...)
 	return self
 end
 
-function module:Render(x, y, world)
+function module:Render(x, y, chunk, world)
     local blockSize = world.BlockSize
     Color.from255(25, 25, 25, 255):Apply()
     love.graphics.rectangle("fill", x*blockSize, y*blockSize, blockSize, blockSize)

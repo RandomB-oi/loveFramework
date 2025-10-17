@@ -8,38 +8,15 @@ module.FrameRendering = true
 
 module.EntitySizeInBlocks = Vector.new(.75,1.8)
 
+local Run = Engine:GetService("RunService")
+local Input = Engine:GetService("InputService")
+
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	self.AnchorPoint = Vector.new(0.5, 1)
 	self.Name = "Entity"
 	self.ZIndex = 1
 	self:CreateProperty("Velocity", "Vector", Vector.new(0,0))
-
-
-local emitter = Instance.new("ParticleEmitter")
-	emitter:SetParent(self)
-
-
-	emitter.Rate = 1
-    -- self.ParticleSize = NumberSequence.new({{0,0}, {0.1,25}, {0.25, 20}, {.5,15}, {1,0}})
-	
-    emitter.ParticleSize = NumberSequence.new({{0,0}, {0.1,1}, {0.25, .8}, {.5,.5}, {1,0}})
-    emitter.Color = ColorSequence.new({
-        {0, Color.new(1, 0, 0, 1)},
-        {1, Color.new(1, 1, .4, 1)},
-        
-        -- {0, Color.new(0, 1, 1, 1)},
-        -- {1, Color.new(0, 0, .6, 1)},
-    })
-
-	emitter.EmitterObject = Instance.new("ImageLabel")
-	emitter.EmitterObject.Image = "Game/Assets/bob.png"
-	emitter.EmitterObject.AnchorPoint = Vector.one/2
-	emitter.EmitterObject.Size = UDim2.fromOffset(50, 50)
-
-    emitter.LifeTime = NumberRange.new(1, 3)
-    emitter.Speed = NumberRange.new(20, 50)
-    emitter.EmissionAngleRange = NumberRange.new(0, 0)
 
 	return self
 end
@@ -50,30 +27,118 @@ function module:SetWorld(world)
 	self:SetParent(world.WorldFrame)
 end
 
-function module:GetPosition(int)
-	local x, y = self.Position.X.Offset / self.World.BlockSize, self.Position.Y.Offset / self.World.BlockSize
-	if int then
-		x, y = math.ceil(x), math.ceil(y)
+function module:GetPosition() -- topleftCorner in block coordinates
+	return self:GetFootPosition() - self.EntitySizeInBlocks*self.AnchorPoint
+end
+
+function module:GetFootPosition()
+	return Vector.new(self.Position.X.Offset, self.Position.Y.Offset) / self.World.BlockSize
+end
+
+function module:SetPosition(position)
+	local pos = (position + self.EntitySizeInBlocks*self.AnchorPoint) * self.World.BlockSize
+	self.Position = UDim2.fromOffset(pos.X, pos.Y)
+end
+
+function module:CollidingCoordinates(x, y, simPos)
+	local block = self.World:ReadBlock(x,y)
+	local blockClass = Instance.GetClass("Block").Blocks[block]
+	if not blockClass then return false end
+	if not blockClass:CanCollide(self) then return false end
+	
+	local selfSize = self.EntitySizeInBlocks
+	local selfPosition = (simPos or self:GetPosition()) + selfSize/2
+	
+	local blockSize = Vector.one
+	local blockPosition = Vector.new(x,y) + blockSize/2
+
+	local bigSize = (blockSize+selfSize)/2
+
+	local diff = selfPosition - blockPosition
+	local aDiff = Vector.new(math.abs(diff.X), math.abs(diff.Y))
+	
+	return aDiff.X <= bigSize.X and aDiff.Y <= bigSize.Y
+end
+
+function module:Grounded()
+	return self:CollidingWithAnything(self:GetPosition()+Vector.yAxis*0.01)
+end
+
+function module:CollidingWithAnything(position)
+	local position = position or self:GetPosition()
+	local sx, sy = math.round(position.X), math.round(position.Y)
+
+	local checkRange = 3
+	for x = sx-checkRange, sx+checkRange do
+		for y = sy-checkRange, sy+checkRange do
+			local collision = self:CollidingCoordinates(x,y, position)
+			if collision then
+				return collision
+			end
+		end
 	end
-	return x, y
+	
+	return false
+end
+
+function module:SolveVelocity(dt)
+	-- self.velocity.x = math.clamp(self.velocity.x, -world.terminalVelocity.x, world.terminalVelocity.x)
+	-- self.velocity.y = math.clamp(self.velocity.y, -world.terminalVelocity.y, world.terminalVelocity.y)
+		
+	local pos = self:GetPosition()
+	local scaledVelocity = self.Velocity*dt
+
+	for _, axis in pairs({Vector.yAxis, Vector.xAxis}) do
+		local inverseAxis = Vector.one - axis
+		local colliding = self:CollidingWithAnything(pos + scaledVelocity*axis)
+		if colliding then
+			scaledVelocity = scaledVelocity * inverseAxis
+			self.Velocity = self.Velocity * inverseAxis
+		else
+			pos = pos + scaledVelocity*axis
+		end
+	end
+
+	-- self:SetPosition(Vector.new(math.round(pos.X*100)/100, math.round(pos.Y*100)/100))
+	self:SetPosition(pos)
+	
+	-- self.position.x = math.round(self.position.x*100)/100
+	-- self.position.y = math.round(self.position.y*100)/100
 end
 
 function module:Update(dt)
-	if not self.Enabled then return end
 	module.Base.Update(self, dt)
 
-	if not Engine:GetService("RunService"):IsRunning() then return end
+	if not self.Enabled then return end
+	if not Run:IsRunning() then return end
 
 	if not self.World then return end
+	if self.Flying then return end
+	
+	local grav = self.World.Gravity * dt
+	if self.Velocity.Y < 0 then
+		grav = grav / 2
+	end
+	self.Velocity = self.Velocity + grav
 
-	local addVelocity = self.Velocity * dt
-	self.Position = self.Position + UDim2.fromOffset(addVelocity.X, addVelocity.Y)
+    -- if Input:IsKeyPressed(Enum.KeyCode.A) then
+    --     self.entityTest.Velocity = self.entityTest.Velocity*Vector.yAxis + Vector.xAxis * -moveSpeed
+    -- elseif Input:IsKeyPressed(Enum.KeyCode.D) then
+    --     self.entityTest.Velocity = self.entityTest.Velocity*Vector.yAxis + Vector.xAxis * moveSpeed
+    -- else
+    --     self.entityTest.Velocity = self.entityTest.Velocity*Vector.yAxis
+    -- end
 
-	-- self.Velocity = self.Velocity + self.World.Gravity * self.World.BlockSize * dt
-
+	local desiredFPS = 240
+	local stepAmount = math.ceil(dt*desiredFPS)
+	for i = 1, stepAmount do
+		self:SolveVelocity(dt/stepAmount)
+	end
 	-- local lmx, lmy = love.mouse.getPosition()
 	-- local parentPos = self.Parent.RenderPosition
 	-- self.Position = UDim2.fromOffset(lmx - parentPos.X, lmy - parentPos.Y)
 end
+
+
 
 return module

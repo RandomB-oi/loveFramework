@@ -88,7 +88,7 @@ do -- load all instances
 				local fileDir = path.."/"..objectName
 				if ignoreList and not table.find(ignoreList, fileDir) or not ignoreList then
 					-- tbl[objectName] = require(fileDir)
-					local s, value = pcall(require, fileDir)
+					local s, value = xpcall(require, print, fileDir)
 					if s then
 						tbl[objectName] = value
 					end
