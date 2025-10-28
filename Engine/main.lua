@@ -17,8 +17,8 @@ string = require("Engine.Utilities.String")
 task = require("Engine.Utilities.Task")
 require("Engine.Utilities.Graphics")
 
-
 do -- DataTypes
+	Binary = require("Engine.Classes.DataTypes.Binary")
 	Vector = require("Engine.Classes.DataTypes.Vector")
 
 	Color = require("Engine.Classes.DataTypes.Color")

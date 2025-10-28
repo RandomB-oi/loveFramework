@@ -63,6 +63,16 @@ function module:__unm()
 	)
 end
 
+function module:Lerp(other, alpha)
+	return module.new(
+		math.lerp(self.X.Scale, other.X.Scale, alpha),
+		math.lerp(self.X.Offset, other.X.Offset, alpha),
+		
+		math.lerp(self.Y.Scale, other.Y.Scale, alpha),
+		math.lerp(self.Y.Offset, other.Y.Offset, alpha)
+	)
+end
+
 function module:Calculate(size)
 	return Vector.new(
 		size.X * self.X.Scale + self.X.Offset,

@@ -38,6 +38,12 @@ end
 function module:Cross(other)
 	return self.X * other.Y - self.Y * other.X
 end
+function module:Lerp(other, alpha)
+	return module.new(
+		math.lerp(self.X, other.X, alpha),
+		math.lerp(self.Y, other.Y, alpha)
+	)
+end
 
 function module:__add(other)
 	if type(self) == "number" then

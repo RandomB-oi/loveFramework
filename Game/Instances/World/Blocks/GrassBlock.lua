@@ -7,20 +7,24 @@ Instance.RegisterClass(module)
 local DirtImage = love.graphics.newImage("Game/Assets/Blocks/DirtBlock.png")
 local GrassImage = love.graphics.newImage("Game/Assets/Blocks/GrassTop.png")
 
+local DefaultGrass = Color.new(0, 1, 0, 1)
+
 module.new = function(...)
 	local self = setmetatable(module.Base.new(...), module)
 
 	return self
 end
 
-function module:Render(x, y, chunk, world)
-    local blockSize = Vector.one * world.BlockSize
-    local pos = Vector.new(x, y) * blockSize
-    
+function module:GenericDraw(blockSize, x,y,chunk, world)
     Color.White:Apply()
-    love.graphics.cleanDrawImage(DirtImage, pos, blockSize)
-    world:GetGrassColor(chunk:GetWorldCoordinates(x,y)):Apply()
-    love.graphics.cleanDrawImage(GrassImage, pos, blockSize)
+    love.graphics.cleanDrawImage(DirtImage, Vector.zero, blockSize)
+
+    if world then
+        world:GetGrassColor(chunk:GetWorldCoordinates(x,y)):Apply()
+    else
+        DefaultGrass:Apply()
+    end
+    love.graphics.cleanDrawImage(GrassImage, Vector.zero, blockSize)
 end
 
 return module

@@ -67,7 +67,7 @@ end
 function module:Update(...)
 	if not Engine:GetService("RunService"):IsRunning() then return end
 	if not self._scriptInitDone then return end
-
+	if not self.Enabled then return end
 	self:ScriptUpdate(...)
 end
 

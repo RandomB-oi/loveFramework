@@ -14,18 +14,19 @@ module.new = function()
 	self:CreateProperty("ChunkSize", "number", 8, "Int")
 	self:CreateProperty("BlockSize", "number", 20, "Int")
 	self:CreateProperty("Gravity", "Vector", Vector.new(0, 50))
+	self:CreateProperty("TerminalVelocity", "Vector", Vector.new(100, 100))
 	self:CreateProperty("LocalPlayer", "Instance", nil)
 
-    
-	self:CreateProperty("Sat_Value", "Vector", Vector.new(50, 50))
+	self:CreateProperty("DrawRaycasts", "boolean", false)
+    self._raycasts = {}
 
 	return self
 end
 
 function module:ScriptInit()
-	print("run it boiii")
 	self.Scene = self.Maid:Add(Instance.new("Scene"))
     self.Scene.Name = "WorldScene"
+    self.Scene.ZIndex = -1
 	self.Scene:SetParent(self:GetScene())
     self.ZIndex = 100
     self.WorldFrame = self.Maid:Add(Instance.new("Frame"))
@@ -36,7 +37,6 @@ function module:ScriptInit()
 
     self.Entities = {}
     self.Chunks = {}
-    self._raycasts = {}
     
     self.Maid:GiveTask(function()
         repeat
@@ -126,7 +126,7 @@ function module:ScriptUpdate(dt)
     -- end
 
     if self.LocalPlayer then
-        self.WorldFrame.Position = -self.LocalPlayer.Position + UDim2.fromScale(0.5, 0.5)
+        self.WorldFrame.Position = self.WorldFrame.Position:Lerp(-self.LocalPlayer.Position + UDim2.fromScale(0.5, 0.5), 1-0.001^dt)
     end
 
     self:UpdateLoadedChunks()
@@ -185,9 +185,39 @@ end
 function module:GenerateChunk(chunk)
 	for x = 0, self.ChunkSize-1 do
 		for y = 0, self.ChunkSize-1 do
-            chunk:WriteBlock(x,y, "dirt_block")
+            chunk:WriteBlock(x,y, "dirt_block", true)
 		end
 	end
+    chunk:RenderCanvas()
+end
+
+function module:Draw()
+    if not self.Enabled then return end
+    if not self.DrawRaycasts then return end
+    
+    for _, ray in ipairs(self._raycasts) do
+        self:PushGraphics()
+        
+
+        local pos = ray.Origin * self.BlockSize
+        local dir = ray.Direction * self.BlockSize
+        local pos2 = pos + dir
+
+        Color.White:Apply()
+        love.graphics.circle("fill", pos.X, pos.Y, 4)
+        love.graphics.line(pos.X, pos.Y, pos2.X, pos2.Y)
+
+        if ray.Block then
+            local pos = ray.Position * self.BlockSize
+            local pos2 = pos + ray.Normal * 20
+            love.graphics.circle("fill", pos.X, pos.Y, 4)
+            love.graphics.line(pos.X, pos.Y,pos2.X, pos2.Y)
+        end
+
+        love.graphics.pop()
+    end
+
+    self._raycasts = {}
 end
 
 function module:RaycastBlocks(origin, direction)
@@ -226,22 +256,37 @@ function module:RaycastBlocks(origin, direction)
 	local lastNormal = Vector.yAxis
 	local maxT = length + 1e-6
 
+
+    local rayResult = {
+        Origin = origin,
+        Direction = direction,
+
+        X = bx,
+        Y = by,
+        Block = nil,
+
+        Position = nil,
+        Normal = nil,
+
+        Distance = nil
+    }
+    if self.DrawRaycasts then
+        table.insert(self._raycasts, rayResult)
+    end
+
 	while totalT <= maxT do
 		local block = self:ReadBlock(bx, by)
 		if block and block ~= -1 then
-			return {
-                Origin = origin,
-                Direction = direction * length,
+            rayResult.X = bx
+            rayResult.Y = by
+            rayResult.Block = block
 
-				X = bx,
-				Y = by,
-				Block = block,
+            rayResult.Position = origin + dir * math.min(totalT, length)
+            rayResult.Normal = lastNormal
 
-				HitPos = origin + dir * math.min(totalT, length),
-				Normal = lastNormal,
+            rayResult.Distance = totalT
 
-				Distance = totalT
-			}
+			return rayResult
 		end
 
 		-- step to next cell

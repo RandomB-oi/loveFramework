@@ -12,12 +12,9 @@ module.new = function(...)
 	return self
 end
 
-function module:Render(x, y, chunk, world)
-    local blockSize = Vector.one * world.BlockSize
-    local pos = Vector.new(x, y) * blockSize
-
+function module:GenericDraw(blockSize, x,y,chunk, world)
     Color.White:Apply()
-    love.graphics.cleanDrawImage(StoneImage, pos, blockSize)
+    love.graphics.cleanDrawImage(StoneImage, Vector.zero, blockSize)
 end
 
 return module

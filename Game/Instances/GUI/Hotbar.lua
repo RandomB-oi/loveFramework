@@ -4,6 +4,13 @@ module.__index = module
 module.__type = "Hotbar"
 Instance.RegisterClass(module)
 
+-- local items = {
+--     {ID = "grass_block_item", Amount = 64},
+--     {ID = "bedrock_block_item", Amount = 64},
+--     {ID = "dirt_block_item", Amount = 64},
+--     {ID = "stone_block_item", Amount = 64},
+-- }
+
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
     self.Name = self.__type
@@ -13,9 +20,11 @@ module.new = function()
     local panel = require("Game.Prefabs.Hotbar")(self)
     Instance.BulkSetProperties(panel, {Archivable = false})
 
-    local slotPrefab = require("Game.Prefabs.ItemSlot")
     for i = 1, 5 do
-        Instance.BulkSetProperties(slotPrefab(panel), {Archivable = false})
+        local new = Instance.new("ItemSlot")
+        new.LayoutOrder = i
+        new.Archivable = false
+        new:SetParent(panel)
     end
 
 

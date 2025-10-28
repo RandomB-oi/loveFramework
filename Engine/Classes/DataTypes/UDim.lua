@@ -43,6 +43,13 @@ function module:__unm()
 	)
 end
 
+function module:Lerp(other, alpha)
+	return module.new(
+		math.lerp(self.Scale, other.Scale, alpha),
+		math.lerp(self.Offset, other.Offset, alpha)
+	)
+end
+
 function module:ToLua()
 	return "UDim.new("..tostring(self.Scale)..", "..tostring(self.Offset)..")"
 end

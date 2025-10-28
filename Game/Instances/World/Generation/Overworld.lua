@@ -11,13 +11,14 @@ module.new = function()
 	local self = setmetatable(module.Base.new(), module)
     self:CreateProperty("MaxWorldHeight", "number", -100, "Int")
     self:CreateProperty("MaxWorldDepth", "number", 40, "Int")
+    self:CreateProperty("MaxWorldWidth", "number", 40, "Int")
 
 	return self
 end
 
 function module:GetGrassColor(x, y)
     -- return Color.new(math.cos(y/5)/2+0.5,math.sin((x)/5)/2+0.5,0,1)
-    return Color.new(0, 1, 0, 1)
+    return Color.new(0, .8, 0, 1)
 end
 
 function module:GenerateChunk(chunk)
@@ -45,19 +46,20 @@ function module:GenerateChunk(chunk)
                 end
             end
 
-            if wy == self.MaxWorldDepth then
+            if wy == self.MaxWorldDepth or wx == self.MaxWorldWidth or wx == -self.MaxWorldWidth or wy == self.MaxWorldHeight then
                 block = "bedrock_block"
             end
-            if wy < self.MaxWorldHeight or wy > self.MaxWorldDepth then
+            if wy < self.MaxWorldHeight or wy > self.MaxWorldDepth or wx > self.MaxWorldWidth or wx < -self.MaxWorldWidth then
                 block = nil
             end
 
             -- block = "grass_block"
 
 
-            chunk:WriteBlock(x,y, block)
+            chunk:WriteBlock(x,y, block, true)
 		end
 	end
+    chunk:RenderCanvas()
 end
 
 return module

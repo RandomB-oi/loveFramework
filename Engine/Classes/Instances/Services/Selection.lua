@@ -10,7 +10,6 @@ module.new = function ()
 
 	self.Selection = {}
 	self.SelectionChanged = self.Maid:Add(Signal.new())
-	self.ZIndex = 99999999
 	
 	return self
 end

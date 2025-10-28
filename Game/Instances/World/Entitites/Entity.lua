@@ -17,6 +17,7 @@ module.new = function()
 	self.Name = "Entity"
 	self.ZIndex = 1
 	self:CreateProperty("Velocity", "Vector", Vector.new(0,0))
+	self:CreateProperty("StepHeight", "number", 1)
 
 	return self
 end
@@ -82,13 +83,31 @@ function module:CollidingWithAnything(position)
 end
 
 function module:SolveVelocity(dt)
-	-- self.velocity.x = math.clamp(self.velocity.x, -world.terminalVelocity.x, world.terminalVelocity.x)
-	-- self.velocity.y = math.clamp(self.velocity.y, -world.terminalVelocity.y, world.terminalVelocity.y)
+	self.Velocity = Vector.new(
+		math.clamp(self.Velocity.X, -self.World.TerminalVelocity.X, self.World.TerminalVelocity.X),
+		math.clamp(self.Velocity.Y, -self.World.TerminalVelocity.Y, self.World.TerminalVelocity.Y)
+	)
 		
 	local pos = self:GetPosition()
 	local scaledVelocity = self.Velocity*dt
 
-	for _, axis in pairs({Vector.yAxis, Vector.xAxis}) do
+	if scaledVelocity.X ~= 0 and self:Grounded() then
+		local stepHeight = self.StepHeight+0.001
+		local origin = self:GetFootPosition() - (Vector.yAxis * stepHeight) - Vector.xAxis * self.EntitySizeInBlocks.X/2
+		local direction = Vector.xAxis * scaledVelocity
+		if scaledVelocity.X > 0 then
+			origin = origin + Vector.xAxis * self.EntitySizeInBlocks.X
+		end
+		local rayOut = self.World:RaycastBlocks(origin, direction)
+		if not rayOut then
+			local rayDown = self.World:RaycastBlocks(origin+direction, Vector.yAxis*stepHeight)
+			if rayDown then
+				pos.Y = rayDown.Position.Y-self.EntitySizeInBlocks.Y*self.AnchorPoint.Y-0.001
+			end
+		end
+	end
+
+	for _, axis in pairs({Vector.xAxis, Vector.yAxis}) do
 		local inverseAxis = Vector.one - axis
 		local colliding = self:CollidingWithAnything(pos + scaledVelocity*axis)
 		if colliding then

@@ -9,6 +9,7 @@ module.ClassIcon = "Engine/Assets/InstanceIcons/Unknown.png"
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	self.Name = self.__type
+	self.ZIndex = 99999999
 	return self
 end
 

@@ -13,9 +13,9 @@ module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 
 	self:CreateProperty("MoveSpeed", "number", 5)
-	self:CreateProperty("JumpPower", "number", 9)
+	self:CreateProperty("JumpPower", "number", 13.2)
 	
-	self:CreateProperty("FlySpeed", "number", 10)
+	self:CreateProperty("FlySpeed", "number", 15)
 	self:CreateProperty("Flying", "boolean", false)
 
 	if Run:IsRunning() then
@@ -38,36 +38,15 @@ end
 
 
 
-function module:Draw()
-    module.Base.Draw(self)
+-- function module:Draw()
+--     module.Base.Draw(self)
 
-    if not Run:IsRunning() then return end
-	if not self.World then return end
+--     if not Run:IsRunning() then return end
+-- 	if not self.World then return end
 
-    self.World:PushGraphics()
-	
-    local origin = self:GetFootPosition()-Vector.yAxis*self.EntitySizeInBlocks.Y
-    local direction = self.World:GetMouseInBlockSpace() - origin
-    local intersection = self.World:RaycastBlocks(origin, direction)
 
-    local pos = origin * self.World.BlockSize
-    local dir = direction * self.World.BlockSize
-    local pos2 = pos + dir
 
-    Color.White:Apply()
-    love.graphics.circle("fill", pos.X, pos.Y, 4)
-    love.graphics.line(pos.X, pos.Y, pos2.X, pos2.Y)
-
-    if intersection then
-        local pos = intersection.HitPos * self.World.BlockSize
-        local pos2 = pos + intersection.Normal * 20
-        love.graphics.circle("fill", pos.X, pos.Y, 4)
-        love.graphics.line(pos.X, pos.Y,pos2.X, pos2.Y)
-    end
-
-    love.graphics.pop()
-
-end
+-- end
 
 
 function module:Update(dt)
@@ -76,6 +55,12 @@ function module:Update(dt)
 	if not self.World then return end
 
 	local Constants = GameScene:WaitForChild("Constants", 5)
+
+	
+	-- local origin = self:GetFootPosition()-Vector.yAxis*self.EntitySizeInBlocks.Y
+	-- local direction = self.World:GetMouseInBlockSpace() - origin
+	-- local intersection = self.World:RaycastBlocks(origin, direction)
+
 
 	if self.Flying then
 		self.Velocity = Vector.zero
