@@ -54,11 +54,11 @@ function love.load()
 
 	function love.draw()
 		EngineScene:Draw()
-		for _, v in pairs(Instance.GetClass("BaseInstance").All) do
+		-- for _, v in pairs(Instance.GetClass("BaseInstance").All) do
 			-- if v:IsA("Scene") then
 			-- 	love.graphics.drawOutline(v.RenderPosition, v.RenderSize)
 			-- end
-		end
+		-- end
 	end
 end
 

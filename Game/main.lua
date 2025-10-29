@@ -2,8 +2,7 @@ GameScene = Instance.new("Scene")
 GameScene.Name = "Test Game"
 GameScene:SetParent(Engine)
 
-local newBin = 0
-newBin = Binary.WriteBits(newBin, 0, 4, 15)
+local newBin = Binary.WriteBits(0, 0, 4, 15)
 for i = 0, Binary.GetSize(newBin)-1 do
     print(Binary.ReadBits(newBin, i, 1))
 end
