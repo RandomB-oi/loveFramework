@@ -14,34 +14,35 @@ function love.load()
 	local ID = tostring(os.time())
 	local fileName = "ExportedInstances/AutoSave"..ID..".lua"
 	
-	-- local GameScene = require("ExportedInstances.SavedGame")()
+	-- local loadedScene = require("ExportedInstances.SavedGame")()
 	if not RunService:IsEditor() then
 		RunService._running = true
 	end
 
-	local GameScene = require("Game.main")
+	local loadedScene = require("Game.main")
+	GameScene = loadedScene
 
 	if RunService:IsEditor() then
-		Editor = require("Editor.main"):Open(GameScene)
+		Editor = require("Editor.main"):Open(loadedScene)
 
 		task.spawn(function()
 			while task.wait(30) do
 				if not RunService:IsRunning() then
 					print("autoSave")
-					Instance.CreatePrefab(GameScene, fileName)
+					Instance.CreatePrefab(loadedScene, fileName)
 				end
 			end
 		end)
 	else
-		GameScene:SetParent(EngineScene)
+		loadedScene:SetParent(EngineScene)
 	end
 
 	function love.update(dt)
 		dt = math.clamp(dt, 0, 1/15)
 		dt = dt * RunService.TimeScale
 		RunService.ElapsedTime = RunService.ElapsedTime + dt
-		local title = GameScene.Name.." - "..tostring(math.round(1/(dt)))
-		-- local title = GameScene.Name.." - "..tostring(#GameScene:GetChildren(true).. " instances")
+		local title = loadedScene.Name.." - "..tostring(math.round(1/(dt)))
+		-- local title = loadedScene.Name.." - "..tostring(#loadedScene:GetChildren(true).. " instances")
 		EngineScene:Unpause():Enable()
 		EngineScene.Name = title
 		love.window.setTitle(title)

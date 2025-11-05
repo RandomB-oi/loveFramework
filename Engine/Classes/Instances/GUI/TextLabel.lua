@@ -27,6 +27,7 @@ module.new = function()
 	self:GetPropertyChangedSignal("Font"):Connect(function()
 		self:UpdateText()
 	end)
+	self:UpdateText()
 
 	return self
 end

@@ -18,6 +18,12 @@ module.new = function()
 	self:CreateProperty("FlySpeed", "number", 15)
 	self:CreateProperty("Flying", "boolean", false)
 
+	self.ContainerGroup = self.Maid:Add(Instance.new("ContainerGroup"))
+	self.ContainerGroup:AddContainer("Inventory", Instance.new("Container", 27, 9))
+	self.ContainerGroup:GiveItemStack(Instance.new("ItemStack", "dirt_block_item", 24))
+
+	-- self.ContainerGroup:AddContainer("Toolbar", Instance.new("Container", 9, 9))
+
 	if Run:IsRunning() then
 		local Constants = GameScene:WaitForChild("Constants", 5)
 		self.Maid:GiveTask(Input.InputBegan:Connect(function(input)

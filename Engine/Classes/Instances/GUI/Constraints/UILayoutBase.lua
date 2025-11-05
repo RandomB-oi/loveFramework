@@ -1,13 +1,15 @@
 local module = {}
-module.Derives = "BaseInstance"
+module.Derives = "ConstraintBase"
 module.__index = module
 module.__type = "UILayoutBase"
 Instance.RegisterClass(module)
 
+module.ConstraintCategory = "List"
+
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
-	self.Name = "UILayout"
-
+	self.Name = self.__type
+	
 	return self
 end
 

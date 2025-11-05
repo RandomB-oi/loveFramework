@@ -66,11 +66,17 @@ do -- load all instances
 		end
 	end
 
+	local function fixPath(path)
+		return select(1, string.gsub(path, "/", "."))
+	end
+
+	-- fixes a yellow warn line
+	love.filesystem.isDirectory = love.filesystem.isDirectory
+	
 	function autoLoad(path, ignoreList)
 		local tbl = {}
 
 		local directories = {}
-		local files = {}
 		
 		for i, fileName in pairs(love.filesystem.getDirectoryItems(path)) do
 			local isDirectory do
@@ -85,14 +91,12 @@ do -- load all instances
 				table.insert(directories, {name = fileName, path = path.."/"..fileName})
 			elseif fileName:find(".lua") then
 				local objectName = string.split(fileName, ".")[1]
-				local fileDir = path.."/"..objectName
+				local fileDir = fixPath(path.."."..objectName)
 				if ignoreList and not table.find(ignoreList, fileDir) or not ignoreList then
-					-- tbl[objectName] = require(fileDir)
 					local s, value = xpcall(require, print, fileDir)
 					if s then
 						tbl[objectName] = value
 					end
-					-- rawset(required,"_fileName", objectName)
 				end
 			end
 		end
@@ -104,11 +108,13 @@ do -- load all instances
 		return tbl
 	end
 
-	autoLoad("Engine/Classes/Instances", {"Engine/main.lua"})
+	autoLoad("Engine/Classes/Instances", {"Engine.main"})
 end
 
 Engine = Instance.new("Scene"):Enable():Unpause()
 Engine.Name = "Engine"
+
+Engine:GetService("RunService")
 
 for className, info in pairs(Instance.Classes) do
 	if info:IsA("BaseService") then

@@ -11,6 +11,9 @@ module.new = function()
     self.Name = self.__type
 
 	self:CreateProperty("ItemID", "string", "")
+	local aspectRatio = Instance.new("UIAspectRatioConstraint")
+	aspectRatio.Archivable = false
+	aspectRatio:SetParent(self)
 
 	return self
 end

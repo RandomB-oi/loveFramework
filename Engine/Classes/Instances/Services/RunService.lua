@@ -15,6 +15,8 @@ module.new = function ()
 	self._editor = false
 	self._currentRunningGame = nil
 
+	self.RunChanged = self.Maid:Add(Signal.new())
+
 	self:SetAttribute("test attribute", 10)
 
 	return self
@@ -29,21 +31,21 @@ function module:IsEditor()
 end
 
 function module:Run()
-	local RunService = Engine:GetService("RunService")
-	if RunService:IsRunning() then return self._currentRunningGame end
+	if self:IsRunning() then return self._currentRunningGame end
 
+	self.RunChanged:Fire(true)
 	
-	if RunService:IsEditor() then
+	if self:IsEditor() then
 		GameScene:Disable()
 		
-		RunService._running = true
+		self._running = true
 		self._currentRunningGame = GameScene:Clone()
 		self._currentRunningGame.Name = self._currentRunningGame.Name .. " Runtime"
 		self._currentRunningGame:SetParent(GameScene.Parent)
 		self._currentRunningGame:Enable()
 	else
 		self._currentRunningGame = GameScene
-		RunService._running = true
+		self._running = true
 		GameScene:Enable():Unpause()
 	end
 
@@ -52,12 +54,13 @@ function module:Run()
 end
 
 function module:Stop()
-	local RunService = Engine:GetService("RunService")
-	if not RunService:IsRunning() then return GameScene end
+	if not self:IsRunning() then return GameScene end
 
-	RunService._running = false
+	self.RunChanged:Fire(false)
+
+	self._running = false
 	
-	if RunService:IsEditor() then
+	if self:IsEditor() then
 		self._currentRunningGame:Destroy()
 		self._currentRunningGame = nil
 		GameScene:Enable()

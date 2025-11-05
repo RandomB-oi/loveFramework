@@ -6,14 +6,6 @@ Instance.RegisterClass(module)
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/UIListLayout.png"
 
-local function StringOrder(name)
-	local order = 0
-	for i = 1, name:len() do
-		order = order + name:sub(i,i):byte() ^ 3
-	end
-	return order
-end
-
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
 	self.Name = self.__type
@@ -25,37 +17,37 @@ module.new = function()
 	self:CreateProperty("SortMode", "SortMode", Enum.SortMode.LayoutOrder)
 
 	self.OrderedChildren = {}
-	self.ParentMaid = self.Maid:Add(Maid.new())
 
 	self.Changed:Connect(function()
 		self:UpdateOrder()
-	end)
-	self.AncestryChanged:Connect(function()
-		self:BindParentConnections()
 	end)
 
 	return self
 end
 
-function module:BindParentConnections()
-	self.ParentMaid:Destroy()
+local function newChild(self, child)
+	if not child:IsA("Frame") then return end
 
-	local parent = self.Parent
-	if not parent then return end
+	self:UpdateOrder()
+
+	local connectionMaid = Maid.new()
+	self.ParentMaid[child] = connectionMaid
+	connectionMaid:GiveTask(child.Changed:Connect(function()
+		self:UpdateOrder()
+	end))
+end
+
+function module:BindToParent(parent)
 	self.ParentMaid:GiveTask(parent.Changed:Connect(function(prop)
 		self:UpdateOrder()
 	end))
 
+	for _, child in ipairs(parent:GetChildren()) do
+		newChild(self, child)
+	end
+
 	self.ParentMaid:GiveTask(parent.ChildAdded:Connect(function(child)
-		if not child:IsA("Frame") then return end
-
-		self:UpdateOrder()
-
-		local connectionMaid = Maid.new()
-		self.ParentMaid[child] = connectionMaid
-		connectionMaid:GiveTask(child.Changed:Connect(function()
-			self:UpdateOrder()
-		end))
+		newChild(self, child)
 	end))
 	
 	self.ParentMaid:GiveTask(parent.ChildRemoved:Connect(function(child)
@@ -70,7 +62,7 @@ end
 function module:Update(dt)
 	module.Base.Update(self, dt)
 
-	self:UpdateOrder()
+	-- self:UpdateOrder()
 end
 
 function module:UpdateOrder()
@@ -88,7 +80,7 @@ function module:UpdateOrder()
 			if self.SortMode == Enum.SortMode.LayoutOrder then
 				order = child.LayoutOrder or 9999
 			else
-				order = StringOrder(child.Name)
+				order = string.getOrder(child.Name)
 			end
 			if not lookup[order] then
 				local tbl = {order, {}}

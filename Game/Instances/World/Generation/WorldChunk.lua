@@ -10,8 +10,8 @@ module.new = function(world, chunkX, chunkY)
     local bigChunkSize = world.ChunkSize * world.BlockSize
 
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
     self.Canvas = love.graphics.newCanvas(bigChunkSize, bigChunkSize)
-	self.Name = "Chunk"
 	self.ZIndex = -1
     self.Archivable = false
     self.Blocks = {}

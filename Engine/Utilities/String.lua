@@ -19,6 +19,14 @@ module.toArray = function(str)
 	return list
 end
 
+module.getOrder = function(name)
+	local order = 0
+	for i = 1, name:len() do
+		order = order + name:sub(i,i):byte() ^ 3
+	end
+	return order
+end
+
 for i,v in pairs(string) do
 	if not module[i] then
 		module[i] = v

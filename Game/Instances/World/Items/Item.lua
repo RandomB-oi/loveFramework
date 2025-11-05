@@ -5,6 +5,10 @@ Instance.RegisterClass(module)
 
 module.Items = {}
 
+module.StackSize = 64
+module.StackWidth = 1
+module.StackHeight = 1
+
 module.new = function(itemID)
 	local self = setmetatable({}, module)
 	self.ID = itemID
@@ -42,6 +46,7 @@ end
 
 function module.Init()
 	module.DirtBlock = Instance.new("BlockItem", "dirt_block_item", "dirt_block")
+	module.DirtBlock.StackWidth = 2
 	module.GrassBlock = Instance.new("BlockItem", "grass_block_item", "grass_block")
 	module.StoneBlock = Instance.new("BlockItem", "stone_block_item", "stone_block")
 	module.BedrockBlock = Instance.new("BlockItem", "bedrock_block_item", "bedrock_block")

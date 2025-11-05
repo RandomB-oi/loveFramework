@@ -6,14 +6,10 @@ Instance.RegisterClass(module)
 module.All = {}
 local idSerial = 0
 
-function module.Get(id)
-	return module.All[id]
-end
-
 local function propertyTypeMatches(value, desiredType)
 	if desiredType then
 		if desiredType == "Instance" then
-			if type(value) == "table" and value.IsA then
+			if type(value) == "table" and value.IsA or value == nil then
 				return true
 			end
 			return false
@@ -46,7 +42,7 @@ module.new = function()
 	self.Attributes = {}
 	self.AttributeSignals = {}
 
-	self:CreateProperty("Name", "string", "Instance"..self.ID)
+	self:CreateProperty("Name", "string", self.__type)
 	self:CreateProperty("Enabled", "boolean", true)
 	self:CreateProperty("Parent", "Instance", nil)
 	self:CreateProperty("Archivable", "boolean", true)
@@ -339,14 +335,20 @@ function module:SetParent(newParent)
 		-- end
 	end
 
-	self.AncestryChanged:Fire(newParent)
+	self.AncestryChanged:Fire()
+	for i,v in ipairs(self:GetChildren(true)) do
+		v.AncestryChanged:Fire()
+	end
 end
 
 function module:IsEnabled()
+	if not self.Enabled then return false end
+
 	if self.Parent and not self.Parent:IsEnabled() then
 		return false
 	end
-	return self.Enabled
+	
+	return true
 end
 
 function module:Clone(ignoreArchivable, _instanceMap, _toSet)
@@ -393,11 +395,7 @@ function module:Clone(ignoreArchivable, _instanceMap, _toSet)
 	return new
 end
 
-function module:Destroy()
-	self:SetParent(nil)
-
-	self.Maid:Destroy()
-
+function module:ClearAllChildren()
 	repeat
 		local key, child = next(self._children)
 		if child then
@@ -405,6 +403,14 @@ function module:Destroy()
 			child:Destroy()
 		end
 	until not key
+end
+
+function module:Destroy()
+	self:SetParent(nil)
+
+	self.Maid:Destroy()
+
+	self:ClearAllChildren()
 end
 
 function module.UpdateOrphanedInstances(dt)

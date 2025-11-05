@@ -5,7 +5,7 @@ Instance.RegisterClass(module)
 
 module.Blocks = {}
 
-module.NormalShader = love.graphics.newShader("Game/Shaders/TestShader/Pixel.glsl", "Game/Shaders/TestShader/Vertex.glsl")
+-- module.Shader = Shaders.NormalShader
 
 module.new = function(blockId)
 	local self = setmetatable({}, module)
@@ -17,8 +17,8 @@ module.new = function(blockId)
 end
 
 function module:Render(x, y, chunk, world)
-	local prevShader = love.graphics.getShader()
-	love.graphics.setShader(self.NormalShader)
+	-- local prevShader = love.graphics.getShader()
+	-- love.graphics.setShader(self.Shader)
 
 	-- make it translate, and call the generic draw
     local blockSize = world.BlockSize
@@ -28,7 +28,7 @@ function module:Render(x, y, chunk, world)
 	self:GenericDraw(Vector.one * blockSize, x,y,chunk, world)
 	love.graphics.pop()
 
-	love.graphics.setShader(prevShader)
+	-- love.graphics.setShader(prevShader)
 end
 
 function module:GenericDraw(blockSize, x,y,chunk, world)

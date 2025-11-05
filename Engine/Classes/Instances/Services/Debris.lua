@@ -11,6 +11,12 @@ module.new = function ()
 	self.Objects = {}
 	
 	self:CreateProperty("MaxItems", "number", 1000)
+
+	Engine:GetService("RunService").RunChanged:Connect(function()
+		for object in pairs(self.Objects) do
+			self.Objects[object] = -1
+		end
+	end)
 	
 	return self
 end

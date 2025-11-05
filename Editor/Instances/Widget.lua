@@ -8,9 +8,9 @@ Instance.RegisterClass(module)
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 	self.Size = UDim2.new(1, 0, 1, 0)
 	self.Color = Color.from255(46, 46, 46, 255)
-	self.Name = "Widget"
 	
 	self.Title = self.Maid:Add(Instance.new("TextLabel"))
 	self.Title.Size = UDim2.new(1, 0, 0, 20)

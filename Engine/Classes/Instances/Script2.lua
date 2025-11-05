@@ -11,9 +11,9 @@ module.ClassIcon = "Engine/Assets/InstanceIcons/Script.png"
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 	self:SetParent(nil)
 
-	self.Name = "Script"
 	self:CreateProperty("Source", "string", "")
 	self.Source = "print(\"Hello World\")"
 

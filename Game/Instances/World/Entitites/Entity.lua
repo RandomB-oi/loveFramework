@@ -13,8 +13,8 @@ local Input = Engine:GetService("InputService")
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 	self.AnchorPoint = Vector.new(0.5, 1)
-	self.Name = "Entity"
 	self.ZIndex = 1
 	self:CreateProperty("Velocity", "Vector", Vector.new(0,0))
 	self:CreateProperty("StepHeight", "number", 1)

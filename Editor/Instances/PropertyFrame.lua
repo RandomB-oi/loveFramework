@@ -85,8 +85,8 @@ local PropConverters = {
 
 module.new = function(propertyName, propertyType)
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
-	self.Name = "PropertyFrame"
 	self.PropertyName = propertyName
 	self.PropertyType = propertyType
 

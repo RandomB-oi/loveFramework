@@ -95,11 +95,25 @@ function module:Draw()
 	module.Base.Draw(self)
 end
 
+function module:GetModifiedSize(size)
+	local aspectRatio = self._constraintChildren and self._constraintChildren.AspectRatio
+	local ratio = aspectRatio and aspectRatio.AspectRatio
+	if ratio then
+		local scale = math.min(size.X, size.Y)
+		if ratio > 1 then
+			size = Vector.new(scale, scale/ratio)
+		else
+			size = Vector.new(scale*ratio, scale)
+		end
+	end
+
+	return size
+end
+
 function module:UpdateRender()
 	local isScene = self:IsA("Scene")
 	if self.Parent or isScene then
 		local parentSize, parentPosition, parentRotation
-		local layout = self.Parent and self.Parent:FindFirstChildWhichIsA("UILayoutBase")
 
 		if self.Parent and self.Parent:IsA("Frame") or not self.Parent and isScene then
 			if self.Parent then
@@ -118,11 +132,23 @@ function module:UpdateRender()
 		-- elseif self.Parent:IsA("Scene") then
 		-- 	parentSize, parentPosition, parentRotation = self.Parent.RenderSize, self.Parent.RenderPosition or Vector.zero, 0
 		end
+
+		local listLayout
+		if self.Parent and self.Parent._constraintChildren then
+			listLayout = self.Parent._constraintChildren.List
+			if self.Parent._constraintChildren.Padding then
+				
+			end
+		end
+
 		if (parentSize and parentPosition) then
-			if layout then
-				self.RenderSize, self.RenderPosition, self.RenderRotation = layout:Resolve(self, parentSize, parentPosition, parentRotation)
+			if listLayout then
+				local size, pos, rot = listLayout:Resolve(self, parentSize, parentPosition, parentRotation)
+				self.RenderSize = self:GetModifiedSize(size)
+				self.RenderPosition = pos
+				self.RenderRotation = rot
 			else
-				self.RenderSize = self.Size:Calculate(parentSize)
+				self.RenderSize = self:GetModifiedSize(self.Size:Calculate(parentSize))
 				self.RenderPosition = parentPosition + self.Position:Calculate(parentSize) - self.RenderSize * self.AnchorPoint
 				self.RenderRotation = parentRotation + self.Rotation
 			end

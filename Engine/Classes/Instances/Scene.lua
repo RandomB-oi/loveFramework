@@ -10,9 +10,9 @@ module.FrameRendering = false
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
-	self:SetParent(nil)
+	self.Name = self.__type
+	-- self:SetParent(nil)
 	
-	self.Name = "Scene"
 	self.Canvas = nil
 	self:CreateProperty("Paused", "boolean", false)
 

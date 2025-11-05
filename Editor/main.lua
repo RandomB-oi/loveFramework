@@ -1,14 +1,13 @@
 EditorScene = Instance.new("Scene")
 EditorScene:SetParent(Engine)
 
-autoLoad("Editor", {"Editor/main.lua"})
+autoLoad("Editor", {"Editor.main"})
 
 function EditorScene:Open(scene)
 	local newEditor = require("Editor.Prefabs.Editor")()
 
 	local explorer = newEditor:FindFirstChild("Explorer", true)
 	explorer.RootObject = scene
-	-- explorer.RootObject = Engine
 
 	newEditor.BannerButtons.Run.LeftClicked:Connect(function()
 		explorer.RootObject = Engine:GetService("RunService"):Run()

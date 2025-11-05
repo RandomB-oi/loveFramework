@@ -1,6 +1,6 @@
-GameScene = Instance.new("Scene")
-GameScene.Name = "Test Game"
-GameScene:SetParent(Engine)
+mainScene = Instance.new("Scene")
+mainScene.Name = "Test Game"
+mainScene:SetParent(Engine)
 
 GameVariables = require("Game.GameVariables")
 
@@ -22,4 +22,4 @@ love.window.setMode(800, 600, {resizable = true})
 -- require("Game.Scenes.MainMenu"):Enable():Unpause()
 require("Game.Scenes.BattleScene")
 
-return GameScene
+return mainScene

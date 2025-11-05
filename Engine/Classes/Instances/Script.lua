@@ -8,9 +8,9 @@ module.ClassIcon = "Engine/Assets/InstanceIcons/Script.png"
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 
 	self._waitingThreads = {}
-	self.Name = "Script"
 
 	if Engine:GetService("RunService"):IsRunning() then
 		task.spawn(function()

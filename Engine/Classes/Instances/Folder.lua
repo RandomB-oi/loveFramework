@@ -8,7 +8,7 @@ module.ClassIcon = "Engine/Assets/InstanceIcons/Folder.png"
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
-	self.Name = "Folder"
+	self.Name = self.__type
 
 	return self
 end

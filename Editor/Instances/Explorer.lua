@@ -6,9 +6,9 @@ Instance.RegisterClass(module)
 
 module.new = function(directory)
 	local self = setmetatable(module.Base.new(), module)
+	self.Name = self.__type
 	self:SetTitle("Explorer")
 
-	self.Name = "Explorer"
 	self.ExplorerList = self.Maid:Add(Instance.new("ScrollingFrame"))
 	self.ExplorerList.Size = UDim2.new(1, 0, 1, 0)
 	self.ExplorerList.Color = Color.new(0,0,0,0)
