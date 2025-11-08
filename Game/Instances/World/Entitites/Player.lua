@@ -25,13 +25,13 @@ module.new = function()
 	-- self.ContainerGroup:AddContainer("Toolbar", Instance.new("Container", 9, 9))
 
 	if Run:IsRunning() then
-		local Constants = GameScene:WaitForChild("Constants", 5)
+		local constants = GameScene:GetService("Constants")
 		self.Maid:GiveTask(Input.InputBegan:Connect(function(input)
-			if input.KeyCode == Constants.ToggleFlight then
+			if input.KeyCode == constants.ToggleFlight then
 				self.Flying = not self.Flying
 			end
 
-			if input.KeyCode == Constants.Jump then
+			if input.KeyCode == constants.Jump then
 				if self:Grounded() then
 					self.Velocity = Vector.new(self.Velocity.X, -self.JumpPower)
 				end
@@ -60,32 +60,32 @@ function module:Update(dt)
 	if not Run:IsRunning() then return end
 	if not self.World then return end
 
-	local Constants = GameScene:WaitForChild("Constants", 5)
-
 	
 	-- local origin = self:GetFootPosition()-Vector.yAxis*self.EntitySizeInBlocks.Y
 	-- local direction = self.World:GetMouseInBlockSpace() - origin
 	-- local intersection = self.World:RaycastBlocks(origin, direction)
 
+	local constants = GameScene:GetService("Constants")
+	self:SetAttribute("Grounded", self:Grounded())
 
 	if self.Flying then
 		self.Velocity = Vector.zero
-		if Input:IsKeyPressed(Constants.MoveLeft) then
+		if Input:IsKeyPressed(constants.MoveLeft) then
 			self:SetPosition(self:GetPosition() - Vector.xAxis * self.FlySpeed*dt)
 		end
-		if Input:IsKeyPressed(Constants.MoveRight) then
+		if Input:IsKeyPressed(constants.MoveRight) then
 			self:SetPosition(self:GetPosition() + Vector.xAxis * self.FlySpeed*dt)
 		end
-		if Input:IsKeyPressed(Constants.MoveUp) then
+		if Input:IsKeyPressed(constants.MoveUp) then
 			self:SetPosition(self:GetPosition() - Vector.yAxis * self.FlySpeed*dt)
 		end
-		if Input:IsKeyPressed(Constants.MoveDown) then
+		if Input:IsKeyPressed(constants.MoveDown) then
 			self:SetPosition(self:GetPosition() + Vector.yAxis * self.FlySpeed*dt)
 		end
 	else
-		if Input:IsKeyPressed(Constants.MoveLeft) then
+		if Input:IsKeyPressed(constants.MoveLeft) then
 			self.Velocity = self.Velocity*Vector.yAxis - Vector.xAxis * self.MoveSpeed
-		elseif Input:IsKeyPressed(Constants.MoveRight) then
+		elseif Input:IsKeyPressed(constants.MoveRight) then
 			self.Velocity = self.Velocity*Vector.yAxis + Vector.xAxis * self.MoveSpeed
 		else
 			self.Velocity = self.Velocity*Vector.yAxis

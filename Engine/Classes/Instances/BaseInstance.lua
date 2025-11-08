@@ -395,6 +395,11 @@ function module:Clone(ignoreArchivable, _instanceMap, _toSet)
 	return new
 end
 
+function module:GetConstraint(constraintType)
+	if not self._constraintChildren then return end
+	return self._constraintChildren[constraintType]
+end
+
 function module:ClearAllChildren()
 	repeat
 		local key, child = next(self._children)

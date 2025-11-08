@@ -13,29 +13,36 @@ module.new = function()
 	self.ParentMaid = self.Maid:Add(Maid.new())
 
 	self:GetPropertyChangedSignal("Parent"):Connect(function()
-		self.ParentMaid:Destroy()
-		local parent = self.Parent
-		if not parent then
-			return
-		end
-
-		if not parent._constraintChildren then
-			parent._constraintChildren = {}
-		end
-		parent._constraintChildren[self.ConstraintCategory] = self
-
-		self.ParentMaid:GiveTask(function()
-			if parent._constraintChildren and parent._constraintChildren[self.ConstraintCategory] == self then
-				parent._constraintChildren[self.ConstraintCategory] = nil
-				if not next(parent._constraintChildren) then
-					parent._constraintChildren = nil
-				end
-			end
-		end)
-		self:BindToParent(parent)
+		self:UpdateParent()
+	end)
+	self:GetPropertyChangedSignal("Enabled"):Connect(function()
+		self:UpdateParent()
 	end)
 	
 	return self
+end
+
+function module:UpdateParent()
+	self.ParentMaid:Destroy()
+
+	if not self.Enabled then return end
+	local parent = self.Parent
+	if not parent then return end
+
+	if not parent._constraintChildren then
+		parent._constraintChildren = {}
+	end
+	parent._constraintChildren[self.ConstraintCategory] = self
+
+	self.ParentMaid:GiveTask(function()
+		if parent._constraintChildren and parent._constraintChildren[self.ConstraintCategory] == self then
+			parent._constraintChildren[self.ConstraintCategory] = nil
+			if not next(parent._constraintChildren) then
+				parent._constraintChildren = nil
+			end
+		end
+	end)
+	self:BindToParent(parent)
 end
 
 function module:BindToParent(parent)

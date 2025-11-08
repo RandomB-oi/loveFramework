@@ -9,6 +9,10 @@ module.new = function(xscale, xoffset, yscale, yoffset)
 	}, module)
 end
 
+module.fromUDims = function(udimA, udimB)
+	return module.new(udimA.Scale, udimA.Offset, udimB.Scale, udimB.Offset)
+end
+
 module.fromScale = function(x,y)
 	return module.new(x, 0, y, 0)
 end

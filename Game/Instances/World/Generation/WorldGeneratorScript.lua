@@ -12,7 +12,7 @@ module.new = function()
 
 	self:CreateProperty("Seed", "number", 0)
 	self:CreateProperty("ChunkSize", "number", 8, "Int")
-	self:CreateProperty("BlockSize", "number", 20, "Int")
+	self:CreateProperty("BlockSize", "number", 16, "Int")
 	self:CreateProperty("Gravity", "Vector", Vector.new(0, 50))
 	self:CreateProperty("TerminalVelocity", "Vector", Vector.new(100, 100))
 	self:CreateProperty("LocalPlayer", "Instance", nil)
@@ -31,9 +31,13 @@ function module:ScriptInit()
     self.ZIndex = 100
     self.WorldFrame = self.Maid:Add(Instance.new("Frame"))
     self.WorldFrame.Position = UDim2.fromScale(0.5, 0.5)
-    self.WorldFrame.Size = UDim2.new(0, 0, 0, 0)
+    self.WorldFrame.Size = UDim2.new(0, self.BlockSize, 0, self.BlockSize)
     self.WorldFrame.Color = Color.new(0, 0, 0, 0)
     self.WorldFrame:SetParent(self.Scene)
+
+    self.Scale = Instance.new("UIScale")
+    self.Scale.Archivable = false
+    self.Scale:SetParent(self.WorldFrame)
 
     self.Entities = {}
     self.Chunks = {}
@@ -126,7 +130,13 @@ function module:ScriptUpdate(dt)
     -- end
 
     if self.LocalPlayer then
-        self.WorldFrame.Position = self.WorldFrame.Position:Lerp(-self.LocalPlayer.Position + UDim2.fromScale(0.5, 0.5), 1-0.001^dt)
+        local screenPos = UDim2.fromOffset(
+            self.LocalPlayer.Position.X.Scale * 
+            self.WorldFrame.Size.X.Offset,
+            self.LocalPlayer.Position.Y.Scale * 
+            self.WorldFrame.Size.Y.Offset
+        ) * self.Scale.Scale
+        self.WorldFrame.Position = self.WorldFrame.Position:Lerp(-screenPos + UDim2.fromScale(0.5, 0.5), 1-0.001^dt)
     end
 
     self:UpdateLoadedChunks()

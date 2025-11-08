@@ -12,6 +12,8 @@ module.new = function(directory)
 	self.ExplorerList = self.Maid:Add(Instance.new("ScrollingFrame"))
 	self.ExplorerList.Size = UDim2.new(1, 0, 1, 0)
 	self.ExplorerList.Color = Color.new(0,0,0,0)
+	self.ExplorerList.ScrollbarPadding = Enum.ScrollbarPadding.Scrollbar
+	self.ExplorerList.ScrollbarThickness = 8
 	self.ExplorerList.Name = "ExplorerList"
 	self:CreateProperty("RootObject", "Instance", nil)
 	self:AttachGui(self.ExplorerList)

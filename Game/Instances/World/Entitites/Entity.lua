@@ -5,11 +5,11 @@ module.__type = "Entity"
 Instance.RegisterClass(module)
 
 module.FrameRendering = true
+module.PhysicsFPS = 60
 
 module.EntitySizeInBlocks = Vector.new(.75,1.8)
 
 local Run = Engine:GetService("RunService")
-local Input = Engine:GetService("InputService")
 
 module.new = function()
 	local self = setmetatable(module.Base.new(), module)
@@ -24,7 +24,6 @@ end
 
 function module:SetWorld(world)
 	self.World = world
-	self.Size = UDim2.fromOffset(self.World.BlockSize * self.EntitySizeInBlocks.X, self.World.BlockSize * self.EntitySizeInBlocks.Y)
 	self:SetParent(world.WorldFrame)
 end
 
@@ -33,12 +32,16 @@ function module:GetPosition() -- topleftCorner in block coordinates
 end
 
 function module:GetFootPosition()
-	return Vector.new(self.Position.X.Offset, self.Position.Y.Offset) / self.World.BlockSize
+	-- return Vector.new(self.Position.X.Offset, self.Position.Y.Offset) / self.World.BlockSize
+	return Vector.new(self.Position.X.Scale, self.Position.Y.Scale)
 end
 
 function module:SetPosition(position)
-	local pos = (position + self.EntitySizeInBlocks*self.AnchorPoint) * self.World.BlockSize
-	self.Position = UDim2.fromOffset(pos.X, pos.Y)
+	-- local pos = (position + self.EntitySizeInBlocks*self.AnchorPoint) * self.World.BlockSize
+	-- self.Position = UDim2.fromOffset(pos.X, pos.Y)
+	
+	local pos = (position + self.EntitySizeInBlocks*self.AnchorPoint)
+	self.Position = UDim2.fromScale(pos.X, pos.Y)
 end
 
 function module:CollidingCoordinates(x, y, simPos)
@@ -62,7 +65,7 @@ function module:CollidingCoordinates(x, y, simPos)
 end
 
 function module:Grounded()
-	return self:CollidingWithAnything(self:GetPosition()+Vector.yAxis*0.01)
+	return self:CollidingWithAnything(self:GetPosition()+Vector.yAxis*0.05)
 end
 
 function module:CollidingWithAnything(position)
@@ -134,6 +137,9 @@ function module:Update(dt)
 	if not self.World then return end
 	if self.Flying then return end
 	
+	-- self.Size = UDim2.fromOffset(self.World.BlockSize * self.EntitySizeInBlocks.X, self.World.BlockSize * self.EntitySizeInBlocks.Y)
+	self.Size = UDim2.fromScale(self.EntitySizeInBlocks.X, self.EntitySizeInBlocks.Y)
+
 	local grav = self.World.Gravity * dt
 	if self.Velocity.Y < 0 then
 		grav = grav / 2
@@ -148,8 +154,7 @@ function module:Update(dt)
     --     self.entityTest.Velocity = self.entityTest.Velocity*Vector.yAxis
     -- end
 
-	local desiredFPS = 240
-	local stepAmount = math.ceil(dt*desiredFPS)
+	local stepAmount = math.ceil(dt*self.PhysicsFPS)
 	for i = 1, stepAmount do
 		self:SolveVelocity(dt/stepAmount)
 	end

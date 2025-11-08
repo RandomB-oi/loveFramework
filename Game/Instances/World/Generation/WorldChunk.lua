@@ -18,8 +18,8 @@ module.new = function(world, chunkX, chunkY)
 
 
     self.Entities = {}
-    self.Size = UDim2.fromOffset(bigChunkSize, bigChunkSize)
-    self.Position = UDim2.fromOffset(chunkX * bigChunkSize, chunkY * bigChunkSize)
+    self.Size = UDim2.fromScale(world.ChunkSize, world.ChunkSize)
+    self.Position = UDim2.fromScale(chunkX * world.ChunkSize, chunkY * world.ChunkSize)
     self.World = world
     self.X = chunkX
     self.Y = chunkY

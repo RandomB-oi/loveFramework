@@ -15,7 +15,7 @@ module.new = function()
     self.Color = Color.new(0,0,0,0)
 	self:CreateProperty("Container", "Container", nil)
     -- self.Hidden = true
-
+    
     self.AspectRatio = Instance.new("UIAspectRatioConstraint")
     self.AspectRatio.Archivable = false
     self.AspectRatio:SetParent(self)

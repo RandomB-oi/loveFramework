@@ -1,5 +1,5 @@
 local module = {}
-module.Derives = "BaseInstance"
+module.Derives = "BaseService"
 module.__index = module
 module.__type = "Constants"
 Instance.RegisterClass(module)

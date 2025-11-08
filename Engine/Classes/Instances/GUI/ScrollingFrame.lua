@@ -14,7 +14,13 @@ module.new = function()
 	self.Canvas = nil
 	self:CreateProperty("CanvasPosition", "Vector", Vector.zero)
 	self:CreateProperty("CanvasSize", "UDim2", UDim2.new(0,0, 0,0))
-
+	self:CreateProperty("ScrollbarColor", "Color", Color.White)
+	self:CreateProperty("CanvasColor", "Color", Color.White)
+	self:CreateProperty("ScrollbarThickness", "number", 12, "Int")
+	self:CreateProperty("ScrollbarPadding", "ScrollbarPadding", Enum.ScrollbarPadding.Never)
+	self:CreateProperty("HorizontalScrollbarSide", "LateralDirection", Enum.LateralDirection.Right)
+	self:CreateProperty("VerticalScrollbarSide", "VerticalDirection", Enum.VerticalDirection.Bottom)
+	
 	self.RenderCanvasSize = Vector.zero
 
 	local InputService = Engine:GetService("InputService")
@@ -33,6 +39,28 @@ module.new = function()
 	return self
 end
 
+function module:GetPadding()
+	local add, sub = module.Base.GetPadding(self)
+
+	if self.ScrollbarPadding == Enum.ScrollbarPadding.Scrollbar and self.RenderSize.Y ~= self.RenderCanvasSize.Y or self.ScrollbarPadding == Enum.ScrollbarPadding.Always then
+		if self.HorizontalScrollbarSide == Enum.LateralDirection.Left then
+			add = add + Vector.new(self.ScrollbarThickness, 0)
+		else
+			sub = sub + Vector.new(self.ScrollbarThickness, 0)
+		end
+	end
+
+	if self.ScrollbarPadding == Enum.ScrollbarPadding.Scrollbar and self.RenderSize.X ~= self.RenderCanvasSize.X or self.ScrollbarPadding == Enum.ScrollbarPadding.Always then
+		if self.VerticalScrollbarSide == Enum.LateralDirection.Top then
+			add = add + Vector.new(0, self.ScrollbarThickness)
+		else
+			sub = sub + Vector.new(0, self.ScrollbarThickness)
+		end
+	end
+
+	return add, sub
+end
+
 function module:Update(dt)
 	local canvasX, canvasY
 	if self.Canvas then
@@ -40,14 +68,14 @@ function module:Update(dt)
 		canvasX = math.round(canvasX)
 		canvasY = math.round(canvasY)
 	end
-	
+
 	local solvedCanvasSize = self.CanvasSize:Calculate(self.RenderSize)
 	self.RenderCanvasSize = Vector.new(math.max(self.RenderSize.X, solvedCanvasSize.X), math.max(self.RenderSize.Y, solvedCanvasSize.Y))
 	self.CanvasPosition = Vector.new(
 		math.clamp(self.CanvasPosition.X, 0, self.RenderCanvasSize.X-self.RenderSize.X),
 		math.clamp(self.CanvasPosition.Y, 0, self.RenderCanvasSize.Y-self.RenderSize.Y)
 	)
-	
+
 	if math.round(self.RenderSize.X) ~= canvasX or math.round(self.RenderSize.Y) ~= canvasY then
 		if self.Canvas then
 			self.Canvas:release()
@@ -64,7 +92,7 @@ end
 
 function module:Draw()
 	if not self.Enabled then return end
-	self.Color:Apply()
+	self:DrawFrame()
 
 	if not self.Canvas then return end
 
@@ -79,31 +107,33 @@ function module:Draw()
 	module.Base.Draw(self)
 	
 	love.graphics.pop()
-	Color.White:Apply()
+	self.CanvasColor:Apply()
 	love.graphics.setCanvas(prevCanvas)
 	love.graphics.cleanDrawImage(self.Canvas, renderPosition, self.RenderSize)
 
-	local scrollbarThickness = 12
+	self.ScrollbarColor:Apply()
 	if self.RenderSize.Y ~= self.RenderCanvasSize.Y then
 		local scrollPercent = self.CanvasPosition.Y/(self.RenderCanvasSize.Y-self.RenderSize.Y)
 		local scrollbarHeight = self.RenderSize.Y * (self.RenderSize.Y/self.RenderCanvasSize.Y)
+		local scrollbarPosition = self.HorizontalScrollbarSide == Enum.LateralDirection.Left and 0 or self.RenderSize.X - self.ScrollbarThickness
 
 		love.graphics.rectangle("fill",
-			renderPosition.X + self.RenderSize.X - scrollbarThickness,
-			renderPosition.Y +  (self.RenderSize.Y - scrollbarHeight) * scrollPercent,
-			scrollbarThickness,
+			renderPosition.X + scrollbarPosition,
+			renderPosition.Y + (self.RenderSize.Y - scrollbarHeight) * scrollPercent,
+			self.ScrollbarThickness,
 			scrollbarHeight
 		)
 	end
 	if self.RenderSize.X ~= self.RenderCanvasSize.X then
 		local scrollPercent = self.CanvasPosition.X/(self.RenderCanvasSize.X-self.RenderSize.X)
 		local scrollbarHeight = self.RenderSize.X * (self.RenderSize.X/self.RenderCanvasSize.X)
+		local scrollbarPosition = self.VerticalScrollbarSide == Enum.VerticalDirection.Top and 0 or self.RenderSize.Y - self.ScrollbarThickness
 
 		love.graphics.rectangle("fill",
-		renderPosition.X +  (self.RenderSize.X - scrollbarHeight) * scrollPercent,
-		renderPosition.Y + self.RenderSize.Y - scrollbarThickness,
+		renderPosition.X + (self.RenderSize.X - scrollbarHeight) * scrollPercent,
+		renderPosition.Y + scrollbarPosition,
 			scrollbarHeight,
-			scrollbarThickness
+			self.ScrollbarThickness
 		)
 	end
 end

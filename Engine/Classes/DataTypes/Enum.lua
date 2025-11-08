@@ -67,6 +67,21 @@ local EngineEnums = {
 		Name = NewEnum("SortMode"),
 	},
 
+	ScrollbarPadding = {
+		Never = NewEnum("ScrollbarPadding"),
+		Always = NewEnum("ScrollbarPadding"),
+		Scrollbar = NewEnum("ScrollbarPadding"),
+	},
+
+	LateralDirection = {
+		Left = NewEnum("LateralDirection"),
+		Right = NewEnum("LateralDirection"),
+	},
+	VerticalDirection = {
+		Top = NewEnum("VerticalDirection"),
+		Bottom = NewEnum("VerticalDirection"),
+	},
+
 	KeyCode = {
 		One = NewKeyCode("1"),
 		Two = NewKeyCode("2"),

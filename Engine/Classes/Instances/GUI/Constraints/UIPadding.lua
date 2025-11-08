@@ -1,7 +1,7 @@
 local module = {}
 module.Derives = "ConstraintBase"
 module.__index = module
-module.__type = "UILayoutBase"
+module.__type = "UIPadding"
 Instance.RegisterClass(module)
 
 module.ConstraintCategory = "Padding"
@@ -15,15 +15,27 @@ module.new = function()
 	self:CreateProperty("PaddingTop", "UDim", UDim.new(0,0))
 	self:CreateProperty("PaddingBottom", "UDim", UDim.new(0,0))
 
-	self:GetPropertyChangedSignal("PaddingLeft"):Connect(function()
-		
+	self.TopLeft = Vector.zero
+	self.BottomRight = Vector.zero
+
+	self.Changed:Connect(function()
+		self:UpdateOffsets()
 	end)
 
 	return self
 end
 
-function module:UpdateUDim2s()
-	self.PosOffset = 
+function module:BindToParent(parent)
+	self.ParentMaid:GiveTask(parent.Changed:Connect(function()
+		self:UpdateOffsets()
+	end))
+end
+
+function module:UpdateOffsets()
+	local parentSize = self.Parent.RenderSize
+
+	self.TopLeft = UDim2.fromUDims(self.PaddingLeft, self.PaddingTop):Calculate(parentSize)
+	self.BottomRight = UDim2.fromUDims(self.PaddingRight, self.PaddingBottom):Calculate(parentSize)
 end
 
 return module

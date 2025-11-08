@@ -18,7 +18,11 @@ function module:ScriptInit()
 	self.GuiScene:SetParent(self:GetScene())
     
     self.InventoryContainer = Instance.new("ContainerGui")
+    self.InventoryContainer.AnchorPoint = Vector.new(0.5, 0)
+    self.InventoryContainer.Position = UDim2.new(0.5, 0, 0, 0)
     self.InventoryContainer:SetParent(self.GuiScene)
+
+    Instance.new("UIPadding"):SetParent(self.GuiScene)
     
     self.WorldMaid = self.Maid:Add(Maid.new())
     self.ZIndex = 100

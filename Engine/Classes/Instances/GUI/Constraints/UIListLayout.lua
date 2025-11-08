@@ -32,6 +32,9 @@ local function newChild(self, child)
 
 	local connectionMaid = Maid.new()
 	self.ParentMaid[child] = connectionMaid
+	connectionMaid:GiveTask(function()
+		self:UpdateOrder()
+	end)
 	connectionMaid:GiveTask(child.Changed:Connect(function()
 		self:UpdateOrder()
 	end))
@@ -51,10 +54,7 @@ function module:BindToParent(parent)
 	end))
 	
 	self.ParentMaid:GiveTask(parent.ChildRemoved:Connect(function(child)
-		if self.ParentMaid[child] then
-			self:UpdateOrder()
 			self.ParentMaid[child] = nil
-		end
 	end))
 	self:UpdateOrder()
 end
@@ -125,11 +125,6 @@ function module:Resolve(child, parentSize, parentPos)
 	if pos and parentSize and self.Parent.RenderRotation then
 		local size = child.Size:Calculate(parentSize)
 		pos = pos + parentPos
-		-- pos = pos + self.Parent.RenderPosition
-
-		-- if self.Parent.CanvasPosition then
-		-- 	pos = pos - self.Parent.CanvasPosition
-		-- end
 
 		return size, pos, self.Parent.RenderRotation
 	end

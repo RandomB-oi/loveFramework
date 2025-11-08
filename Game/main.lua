@@ -1,6 +1,6 @@
-local mainScene = Instance.new("Scene")
-mainScene.Name = "Test Game"
-mainScene:SetParent(Engine)
+GameScene = Instance.new("Scene")
+GameScene.Name = "Test Game"
+GameScene:SetParent(Engine)
 Shaders = require("Game.Utility.Shaders")
 Engine.Updated:Connect(function(dt)
     Shaders:Update(dt)
@@ -18,11 +18,9 @@ Instance.GetClass("Item").Init()
 
 love.window.setMode(800, 600, {resizable = true})
 
-Instance.new("Constants"):SetParent(mainScene)
-
 local mainMenuScene = Instance.new("Scene", Vector.new(800, 600))
 mainMenuScene.Name = "MainMenu"
-mainMenuScene:SetParent(mainScene)
+mainMenuScene:SetParent(GameScene)
 
 local worldGenScript = Instance.new("Overworld")
 worldGenScript.Seed = 67
@@ -37,4 +35,24 @@ local localPlayer = Instance.new("Player")
 worldGenScript:SetLocalPlayer(localPlayer)
 
 
-return mainScene
+-- local list = Instance.new("Frame")
+-- list.Position = UDim2.new(0.5, 0, 0.5, 0)
+-- list.Size = UDim2.new(0.5, 0, 0.5, 0)
+-- list.AnchorPoint = Vector.one/2
+-- list.Color = Color.new(0,1,0,0.5)
+-- list:SetParent(mainMenuScene)
+
+-- local list = Instance.new("ScrollingFrame")
+-- list.Position = UDim2.new(0.5, 0, 0.5, 0)
+-- list.Size = UDim2.new(0.5, 0, 0.5, 0)
+-- list.AnchorPoint = Vector.one/2
+-- list.CanvasSize = UDim2.new(2,0,2,0)
+-- list.Color = Color.new(1,1,1,0.5)
+-- list:SetParent(mainMenuScene)
+
+-- local newFrame = Instance.new("Frame")
+-- newFrame.Size = UDim2.new(1,0,1,0)
+-- newFrame.Color = Color.new(1,0,0,.5)
+-- newFrame:SetParent(list)
+
+return GameScene

@@ -10,14 +10,13 @@ local InputService = Engine:GetService("InputService")
 local DefaultExpanded = false
 local CellHeight = 20
 
-module.new = function(object, depth, parentExplorerObject)
+module.new = function(object, depth)
 	if object:IsA("EditorInstance") or object.Hidden then return end
 	local self = setmetatable(module.Base.new(), module)
 
 	self.Name = object.Name
 	self.Object = object
 	self.Depth = depth or 0
-	self.ParentExplorerObject = parentExplorerObject
 
 	self.Size = UDim2.new(1, 0, 0, CellHeight)
 	self.Color = Color.new(0.1, 0.1, 0.1, 1)
@@ -88,16 +87,8 @@ module.new = function(object, depth, parentExplorerObject)
 	self.Maid:GiveTask(self.Object.ChildAdded:Connect(function(newChild)
 		self:NewChild(newChild)
 	end))
-	for _, child in ipairs(self.Object:GetChildren()) do
-		self:NewChild(child)
-	end
 
-	local first
-	self.Maid:GiveTask(self.Object.AncestryChanged:Connect(function()
-		if not first then
-			first = true
-			return
-		end
+	self.Maid:GiveTask(self.Object:GetPropertyChangedSignal("Parent"):Connect(function()
 		self:Destroy()
 	end))
 
@@ -129,6 +120,10 @@ module.new = function(object, depth, parentExplorerObject)
 	self.Button.RightClicked:Connect(function()
 		EditorScene:CreateContextMenu(self.Object)
 	end)
+	
+	for _, child in ipairs(self.Object:GetChildren()) do
+		self:NewChild(child)
+	end
 
 	self:UpdateSelected()
 	self.Maid:GiveTask(Selection.SelectionChanged:Connect(function()
@@ -147,7 +142,7 @@ function module:UpdateSelected()
 	end
 end
 
-function module:CalculateDeepestDepth(depth)
+function module:CalculateDeepestDepth()
 	local depth = self.Depth
 
 	for _, child in ipairs(self:GetChildren(true)) do
@@ -169,10 +164,6 @@ function module:UpdateScales()
 
 	local deepestDepth = self:CalculateDeepestDepth()
 	self.Size = UDim2.new(1, (deepestDepth - self.Depth) * CellHeight, 0, CellHeight+height)
-
-	if self.ParentExplorerObject then
-		self.ParentExplorerObject:UpdateScales()
-	end
 end
 
 function module:Update(dt)
@@ -193,7 +184,7 @@ function module:Update(dt)
 end
 
 function module:NewChild(child)
-	local newFrame = Instance.new("ExplorerObject", child, self.Depth + 1, self)
+	local newFrame = Instance.new("ExplorerObject", child, self.Depth + 1)
 	if not newFrame then return end
 	newFrame:SetParent(self.ChildrenList)
 end

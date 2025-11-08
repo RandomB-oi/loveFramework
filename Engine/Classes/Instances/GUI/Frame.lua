@@ -96,18 +96,32 @@ function module:Draw()
 end
 
 function module:GetModifiedSize(size)
-	local aspectRatio = self._constraintChildren and self._constraintChildren.AspectRatio
+	local aspectRatio = self:GetConstraint("AspectRatio")
 	local ratio = aspectRatio and aspectRatio.AspectRatio
+
 	if ratio then
-		local scale = math.min(size.X, size.Y)
-		if ratio > 1 then
-			size = Vector.new(scale, scale/ratio)
-		else
-			size = Vector.new(scale*ratio, scale)
+		local targetWidth = size.Y * ratio
+		local targetHeight = size.X / ratio
+
+		if targetWidth <= size.X then
+			return Vector.new(targetWidth, size.Y)
 		end
+		return Vector.new(size.X, targetHeight)
 	end
 
 	return size
+end
+
+function module:GetPadding()
+	local topLeft, bottomRight = Vector.zero, Vector.zero
+	
+	local padding = self:GetConstraint("Padding")
+	if padding then
+		topLeft = topLeft + padding.TopLeft
+		bottomRight = bottomRight + padding.BottomRight
+	end
+
+	return topLeft, bottomRight
 end
 
 function module:UpdateRender()
@@ -129,17 +143,15 @@ function module:UpdateRender()
 			if parentPosition and self.Parent and self.Parent.CanvasPosition then
 				parentPosition = parentPosition - self.Parent.CanvasPosition
 			end
-		-- elseif self.Parent:IsA("Scene") then
-		-- 	parentSize, parentPosition, parentRotation = self.Parent.RenderSize, self.Parent.RenderPosition or Vector.zero, 0
 		end
 
-		local listLayout
-		if self.Parent and self.Parent._constraintChildren then
-			listLayout = self.Parent._constraintChildren.List
-			if self.Parent._constraintChildren.Padding then
-				
-			end
+		if self.Parent and self.Parent.GetPadding then
+			local paddingTL, paddingBR = self.Parent:GetPadding()
+			parentPosition = parentPosition + paddingTL
+			parentSize = parentSize - (paddingBR + paddingTL)
 		end
+
+		local listLayout = self.Parent and self.Parent:GetConstraint("List")
 
 		if (parentSize and parentPosition) then
 			if listLayout then
@@ -151,6 +163,12 @@ function module:UpdateRender()
 				self.RenderSize = self:GetModifiedSize(self.Size:Calculate(parentSize))
 				self.RenderPosition = parentPosition + self.Position:Calculate(parentSize) - self.RenderSize * self.AnchorPoint
 				self.RenderRotation = parentRotation + self.Rotation
+			end
+
+			local scale = self:GetConstraint("Scale")
+			if scale then
+				self.RenderPosition = self.RenderPosition - (self.RenderSize * self.AnchorPoint) * (scale.Scale-1)
+				self.RenderSize = self.RenderSize * scale.Scale
 			end
 
 			return self.RenderSize, self.RenderPosition, self.RenderRotation

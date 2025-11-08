@@ -30,6 +30,19 @@ local PropConverters = {
 			)
 		end
 	},
+	UDim = {
+		tostring = function(value)
+			return stringRound(value.Scale)..", "..tostring(math.round(value.Offset))
+		end,
+		tovalue = function(str)
+			local split = string.split(str, ",")
+
+			return UDim.new(
+				tonumber(split[1]) or 0,
+				tonumber(split[2]) or 0
+			)
+		end
+	},
 
 	Color = {
 		tostring = function(value)
