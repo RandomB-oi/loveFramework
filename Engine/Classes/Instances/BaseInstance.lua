@@ -13,7 +13,6 @@ module._newindex = function(self, index, value)
 end
 
 module._index = function(self, index)
-	print("ask")
     local properties = rawget(self, "_properties")
     if properties and properties[index] then
         return properties[index].Value
@@ -45,6 +44,7 @@ local TypeCleaners = {
 module.ClassIcon = "Engine/Assets/InstanceIcons/Unknown.png"
 
 module.new = function()
+	print(module.SetProperty)
 	local self = setmetatable({}, module._metatable)
 	self.Maid = Maid.new()
 	self.ID = tostring(idSerial)

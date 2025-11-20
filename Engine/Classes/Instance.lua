@@ -177,12 +177,14 @@ function module.BulkSetProperties(instance, properties)
 end
 
 local function UpdateBases()
-	for className, class in pairs(GetOrphanedClasses()) do
+	for className, class in pairs(module.Classes) do
 		local derives = rawget(class, "Derives")
 		local baseClass = derives and Classes[derives]
-		if baseClass then
-			rawset(class, "Base", baseClass)
+		if not rawget(class, "_metatable") then
 			rawset(class, "_metatable", CreateInstanceMetatable(class))
+		end
+		if baseClass and not rawget(class,"Base") then
+			rawset(class, "Base", baseClass)
 			setmetatable(class, baseClass)
 		end
 	end
