@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "ValueBase"
-module.__index = module
+
 module.__type = "IntValue"
-Instance.RegisterClass(module)
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("Value", "number", 0, "Int")
@@ -13,4 +12,4 @@ module.new = function()
 	return self
 end
 
-return module
+return Instance.RegisterClass(module)

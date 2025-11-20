@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "BaseService"
-module.__index = module
+
 module.__type = "Constants"
-Instance.RegisterClass(module)
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
     self.Name = self.__type
 
     -- generic movement
@@ -22,4 +21,4 @@ module.new = function()
 end
 
 
-return module
+return Instance.RegisterClass(module)

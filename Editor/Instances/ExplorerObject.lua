@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "EditorInstance"
-module.__index = module
+
 module.__type = "ExplorerObject"
-Instance.RegisterClass(module)
 
 local Selection = Engine:GetService("Selection")
 local InputService = Engine:GetService("InputService")
@@ -12,7 +11,7 @@ local CellHeight = 20
 
 module.new = function(object, depth)
 	if object:IsA("EditorInstance") or object.Hidden then return end
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 
 	self.Name = object.Name
 	self.Object = object
@@ -45,7 +44,7 @@ module.new = function(object, depth)
 	self.Title.Size = UDim2.new(1, -CellHeight*2, 0, CellHeight)
 	self.Title.Position = UDim2.new(0, CellHeight*2, 0, 0)
 	self.Title.Text = object.Name
-	self.Title.XAlignment = Enum.TextXAlignment.Left
+	self.Title.XAlignment = Enum.XAlignment.Left
 	self.Title.ZIndex = 1
 	self.Title:SetParent(self)
 
@@ -189,4 +188,4 @@ function module:NewChild(child)
 	newFrame:SetParent(self.ChildrenList)
 end
 
-return module
+return Instance.RegisterClass(module)

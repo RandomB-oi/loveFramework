@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "UILayoutBase"
-module.__index = module
+
 module.__type = "UIListLayout"
-Instance.RegisterClass(module)
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/UIListLayout.png"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("Padding", "UDim2", UDim2.new(0, 6, 0, 6))
@@ -62,7 +61,12 @@ end
 function module:Update(dt)
 	module.Base.Update(self, dt)
 
-	-- self:UpdateOrder()
+	if self.Parent then
+		if self._lastParentSize ~= self.Parent.RenderSize then
+			self._lastParentSize = self.Parent.RenderSize
+			self:UpdateOrder()
+		end
+	end
 end
 
 function module:UpdateOrder()
@@ -97,22 +101,21 @@ function module:UpdateOrder()
 	end)
 
 	local orderedChildren = {}
-	local currentPosition = UDim2.new(0, 0, 0, 0)
 	local parentSize = self.Parent.RenderSize
 
 	local contentSize = Vector.zero
-	local paddingSize = self.Padding:Calculate(parentSize)
+	local paddingSize = self.Padding:Calculate(parentSize) * self.ListAxis
 	
 	for _, list in ipairs(array) do
-		for _, child in ipairs(list[2]) do
-			orderedChildren[child] = (currentPosition:Calculate(parentSize) * self.ListAxis)
-			
-			if contentSize ~= Vector.zero then
+		for index, child in ipairs(list[2]) do
+			local size = child:GetModifiedSize(child.Size:Calculate(parentSize))
+
+			orderedChildren[child] = contentSize
+			contentSize = contentSize + size * self.ListAxis
+
+			if next(list[2], index) then
 				contentSize = contentSize + paddingSize
 			end
-			contentSize = contentSize + child.RenderSize * self.ListAxis
-
-			currentPosition = currentPosition + child.Size + self.Padding
 		end
 	end
 
@@ -123,7 +126,7 @@ end
 function module:Resolve(child, parentSize, parentPos)
 	local pos = self.OrderedChildren[child]
 	if pos and parentSize and self.Parent.RenderRotation then
-		local size = child.Size:Calculate(parentSize)
+		local size = child:GetModifiedSize(child.Size:Calculate(parentSize))
 		pos = pos + parentPos
 
 		return size, pos, self.Parent.RenderRotation
@@ -132,4 +135,4 @@ function module:Resolve(child, parentSize, parentPos)
 	return Vector.zero, Vector.zero, 0
 end
 
-return module
+return Instance.RegisterClass(module)

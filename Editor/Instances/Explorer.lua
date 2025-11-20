@@ -1,11 +1,9 @@
 local module = {}
 module.Derives = "Widget"
-module.__index = module
 module.__type = "Explorer"
-Instance.RegisterClass(module)
 
 module.new = function(directory)
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	self:SetTitle("Explorer")
 
@@ -37,4 +35,4 @@ module.new = function(directory)
 	return self
 end
 
-return module
+return Instance.RegisterClass(module)

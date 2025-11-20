@@ -1,12 +1,11 @@
 local module = {}
 module.__index = module
 module.__type = "Container"
-Instance.RegisterClass(module)
 
 local ContainerUtility = require("Game.Utility.Container")
 
 module.new = function(slotCount, rowSize)
-	local self = setmetatable({}, module)
+	local self = setmetatable({}, module._metatable)
     self.Maid = Maid.new()
 
     self.Slots = {}
@@ -100,4 +99,4 @@ function module:Destroy()
     self.Maid:Destroy()
 end
 
-return module
+return Instance.RegisterClass(module)

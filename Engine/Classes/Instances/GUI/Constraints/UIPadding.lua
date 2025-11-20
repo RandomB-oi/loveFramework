@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "ConstraintBase"
-module.__index = module
+
 module.__type = "UIPadding"
-Instance.RegisterClass(module)
 
 module.ConstraintCategory = "Padding"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	
 	self:CreateProperty("PaddingLeft", "UDim", UDim.new(0,0))
@@ -38,4 +37,4 @@ function module:UpdateOffsets()
 	self.BottomRight = UDim2.fromUDims(self.PaddingRight, self.PaddingBottom):Calculate(parentSize)
 end
 
-return module
+return Instance.RegisterClass(module)

@@ -5,7 +5,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords) {
     vec4 pixelColor = texcolor * color;
 
     pixelColor.w *= sin(time)/2.0f+0.5f;
-    pixelColor.w *= 0.5f;
+    // pixelColor.w *= 0.5f;
 
     return pixelColor;
 }

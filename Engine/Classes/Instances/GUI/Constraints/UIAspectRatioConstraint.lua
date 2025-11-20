@@ -1,14 +1,13 @@
 local module = {}
 module.Derives = "ConstraintBase"
-module.__index = module
+
 module.__type = "UIAspectRatioConstraint"
-Instance.RegisterClass(module)
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/UIAspectRatioConstraint.png"
 module.ConstraintCategory = "AspectRatio"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
     self:CreateProperty("AspectRatio", "number", 1)
@@ -16,4 +15,4 @@ module.new = function()
 	return self
 end
 
-return module
+return Instance.RegisterClass(module)

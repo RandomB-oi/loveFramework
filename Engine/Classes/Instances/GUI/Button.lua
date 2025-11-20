@@ -1,14 +1,13 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "Button"
-Instance.RegisterClass(module)
 
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/ImageButton.png"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self.LeftClicked = self.Maid:Add(Signal.new())
@@ -54,4 +53,4 @@ function module:Draw()
 	module.Base.Draw(self)
 end
 
-return module
+return Instance.RegisterClass(module)

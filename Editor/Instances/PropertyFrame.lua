@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "EditorInstance"
-module.__index = module
+
 module.__type = "PropertyFrame"
-Instance.RegisterClass(module)
 
 local CellHeight = 20
 local existingDropdown
@@ -97,7 +96,7 @@ local PropConverters = {
 }
 
 module.new = function(propertyName, propertyType)
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self.PropertyName = propertyName
@@ -111,7 +110,7 @@ module.new = function(propertyName, propertyType)
 	self.Title = self.Maid:Add(Instance.new("TextLabel"))
 	self.Title.Size = UDim2.fromScale(0.5, 1)
 	self.Title.Text = propertyName
-	self.Title.XAlignment = Enum.TextXAlignment.Left
+	self.Title.XAlignment = Enum.XAlignment.Left
 	self.Title.ZIndex = 1
 	self.Title:SetParent(self)
 
@@ -160,7 +159,7 @@ module.new = function(propertyName, propertyType)
 
 		local textLabel = self.Maid:Add(Instance.new("TextLabel"))
 		textLabel.Size = UDim2.fromScale(1, 1)
-		textLabel.XAlignment = Enum.TextXAlignment.Left
+		textLabel.XAlignment = Enum.XAlignment.Left
 		textLabel:SetParent(button)
 		
 		self.PropertyChanged:Connect(function(newValue)
@@ -190,7 +189,7 @@ module.new = function(propertyName, propertyType)
 	elseif PropConverters[propertyType] then
 		local textbox = self.Maid:Add(Instance.new("TextBox"))
 		textbox.Size = UDim2.fromScale(1, 1)
-		textbox.XAlignment = Enum.TextXAlignment.Left
+		textbox.XAlignment = Enum.XAlignment.Left
 		textbox:SetParent(self.InteractArea)
 
 		textbox.FocusLost:Connect(function()
@@ -215,4 +214,4 @@ function module:SetValue(newValue)
 	self.PropertyChanged:Fire(newValue)
 end
 
-return module
+return Instance.RegisterClass(module)

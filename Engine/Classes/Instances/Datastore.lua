@@ -13,12 +13,21 @@ function getStr(value, alreadyDoneTables, tabs, oneLine)
 	if type(value) == "string" then
 		return "\""..value.."\""
 	elseif type(value) == "table" then
+		if value.IsA then
+			-- return "\""..value.__tostring(value).."\""
+			return "\""..tostring(value).."\""
+		end
+		
+		if value.ToLua then
+			return value:ToLua()
+		end
+
 		alreadyDoneTables = alreadyDoneTables or {}
 		if alreadyDoneTables[value] then
 			return "** cyclic table reference **"
 		end
 		alreadyDoneTables[value] = true
-		
+
 		return tableToString(value, alreadyDoneTables, tabs+1, oneLine)
 	else
 		return tostring(value)
@@ -70,39 +79,48 @@ local function isdir(path)
    return exists(path.."/")
 end
 
-local Datastore = {}
-Datastore.__index = Datastore
-Datastore.__type = "Datastore"
+local function MockEnabled()
+	return Engine:GetService("DatastoreService").MockEnabled
+end
 
-Datastore.Enabled = true
+local function makeDirectory(path)
+	path = path:gsub("/","\\")
+	os.execute("mkdir "..path)
+end
 
-local datastoreCache = {}
+local module = {}
+module.Derives = "BaseInstance"
 
-function Datastore:GetDatastore(name)
-	if datastoreCache[name] then
-		return datastoreCache[name]
-	end
-	local self = setmetatable({}, Datastore)
-	self.name = name
-	self.path = "storedData\\"..name
+module.__type = "Datastore"
+
+-- module.ClassIcon = "Engine/Assets/InstanceIcons/Folder.png"
+
+-- do not call Instance.new on this
+module.new = function(path)
+	local self = setmetatable(module.Base.new(), module._metatable)
+	self.Name = path
+	self.Path = path
+
+	self.MockData = {}
 
 	xpcall(function()
-		if not isdir(self.path) then
-			os.execute("mkdir "..self.path)
-			love.filesystem.createDirectory(self.path)
+		if not isdir(self.Path) then -- i think this only works on windows
+			makeDirectory(self.Path)
+			love.filesystem.createDirectory(self.Path)
 		end
 	end, warn)
-
-	datastoreCache[name] = self
 
 	return self
 end
 
-function Datastore:SetAsync(key, data)
-	if not Datastore.Enabled then return end
+function module:SetAsync(key, data)
+	if MockEnabled() then
+		self.MockData[key] = table.copy(data)
+		return
+	end
 
 	local str = "return "..getStr(data, {})
-	local directory = self.path.."/"..key..".lua"
+	local directory = self.Path.."/"..key..".lua"
 	local file = io.open(directory, "w")
 	if file then
 		file:write("", str)
@@ -110,8 +128,10 @@ function Datastore:SetAsync(key, data)
 	end
 end
 
-function Datastore:GetAsync(key)
-	if not Datastore.Enabled then return end
+function module:GetAsync(key)
+	if MockEnabled() then
+		return table.copy(self.MockData[key])
+	end
 
 	local directory = self.path.."/"..key..".lua"
 	local file = io.open(directory, "r")
@@ -123,18 +143,13 @@ function Datastore:GetAsync(key)
 	end
 end
 
-function Datastore:IncrementAsync(key, amount)
-	if not Datastore.Enabled then return end
-
+function module:IncrementAsync(key, amount)
 	local amount = amount or 1
-	local hasVal = self:GetAsync(key)
-	if type(hasVal) ~= "number" then
-		hasVal = 0
-	end
-	local val = (hasVal or 0) + amount
+	local hasVal = tonumber(self:GetAsync(key)) or 0
+	local val = hasVal + amount
 	self:SetAsync(key, val)
 
 	return val
 end
 
-return Datastore
+return Instance.RegisterClass(module)

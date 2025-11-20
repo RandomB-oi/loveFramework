@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "BaseInstance"
-module.__index = module
+
 module.__type = "Script"
-Instance.RegisterClass(module)
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/Script.png"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self._waitingThreads = {}
@@ -71,4 +70,4 @@ function module:Update(...)
 	self:ScriptUpdate(...)
 end
 
-return module
+return Instance.RegisterClass(module)

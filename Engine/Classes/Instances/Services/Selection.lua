@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "BaseService"
-module.__index = module
+
 module.__type = "Selection"
-Instance.RegisterClass(module)
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self.Selection = {}
@@ -61,4 +60,4 @@ function module:Remove(object)
 	self.SelectionChanged:Fire(self:Get())
 end
 
-return module
+return Instance.RegisterClass(module)

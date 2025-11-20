@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "Item"
-module.__index = module
+
 module.__type = "BlockItem"
-Instance.RegisterClass(module)
 
 module.Items = {}
 
@@ -35,4 +34,4 @@ end
 -- end
 
 
-return module
+return Instance.RegisterClass(module)

@@ -2,15 +2,14 @@
 
 local module = {}
 module.Derives = "BaseInstance"
-module.__index = module
+
 module.__type = "Script-DEPRECATED"
-Instance.RegisterClass(module)
 
 local LoadedServices = {}
 module.ClassIcon = "Engine/Assets/InstanceIcons/Script.png"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	self:SetParent(nil)
 
@@ -47,4 +46,4 @@ function module:Run(code)
 	end)
 end
 
-return module
+return Instance.RegisterClass(module)

@@ -51,15 +51,15 @@ local EngineEnums = {
 		MouseButton5 = NewMouseButton(5),
 	},
 
-	TextXAlignment = {
-		Left = NewEnum("TextXAlignment"),
-		Center = NewEnum("TextXAlignment"),
-		Right = NewEnum("TextXAlignment"),
+	XAlignment = {
+		Left = NewEnum("XAlignment"),
+		Center = NewEnum("XAlignment"),
+		Right = NewEnum("XAlignment"),
 	},
-	TextYAlignment = {
-		Up = NewEnum("TextYAlignment"),
-		Center = NewEnum("TextYAlignment"),
-		Bottom = NewEnum("TextYAlignment"),
+	YAlignment = {
+		Up = NewEnum("YAlignment"),
+		Center = NewEnum("YAlignment"),
+		Bottom = NewEnum("YAlignment"),
 	},
 	
 	SortMode = {

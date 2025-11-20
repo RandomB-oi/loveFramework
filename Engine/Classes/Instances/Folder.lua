@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "BaseInstance"
-module.__index = module
+
 module.__type = "Folder"
-Instance.RegisterClass(module)
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/Folder.png"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	return self
@@ -21,4 +20,4 @@ function module:Update(dt)
 	module.Base.Update(self, dt)
 end
 
-return module
+return Instance.RegisterClass(module)

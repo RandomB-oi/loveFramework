@@ -1,19 +1,38 @@
 local module = {}
 module.Derives = "WorldGeneratorScript"
-module.__index = module
+
 module.__type = "Overworld"
-Instance.RegisterClass(module)
 
 local Run = Engine:GetService("RunService")
 local Input = Engine:GetService("InputService")
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
     self:CreateProperty("MaxWorldHeight", "number", -100, "Int")
     self:CreateProperty("MaxWorldDepth", "number", 40, "Int")
     self:CreateProperty("MaxWorldWidth", "number", 40, "Int")
 
 	return self
+end
+
+function module:ScriptInit()
+    module.Base.ScriptInit(self)
+
+    self.SkyFrame = Instance.new("Sky")
+    self.SkyFrame:SetParent(self.Scene)
+
+    self.OverlayFrame = Instance.new("Fog")
+    self.OverlayFrame.Color = Color.new(0,0,0,1)
+    self.OverlayFrame:SetParent(self.Scene)
+
+    self.OverlayFrame.FogStart = 0
+    self.OverlayFrame.FogEnd = 1
+    self.OverlayFrame.Roundness = 0.5
+end
+
+function module:ScriptUpdate(dt)
+    module.Base.ScriptUpdate(self, dt)
+    self.OverlayFrame.Scale = self.Scale.Scale
 end
 
 function module:GetGrassColor(x, y)
@@ -62,4 +81,4 @@ function module:GenerateChunk(chunk)
     chunk:RenderCanvas()
 end
 
-return module
+return Instance.RegisterClass(module)

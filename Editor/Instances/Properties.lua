@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "Widget"
-module.__index = module
+
 module.__type = "Properties"
-Instance.RegisterClass(module)
 
 local Selection = Engine:GetService("Selection")
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	
 	self:SetTitle("Properties")
@@ -140,4 +139,4 @@ function module:UpdateProperties()
 	-- textLabel:SetParent(addAttributeButton)
 end
 
-return module
+return Instance.RegisterClass(module)

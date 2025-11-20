@@ -1,14 +1,13 @@
 local module = {}
 module.__index = module
 module.__type = "Block"
-Instance.RegisterClass(module)
 
 module.Blocks = {}
 
--- module.Shader = Shaders.NormalShader
+module.Shader = Instance.GetClass("Shader").Normal.ID
 
 module.new = function(blockId)
-	local self = setmetatable({}, module)
+	local self = setmetatable({}, module._metatable)
 	self.ID = blockId
 
     module.Blocks[blockId] = self
@@ -40,6 +39,10 @@ function module:CanCollide(entity)
 	return true
 end
 
+function module:GetRenderLayer()
+	return self.Shader or -1
+end
+
 function module.Init()
 	module.DirtBlock = Instance.new("DirtBlock", "dirt_block")
 	module.GrassBlock = Instance.new("GrassBlock", "grass_block")
@@ -47,4 +50,4 @@ function module.Init()
 	module.BedrockBlock = Instance.new("BedrockBlock", "bedrock_block")
 end
 
-return module
+return Instance.RegisterClass(module)

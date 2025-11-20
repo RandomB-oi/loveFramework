@@ -1,14 +1,13 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "ScrollingFrame"
-Instance.RegisterClass(module)
 
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/ScrollingFrame.png"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self.Canvas = nil
@@ -138,4 +137,4 @@ function module:Draw()
 	end
 end
 
-return module
+return Instance.RegisterClass(module)

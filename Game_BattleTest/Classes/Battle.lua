@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "BaseInstance"
-module.__index = module
+
 module.__type = "Battle"
-Instance.RegisterClass(module)
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/ImageButton.png"
 
@@ -32,7 +31,7 @@ local function Hurt(amount)
 end
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Maid = Maid.new()
 	self.Done = Signal.new()
 
@@ -144,4 +143,4 @@ function module:Destroy()
 	self.Maid:Destroy()
 end
 
-return module
+return Instance.RegisterClass(module)

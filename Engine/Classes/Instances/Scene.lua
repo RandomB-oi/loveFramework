@@ -1,15 +1,13 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
 module.__type = "Scene"
-Instance.RegisterClass(module)
 
 local LoadedServices = {}
 module.ClassIcon = "Engine/Assets/InstanceIcons/Workspace.png"
 module.FrameRendering = false
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	-- self:SetParent(nil)
 	
@@ -119,9 +117,13 @@ function module:Draw()
 
 	self.Color:Apply()
 	
+	local prev = love.graphics.getShader()
 	local scene = self:FindFirstAncestorWhichIsA("Scene")
 	local sceneOffset = scene and scene.RenderPosition or Vector.zero
+
+	love.graphics.setShader(self.Shader)
 	love.graphics.cleanDrawImage(self.Canvas, self.RenderPosition-sceneOffset, self.RenderSize)
+	love.graphics.setShader(prev)
 end
 
 function module:Pause()
@@ -141,4 +143,4 @@ function module:Disable()
 	return self
 end
 
-return module
+return Instance.RegisterClass(module)

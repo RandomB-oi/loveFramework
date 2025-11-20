@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "Hotbar"
-Instance.RegisterClass(module)
 
 -- local items = {
 --     {ID = "grass_block_item", Amount = 64},
@@ -12,7 +11,7 @@ Instance.RegisterClass(module)
 -- }
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
     self.Name = self.__type
     self.Color = Color.new(0,0,0,0)
     self.Size = UDim2.new(1, 0, 1, 0)
@@ -32,4 +31,4 @@ module.new = function()
 end
 
 
-return module
+return Instance.RegisterClass(module)

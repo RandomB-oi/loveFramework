@@ -1,14 +1,12 @@
 local module = {}
 module.Derives = "EditorInstance"
-module.__index = module
 module.__type = "Dropdown"
-Instance.RegisterClass(module)
 
 local Selection = Engine:GetService("Selection")
 local InputService = Engine:GetService("InputService")
 
 module.new = function(list)
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 
 	self.ZIndex = 100
 	self.Color = Color.new(0.5, 0.5, 0.5, 1)
@@ -25,7 +23,7 @@ module.new = function(list)
 
 	self.ValueSelected = self.Maid:Add(Signal.new())
 
-	self.Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
+	self.Layout:BindProperty("AbsoluteContentSize", function(size)
 		self.Size = UDim2.new(0, 112, 0, math.min(size.Y, 200))
 		self.List.CanvasSize = UDim2.new(0, 0, 0, size.Y)
 	end)
@@ -50,7 +48,7 @@ module.new = function(list)
 		textLabel.Color = Color.new(1, 1, 1, 1)
 		textLabel.Size = UDim2.fromScale(1, 1)
 		textLabel.Text = name
-		textLabel.XAlignment = Enum.TextXAlignment.Left
+		textLabel.XAlignment = Enum.XAlignment.Left
 		textLabel:SetParent(newButton)
 
 		newButton.LeftClicked:Connect(function()
@@ -62,4 +60,4 @@ module.new = function(list)
 end
 
 
-return module
+return Instance.RegisterClass(module)

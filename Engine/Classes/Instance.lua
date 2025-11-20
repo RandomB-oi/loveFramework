@@ -5,15 +5,18 @@ local Classes = {}
 module.Classes = Classes
 module.new = function(className, ...)
 	local new = assert(Classes[className] and Classes[className].new, tostring(className).." is an invalid instance type")
-
-	return new(...)
+	local object = new(...)
+	if object.IsA then
+		object.Base = Classes[className]
+	end
+	return object
 end
 
 module.GetClass = function(className)
 	return Classes[className]
 end
 
-function module.GetOrphanedClasses()
+local function GetOrphanedClasses()
 	local list = {}
 	for className, class in pairs(Classes) do
 		local derives = rawget(class, "Derives")
@@ -23,6 +26,37 @@ function module.GetOrphanedClasses()
 		end
 	end
 	return list
+end
+
+local function CreateInstanceMetatable(class)
+    return {
+        __index = function(self, index)
+            local current = class
+            while current do
+                if current._index then
+                    local value = current._index(self, index)
+                    if value ~= nil then return value end
+                end
+                current = current.Base
+            end
+
+            local selfHas = rawget(self, index)
+            if selfHas ~= nil then return selfHas end
+            return rawget(class, index)
+        end,
+
+        __newindex = function(self, index, value)
+            local current = class
+            while current do
+                if current._newindex then
+                    local handled = current._newindex(self, index, value)
+                    if handled then return end
+                end
+                current = current.Base
+            end
+            rawset(self, index, value)
+        end,
+    }
 end
 
 local function GetVarName(object, counts)
@@ -143,11 +177,12 @@ function module.BulkSetProperties(instance, properties)
 end
 
 local function UpdateBases()
-	for className, class in pairs(module.GetOrphanedClasses()) do
+	for className, class in pairs(GetOrphanedClasses()) do
 		local derives = rawget(class, "Derives")
-		local baseClass = Classes[derives]
+		local baseClass = derives and Classes[derives]
 		if baseClass then
 			rawset(class, "Base", baseClass)
+			rawset(class, "_metatable", CreateInstanceMetatable(class))
 			setmetatable(class, baseClass)
 		end
 	end

@@ -1,10 +1,9 @@
 local module = {}
 module.__index = module
 module.__type = "ItemStack"
-Instance.RegisterClass(module)
 
 module.new = function(itemID, amount)
-    local self = setmetatable({}, module)
+    local self = setmetatable({}, module._metatable)
     self.ID = itemID
     self.Amount = amount or 1
 
@@ -63,4 +62,4 @@ function module:Destroy()
     end
 end
 
-return module
+return Instance.RegisterClass(module)

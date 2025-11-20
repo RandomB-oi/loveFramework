@@ -1,7 +1,6 @@
 local module = {}
 module.__index = module
 module.__type = "Item"
-Instance.RegisterClass(module)
 
 module.Items = {}
 
@@ -10,7 +9,7 @@ module.StackWidth = 1
 module.StackHeight = 1
 
 module.new = function(itemID)
-	local self = setmetatable({}, module)
+	local self = setmetatable({}, module._metatable)
 	self.ID = itemID
 
     module.Items[itemID] = self
@@ -52,4 +51,4 @@ function module.Init()
 	module.BedrockBlock = Instance.new("BlockItem", "bedrock_block_item", "bedrock_block")
 end
 
-return module
+return Instance.RegisterClass(module)

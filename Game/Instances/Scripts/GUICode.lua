@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "Script"
-module.__index = module
+
 module.__type = "GUICode"
-Instance.RegisterClass(module)
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self:CreateProperty("World", "Instance", nil)
 
 	return self
@@ -66,4 +65,4 @@ function module:Draw()
     module.Base.Draw(self)
 end
 
-return module
+return Instance.RegisterClass(module)

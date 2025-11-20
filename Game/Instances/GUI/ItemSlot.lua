@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "Button"
-module.__index = module
+
 module.__type = "ItemSlot"
-Instance.RegisterClass(module)
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
     self.Name = self.__type
 	self.Size = UDim2.new(0, 50, 0, 50)
 	self.Color = Color.new(0,0,0,0)
@@ -75,8 +74,8 @@ module.new = function()
 	self.AmountLabel.Position = UDim2.new(0.5, 0, 1, -borderThickness)
 	self.AmountLabel.Archivable = false
 	self.AmountLabel.AnchorPoint = Vector.new(0.5, 1)
-	self.AmountLabel.XAlignment = Enum.TextXAlignment.Right
-	self.AmountLabel.YAlignment = Enum.TextYAlignment.Bottom
+	self.AmountLabel.XAlignment = Enum.XAlignment.Right
+	self.AmountLabel.YAlignment = Enum.YAlignment.Bottom
 	self.AmountLabel.Name = "AmountLabel"
 	self.AmountLabel.ZIndex = 2
 	self.AmountLabel.Size = UDim2.new(1, -borderThickness*2, 0, 16)
@@ -97,4 +96,4 @@ function module:SetItem(stack)
 	end
 end
 
-return module
+return Instance.RegisterClass(module)

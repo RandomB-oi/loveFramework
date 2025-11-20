@@ -111,7 +111,7 @@ do -- load all instances
 	autoLoad("Engine/Classes/Instances", {"Engine.main"})
 end
 
-Engine = Instance.new("Scene"):Enable():Unpause()
+Engine = Instance.new("Scene")
 Engine.Name = "Engine"
 
 Engine:GetService("RunService")

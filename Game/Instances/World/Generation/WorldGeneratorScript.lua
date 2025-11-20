@@ -1,14 +1,13 @@
 local module = {}
 module.Derives = "Script"
-module.__index = module
+
 module.__type = "WorldGeneratorScript"
-Instance.RegisterClass(module)
 
 local Run = Engine:GetService("RunService")
 local Input = Engine:GetService("InputService")
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 
 	self:CreateProperty("Seed", "number", 0)
 	self:CreateProperty("ChunkSize", "number", 8, "Int")
@@ -24,12 +23,17 @@ module.new = function()
 end
 
 function module:ScriptInit()
-	self.Scene = self.Maid:Add(Instance.new("Scene"))
+	self.Scene = Instance.new("Scene")
+    self.Scene.Archivable = false
     self.Scene.Name = "WorldScene"
     self.Scene.ZIndex = -1
 	self.Scene:SetParent(self:GetScene())
+
     self.ZIndex = 100
-    self.WorldFrame = self.Maid:Add(Instance.new("Frame"))
+    
+    self.WorldFrame = Instance.new("Frame")
+    self.WorldFrame.Name = "WorldFrame"
+    self.WorldFrame.Archivable = false
     self.WorldFrame.Position = UDim2.fromScale(0.5, 0.5)
     self.WorldFrame.Size = UDim2.new(0, self.BlockSize, 0, self.BlockSize)
     self.WorldFrame.Color = Color.new(0, 0, 0, 0)
@@ -129,14 +133,22 @@ function module:ScriptUpdate(dt)
     --     self.WorldFrame.Position = self.WorldFrame.Position - UDim2.fromOffset(dt*moveSpeed, 0)
     -- end
 
+    if Input:IsKeyPressed(Enum.KeyCode.Minus) then
+        self.Scale.Scale = self.Scale.Scale - dt
+    end
+    if Input:IsKeyPressed(Enum.KeyCode.Equals) then
+        self.Scale.Scale = self.Scale.Scale + dt
+    end
+    self.Scale.Scale = math.clamp(self.Scale.Scale, .25, 4)
+
     if self.LocalPlayer then
         local screenPos = UDim2.fromOffset(
             self.LocalPlayer.Position.X.Scale * 
             self.WorldFrame.Size.X.Offset,
-            self.LocalPlayer.Position.Y.Scale * 
-            self.WorldFrame.Size.Y.Offset
+            (self.LocalPlayer.Position.Y.Scale - self.LocalPlayer.EntitySizeInBlocks.Y/2) * 
+            self.WorldFrame.Size.Y.Offset 
         ) * self.Scale.Scale
-        self.WorldFrame.Position = self.WorldFrame.Position:Lerp(-screenPos + UDim2.fromScale(0.5, 0.5), 1-0.001^dt)
+        self.WorldFrame.Position = -screenPos + UDim2.fromScale(0.5, 0.5)
     end
 
     self:UpdateLoadedChunks()
@@ -322,4 +334,4 @@ function module:GetMouseInBlockSpace()
 	return Vector.new(lmx - parentPos.X, lmy - parentPos.Y) / self.BlockSize
 end
 
-return module
+return Instance.RegisterClass(module)

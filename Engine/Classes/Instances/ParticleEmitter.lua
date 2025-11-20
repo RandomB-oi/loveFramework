@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "BaseInstance"
-module.__index = module
+
 module.__type = "ParticleEmitter"
-Instance.RegisterClass(module)
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	
     -- particle properties 
@@ -110,4 +109,4 @@ function module:Draw()
     end
 end
 
-return module
+return Instance.RegisterClass(module)

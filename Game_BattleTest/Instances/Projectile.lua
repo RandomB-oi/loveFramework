@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "Projectile"
-Instance.RegisterClass(module)
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 
 	self.AnchorPoint = Vector.one/2
 	self.Size = UDim2.fromOffset(25,50)
@@ -23,4 +22,4 @@ function module:Update(dt)
 	self.Position = self.Position + UDim2.fromOffset(dir.X, dir.Y)
 end
 
-return module
+return Instance.RegisterClass(module)

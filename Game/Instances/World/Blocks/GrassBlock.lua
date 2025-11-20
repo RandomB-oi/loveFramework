@@ -1,13 +1,14 @@
 local module = {}
 module.Derives = "Block"
-module.__index = module
+
 module.__type = "GrassBlock"
-Instance.RegisterClass(module)
 
 local DirtImage = love.graphics.newImage("Game/Assets/Blocks/DirtBlock.png")
 local GrassImage = love.graphics.newImage("Game/Assets/Blocks/GrassTop.png")
 
 local DefaultGrass = Color.new(0, 1, 0, 1)
+
+-- module.Shader = -1
 
 module.new = function(...)
 	local self = setmetatable(module.Base.new(...), module)
@@ -27,4 +28,4 @@ function module:GenericDraw(blockSize, x,y,chunk, world)
     love.graphics.cleanDrawImage(GrassImage, Vector.zero, blockSize)
 end
 
-return module
+return Instance.RegisterClass(module)

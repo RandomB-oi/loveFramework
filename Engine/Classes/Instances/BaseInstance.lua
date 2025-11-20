@@ -1,10 +1,24 @@
 local module = {}
-module.__index = module
 module.__type = "BaseInstance"
-Instance.RegisterClass(module)
-
+module.__index = module
 module.All = {}
 local idSerial = 0
+
+module._newindex = function(self, index, value)
+	local properties = rawget(self, "_properties")
+	if properties and properties[index] then
+		self:SetProperty(index, value)
+		return true
+	end
+end
+
+module._index = function(self, index)
+	print("ask")
+    local properties = rawget(self, "_properties")
+    if properties and properties[index] then
+        return properties[index].Value
+    end
+end
 
 local function propertyTypeMatches(value, desiredType)
 	if desiredType then
@@ -31,7 +45,7 @@ local TypeCleaners = {
 module.ClassIcon = "Engine/Assets/InstanceIcons/Unknown.png"
 
 module.new = function()
-	local self = setmetatable({}, module)
+	local self = setmetatable({}, module._metatable)
 	self.Maid = Maid.new()
 	self.ID = tostring(idSerial)
 	idSerial = idSerial + 1
@@ -79,17 +93,99 @@ function module:GetProperties()
 end
 
 function module:CreateProperty(name, propType, defaultValue, cleaner)
-	self[name] = defaultValue
+	-- self[name] = defaultValue
 
 	if not self._properties[name] then
 		self._properties[name] = {
 			-- Changed = Signal.new(),
-			CurrentValue = defaultValue,
+			Value = defaultValue,
 			PropType = propType,
 			DefaultValue = defaultValue,
 			TypeCleaner = cleaner,
 		}
 	end
+end
+
+
+function module:GetFullName()
+	local path = {}
+	local object = self
+	while object do
+		table.insert(path, object.Name)
+		object = object.Parent
+	end
+	return table.concat(table.reverse(path),".")
+end
+
+function module:SetProperty(propName, newValue)
+	local info = self._properties[propName]
+
+	if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
+		newValue = TypeCleaners[info.TypeCleaner](newValue)
+	end
+	if newValue ~= info.Value then
+		if propertyTypeMatches(newValue, info.PropType) then
+			info.Value = newValue
+
+			if propName == "Parent" then
+				self.Maid.RemoveParent = nil
+				if newValue then
+					newValue._children[self.ID] = self
+					newValue.ChildAdded:Fire(self)
+					
+					self.Maid.RemoveParent = function()
+						newValue._children[self.ID] = nil
+						newValue.ChildRemoved:Fire(self)
+					end
+				end
+			end
+
+			if info.Changed then
+				info.Changed:Fire(newValue)
+			end
+
+			self.Changed:Fire(propName, newValue)
+
+			if propName == "Parent" then
+				self.AncestryChanged:Fire()
+				for i,v in ipairs(self:GetChildren(true)) do
+					v.AncestryChanged:Fire()
+				end
+			end
+		else
+			print("invalid value for "..propName..":",tostring(newValue))
+		end
+	end
+end
+
+function module:SetParent(newParent)
+	self:SetProperty("Parent", newParent)
+	-- if not newParent then newParent = nil end
+	-- if self.Parent == newParent then return end
+
+	-- self.Maid.RemoveParent = nil
+	-- if newParent == self then newParent = nil return end
+	-- self.Parent = newParent
+
+	-- if newParent then
+	-- 	newParent._children[self.ID] = self
+	-- 	newParent.ChildAdded:Fire(self)
+		
+	-- 	self.Maid.RemoveParent = function()
+	-- 		newParent._children[self.ID] = nil
+	-- 		newParent.ChildRemoved:Fire(self)
+	-- 	end
+
+	-- 	-- local scene = newParent:GetScene()
+	-- 	-- if scene then
+	-- 	-- 	scene._canvasNeedsUpdate = true
+	-- 	-- end
+	-- end
+
+	-- self.AncestryChanged:Fire()
+	-- for i,v in ipairs(self:GetChildren(true)) do
+	-- 	v.AncestryChanged:Fire()
+	-- end
 end
 
 function module:CheckProperties()
@@ -98,9 +194,9 @@ function module:CheckProperties()
 		if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
 			newValue = TypeCleaners[info.TypeCleaner](newValue)
 		end
-		if newValue ~= info.CurrentValue then
+		if newValue ~= info.Value then
 			if propertyTypeMatches(newValue, info.PropType) then
-				info.CurrentValue = newValue
+				info.Value = newValue
 
 				if info.Changed then
 					info.Changed:Fire(newValue)
@@ -108,10 +204,15 @@ function module:CheckProperties()
 
 				self.Changed:Fire(propName, newValue)
 			else
-				self[propName] = info.CurrentValue
+				self[propName] = info.Value
 			end
 		end
 	end
+end
+
+function module:BindProperty(name, callback)
+	callback(self[name])
+	return self:GetPropertyChangedSignal(name):Connect(callback)
 end
 
 function module:GetPropertyChangedSignal(name)
@@ -191,7 +292,7 @@ function module:DrawChildren()
 end
 
 function module:Update(dt)
-	self:CheckProperties()
+	-- self:CheckProperties()
 	for _, child in ipairs(self:GetChildren()) do
 		child:Update(dt)
 	end
@@ -302,45 +403,6 @@ function module:SearchPath(path)
 	return root
 end
 
-function module:GetFullName()
-	local path = {}
-	local object = self
-	while object do
-		table.insert(path, object.Name)
-		object = object.Parent
-	end
-	return table.concat(table.reverse(path),".")
-end
-
-function module:SetParent(newParent)
-	if not newParent then newParent = nil end
-	if self.Parent == newParent then return end
-
-	self.Maid.RemoveParent = nil
-	if newParent == self then newParent = nil return end
-	self.Parent = newParent
-
-	if newParent then
-		newParent._children[self.ID] = self
-		newParent.ChildAdded:Fire(self)
-		
-		self.Maid.RemoveParent = function()
-			newParent._children[self.ID] = nil
-			newParent.ChildRemoved:Fire(self)
-		end
-
-		-- local scene = newParent:GetScene()
-		-- if scene then
-		-- 	scene._canvasNeedsUpdate = true
-		-- end
-	end
-
-	self.AncestryChanged:Fire()
-	for i,v in ipairs(self:GetChildren(true)) do
-		v.AncestryChanged:Fire()
-	end
-end
-
 function module:IsEnabled()
 	if not self.Enabled then return false end
 
@@ -418,12 +480,16 @@ function module:Destroy()
 	self:ClearAllChildren()
 end
 
+function module:__tostring()
+	return typeof(self).."_"..self.Name.."-"..self.ID
+end
+
 function module.UpdateOrphanedInstances(dt)
 	for _, instance in pairs(module.All) do
-		if not instance._properties.Parent.CurrentValue and instance ~= Engine then
+		if not instance._properties.Parent.Value and instance ~= Engine then
 			instance:Update(dt)
 		end
 	end
 end
 
-return module
+return Instance.RegisterClass(module)

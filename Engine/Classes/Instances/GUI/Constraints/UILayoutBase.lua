@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "ConstraintBase"
-module.__index = module
+
 module.__type = "UILayoutBase"
-Instance.RegisterClass(module)
 
 module.ConstraintCategory = "List"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	
 	return self
@@ -17,4 +16,4 @@ function module:Resolve(child, parentSize, parentPosition, parentRotation)
 	return Vector.zero, Vector.zero, 0
 end
 
-return module
+return Instance.RegisterClass(module)

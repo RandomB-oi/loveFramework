@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "BaseService"
-module.__index = module
+
 module.__type = "InputService"
-Instance.RegisterClass(module)
 
 local cachedEnums = {}
 local function ScanCodeToKeyCode(scancode)
@@ -23,7 +22,7 @@ local function GetMouseButton(number)
 end
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	self.InputBegan = self.Maid:Add(Signal.new())
 	self.InputEnded = self.Maid:Add(Signal.new())
@@ -93,4 +92,4 @@ function module:IsMouseButtonPressed(key)
 	return not not self.PressedMouseButtons[key]
 end
 
-return module
+return Instance.RegisterClass(module)

@@ -1,14 +1,12 @@
 local module = {}
 module.Derives = "BaseInstance"
-module.__index = module
 module.__type = "Frame"
-Instance.RegisterClass(module)
 
 module.FrameRendering = true
 module.ClassIcon = "Engine/Assets/InstanceIcons/Frame.png"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("ZIndex", "number", 0)
@@ -18,6 +16,8 @@ module.new = function()
 	self:CreateProperty("Color", "Color", Color.from255(255, 255, 255, 255))
 	self:CreateProperty("Rotation", "number", 0)
 	self:CreateProperty("LayoutOrder", "number", 0)
+
+	self.Shader = nil
 
 	self.RenderSize = Vector.zero
 	self.RenderPosition = Vector.zero
@@ -69,21 +69,25 @@ function module:Update(dt)
 end
 
 function module:Translate()
-	love.graphics.push()
+	local prev = love.graphics.getShader()
 	local anchorSize = self.RenderSize * self.AnchorPoint
 	local scenePosition = self:GetScene().RenderPosition
+
+	love.graphics.push()
 	love.graphics.translate(self.RenderPosition.X+anchorSize.X-scenePosition.X, self.RenderPosition.Y+anchorSize.Y-scenePosition.Y)
 	love.graphics.rotate(math.rad(self.RenderRotation))
+	love.graphics.setShader(self.Shader)
 
-	return anchorSize
+	return anchorSize, prev
 end
 
 function module:DrawFrame()
 	self.Color:Apply()
 
-	local anchorSize = self:Translate()
+	local anchorSize, prev = self:Translate()
 	love.graphics.rectangle("fill", -anchorSize.X, -anchorSize.Y, self.RenderSize.X, self.RenderSize.Y)
 	love.graphics.pop()
+	love.graphics.setShader(prev)
 end
 
 function module:Draw()
@@ -98,6 +102,11 @@ end
 function module:GetModifiedSize(size)
 	local aspectRatio = self:GetConstraint("AspectRatio")
 	local ratio = aspectRatio and aspectRatio.AspectRatio
+
+	local sizeConstraint = self:GetConstraint("Size")
+	if sizeConstraint then
+		size = Vector.new(math.clamp(size.X, sizeConstraint.Min.X, sizeConstraint.Max.X), math.clamp(size.Y, sizeConstraint.Min.Y, sizeConstraint.Max.Y))
+	end
 
 	if ratio then
 		local targetWidth = size.Y * ratio
@@ -156,7 +165,7 @@ function module:UpdateRender()
 		if (parentSize and parentPosition) then
 			if listLayout then
 				local size, pos, rot = listLayout:Resolve(self, parentSize, parentPosition, parentRotation)
-				self.RenderSize = self:GetModifiedSize(size)
+				self.RenderSize = size
 				self.RenderPosition = pos
 				self.RenderRotation = rot
 			else
@@ -177,4 +186,4 @@ function module:UpdateRender()
 	-- return Vector.new(love.graphics.getDimensions()), Vector.zero, 0
 end
 
-return module
+return Instance.RegisterClass(module)

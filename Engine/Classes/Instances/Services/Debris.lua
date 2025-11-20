@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "BaseService"
-module.__index = module
+
 module.__type = "Debris"
-Instance.RegisterClass(module)
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self.Objects = {}
@@ -50,4 +49,4 @@ function module:Cancel(item)
 	return item
 end
 
-return module
+return Instance.RegisterClass(module)

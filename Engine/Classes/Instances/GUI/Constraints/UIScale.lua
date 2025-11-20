@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "ConstraintBase"
-module.__index = module
+
 module.__type = "UIScale"
-Instance.RegisterClass(module)
 
 module.ConstraintCategory = "Scale"
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	
 	self:CreateProperty("Scale", "number", 1)
@@ -15,4 +14,4 @@ module.new = function()
 	return self
 end
 
-return module
+return Instance.RegisterClass(module)

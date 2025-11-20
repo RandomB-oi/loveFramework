@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "Entity"
-module.__index = module
+
 module.__type = "Player"
-Instance.RegisterClass(module)
 
 module.EntitySizeInBlocks = Vector.new(.75,1.8)
 
@@ -10,7 +9,7 @@ local Run = Engine:GetService("RunService")
 local Input = Engine:GetService("InputService")
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 
 	self:CreateProperty("MoveSpeed", "number", 5)
 	self:CreateProperty("JumpPower", "number", 13.2)
@@ -95,4 +94,4 @@ function module:Update(dt)
 	module.Base.Update(self, dt)
 end
 
-return module
+return Instance.RegisterClass(module)

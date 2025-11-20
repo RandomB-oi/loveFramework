@@ -1,12 +1,11 @@
 local module = {}
 module.Derives = "BaseService"
-module.__index = module
+
 module.__type = "RunService"
-Instance.RegisterClass(module)
 
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("ElapsedTime", "number", 0)
@@ -16,8 +15,6 @@ module.new = function ()
 	self._currentRunningGame = nil
 
 	self.RunChanged = self.Maid:Add(Signal.new())
-
-	self:SetAttribute("test attribute", 10)
 
 	return self
 end
@@ -73,4 +70,4 @@ function module:Stop()
 	return GameScene
 end
 
-return module
+return Instance.RegisterClass(module)

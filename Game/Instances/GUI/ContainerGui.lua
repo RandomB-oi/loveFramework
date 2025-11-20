@@ -1,15 +1,14 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "ContainerGui"
-Instance.RegisterClass(module)
 
 local Run = Engine:GetService("RunService")
 local Input = Engine:GetService("InputService")
 local ContainerUtility = require("Game.Utility.Container")
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
     self.Name = self._type
     self.Size = UDim2.fromScale(1,1)
     self.Color = Color.new(0,0,0,0)
@@ -19,6 +18,10 @@ module.new = function()
     self.AspectRatio = Instance.new("UIAspectRatioConstraint")
     self.AspectRatio.Archivable = false
     self.AspectRatio:SetParent(self)
+
+    self.SizeConstraint = Instance.new("UISizeConstraint")
+    self.SizeConstraint.Archivable = false
+    self.SizeConstraint:SetParent(self)
 
     self.Frames = {}
 
@@ -39,6 +42,7 @@ function module:RenderFrames()
     
     local rowAmount = ContainerUtility.GetRowCount(container.SlotCount, container.RowSize)
     self.AspectRatio.AspectRatio = container.RowSize/rowAmount
+    self.SizeConstraint.Max = Vector.new(math.huge, 50*rowAmount)
 
     local xSize = 1/container.RowSize
     local ySize = 1/rowAmount
@@ -70,4 +74,4 @@ function module:Draw()
     module.Base.Draw(self)
 end
 
-return module
+return Instance.RegisterClass(module)

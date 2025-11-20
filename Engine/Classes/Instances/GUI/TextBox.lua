@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "TextLabel"
-module.__index = module
+
 module.__type = "TextBox"
-Instance.RegisterClass(module)
 
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/TextBox.png"
@@ -31,7 +30,7 @@ local UpperReplace = {
 }
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	local InputService = Engine:GetService("InputService")
@@ -148,4 +147,4 @@ function module:Draw()
 end
 
 
-return module
+return Instance.RegisterClass(module)

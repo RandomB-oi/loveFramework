@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "Block"
-module.__index = module
+
 module.__type = "StoneBlock"
-Instance.RegisterClass(module)
 
 local StoneImage = love.graphics.newImage("Game/Assets/Blocks/StoneBlock.png")
 
@@ -17,4 +16,4 @@ function module:GenericDraw(blockSize, x,y,chunk, world)
     love.graphics.cleanDrawImage(StoneImage, Vector.zero, blockSize)
 end
 
-return module
+return Instance.RegisterClass(module)

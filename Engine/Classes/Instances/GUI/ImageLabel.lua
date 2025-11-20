@@ -1,15 +1,14 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "ImageLabel"
-Instance.RegisterClass(module)
 
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/ImageLabel.png"
 
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("Image", "string", "")
@@ -27,12 +26,13 @@ function module:Draw()
 	if not self.Enabled then return end
 	self.Color:Apply()
 	if self._imageObject then
-		local anchorSize = self:Translate()
+		local anchorSize, prev = self:Translate()
 		love.graphics.cleanDrawImage(self._imageObject, -anchorSize, self.RenderSize)
 		love.graphics.pop()
+		love.graphics.setShader(prev)
 	end
 
 	module.Base.Draw(self)
 end
 
-return module
+return Instance.RegisterClass(module)

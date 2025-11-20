@@ -1,13 +1,12 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "ItemRenderFrame"
-Instance.RegisterClass(module)
 
 module.FrameRendering = false
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
     self.Name = self.__type
 
 	self:CreateProperty("ItemID", "string", "")
@@ -32,4 +31,4 @@ function module:Draw()
 	love.graphics.pop()
 end
 
-return module
+return Instance.RegisterClass(module)

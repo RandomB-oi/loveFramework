@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "Frame"
-module.__index = module
+
 module.__type = "Entity"
-Instance.RegisterClass(module)
 
 module.FrameRendering = true
 module.PhysicsFPS = 60
@@ -12,7 +11,7 @@ module.EntitySizeInBlocks = Vector.new(.75,1.8)
 local Run = Engine:GetService("RunService")
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 	self.AnchorPoint = Vector.new(0.5, 1)
 	self.ZIndex = 1
@@ -164,5 +163,4 @@ function module:Update(dt)
 end
 
 
-
-return module
+return Instance.RegisterClass(module)

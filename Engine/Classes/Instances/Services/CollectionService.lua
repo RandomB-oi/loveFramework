@@ -1,11 +1,10 @@
 local module = {}
 module.Derives = "BaseService"
-module.__index = module
+
 module.__type = "CollectionService"
-Instance.RegisterClass(module)
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
 
 	self.Tagged = {}
@@ -78,4 +77,4 @@ function module:GetTags(object)
 	return tags
 end
 
-return module
+return Instance.RegisterClass(module)

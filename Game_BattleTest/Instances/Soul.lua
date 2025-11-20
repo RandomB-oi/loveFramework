@@ -1,8 +1,7 @@
 local module = {}
 module.Derives = "ImageLabel"
-module.__index = module
+
 module.__type = "Soul"
-Instance.RegisterClass(module)
 
 local Collision = require("Game.Utility.Collision")
 module.ClassIcon = "Game/Assets/Souls/Determination.png"
@@ -19,7 +18,7 @@ Enum:AddEnum("SoulMode", {
 })
 
 module.new = function()
-	local self = setmetatable(module.Base.new(), module)
+	local self = setmetatable(module.Base.new(), module._metatable)
 	
 	self.Name = self.__type
 	self.Size = UDim2.fromOffset(34, 34)
@@ -155,4 +154,4 @@ function module:Update(dt)
 	)
 end
 
-return module
+return Instance.RegisterClass(module)
