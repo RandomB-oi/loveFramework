@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "Entity"
 
 module.FrameRendering = true
@@ -10,8 +10,8 @@ module.EntitySizeInBlocks = Vector.new(.75,1.8)
 
 local Run = Engine:GetService("RunService")
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 	self.AnchorPoint = Vector.new(0.5, 1)
 	self.ZIndex = 1

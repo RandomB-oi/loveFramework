@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "Hotbar"
 
 -- local items = {
@@ -10,8 +10,8 @@ module.__type = "Hotbar"
 --     {ID = "stone_block_item", Amount = 64},
 -- }
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
     self.Name = self.__type
     self.Color = Color.new(0,0,0,0)
     self.Size = UDim2.new(1, 0, 1, 0)

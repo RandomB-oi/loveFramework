@@ -1,13 +1,15 @@
 local module = {}
 module.Derives = "WorldGeneratorScript"
-
+module.__index = module
 module.__type = "Overworld"
 
 local Run = Engine:GetService("RunService")
 local Input = Engine:GetService("InputService")
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
+    self.Name = self.__type
+    
     self:CreateProperty("MaxWorldHeight", "number", -100, "Int")
     self:CreateProperty("MaxWorldDepth", "number", 40, "Int")
     self:CreateProperty("MaxWorldWidth", "number", 40, "Int")
@@ -23,6 +25,7 @@ function module:ScriptInit()
 
     self.OverlayFrame = Instance.new("Fog")
     self.OverlayFrame.Color = Color.new(0,0,0,1)
+    self.OverlayFrame.Size = UDim2.new(1,1,1,1)
     self.OverlayFrame:SetParent(self.Scene)
 
     self.OverlayFrame.FogStart = 0

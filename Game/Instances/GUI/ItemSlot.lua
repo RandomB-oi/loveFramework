@@ -1,10 +1,10 @@
 local module = {}
 module.Derives = "Button"
-
+module.__index = module
 module.__type = "ItemSlot"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
     self.Name = self.__type
 	self.Size = UDim2.new(0, 50, 0, 50)
 	self.Color = Color.new(0,0,0,0)
@@ -89,10 +89,10 @@ end
 function module:SetItem(stack)
 	if stack and stack.ID then
 		self.AmountLabel.Text = stack.Amount ~= 1 and tostring(stack.Amount) or ""
-		self.RenderFrame.ItemID = stack.ID or -1
+		self.RenderFrame.ItemID = stack.ID or ""
 	else
 		self.AmountLabel.Text = ""
-		self.RenderFrame.ItemID = -1
+		self.RenderFrame.ItemID = ""
 	end
 end
 

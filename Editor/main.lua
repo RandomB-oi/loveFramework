@@ -23,7 +23,7 @@ function EditorScene:Open(scene)
 		newEditor.BannerButtons.Run.Enabled = true
 	end)
 
-	scene:SetParent(newEditor:FindFirstChild("Viewport", true))
+	scene:SetParent(newEditor.Viewport)
 
 	return newEditor
 end

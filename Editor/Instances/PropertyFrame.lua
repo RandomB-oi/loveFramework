@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "EditorInstance"
-
+module.__index = module
 module.__type = "PropertyFrame"
 
 local CellHeight = 20

@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "BaseService"
-
+module.__index = module
 module.__type = "Debris"
 
 module.new = function ()

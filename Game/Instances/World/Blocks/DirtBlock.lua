@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "Block"
-
+module.__index = module
 module.__type = "DirtBlock"
 
 local DirtImage = love.graphics.newImage("Game/Assets/Blocks/DirtBlock.png")
@@ -8,7 +8,7 @@ local DirtImage = love.graphics.newImage("Game/Assets/Blocks/DirtBlock.png")
 -- module.Shader = 2
 
 module.new = function(...)
-	local self = setmetatable(module.Base.new(...), module)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 
 	return self
 end

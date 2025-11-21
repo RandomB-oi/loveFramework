@@ -1,12 +1,12 @@
 local module = {}
 module.Derives = "BaseInstance"
-
+module.__index = module
 module.__type = "Script"
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/Script.png"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self._waitingThreads = {}
@@ -40,11 +40,10 @@ function module:Await(callback)
 	if callback then
 		task.spawn(function()
 			self:Await()
+
+			callback()
 		end)
 		
-		if callback then
-			callback()
-		end
 		return
 	end
 

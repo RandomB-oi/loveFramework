@@ -1,12 +1,12 @@
 local module = {}
 module.Derives = "UILayoutBase"
-
+module.__index = module
 module.__type = "UIListLayout"
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/UIListLayout.png"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("Padding", "UDim2", UDim2.new(0, 6, 0, 6))

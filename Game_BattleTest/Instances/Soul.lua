@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "ImageLabel"
-
+module.__index = module
 module.__type = "Soul"
 
 local Collision = require("Game.Utility.Collision")
@@ -17,8 +17,8 @@ Enum:AddEnum("SoulMode", {
 	Bravery = Enum.NewEnum("SoulMode"),
 })
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	
 	self.Name = self.__type
 	self.Size = UDim2.fromOffset(34, 34)

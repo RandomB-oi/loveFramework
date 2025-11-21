@@ -1,12 +1,12 @@
 local module = {}
 module.Derives = "Block"
-
+module.__index = module
 module.__type = "StoneBlock"
 
 local StoneImage = love.graphics.newImage("Game/Assets/Blocks/StoneBlock.png")
 
 module.new = function(...)
-	local self = setmetatable(module.Base.new(...), module)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 
 	return self
 end

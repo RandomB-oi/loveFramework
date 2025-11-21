@@ -27,9 +27,9 @@ worldGenScript.Seed = 67
 worldGenScript:SetParent(mainMenuScene)
 
 
-local guiScript = Instance.new("GUICode")
-guiScript:SetParent(mainMenuScene)
-guiScript.World = worldGenScript
+-- local guiScript = Instance.new("GUICode")
+-- guiScript:SetParent(mainMenuScene)
+-- guiScript.World = worldGenScript
 
 local localPlayer = Instance.new("Player")
 worldGenScript:SetLocalPlayer(localPlayer)

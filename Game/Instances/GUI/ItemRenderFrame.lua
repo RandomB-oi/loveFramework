@@ -1,12 +1,12 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "ItemRenderFrame"
 
 module.FrameRendering = false
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
     self.Name = self.__type
 
 	self:CreateProperty("ItemID", "string", "")

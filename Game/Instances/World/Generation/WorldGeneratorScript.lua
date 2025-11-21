@@ -1,13 +1,14 @@
 local module = {}
 module.Derives = "Script"
-
+module.__index = module
 module.__type = "WorldGeneratorScript"
 
 local Run = Engine:GetService("RunService")
 local Input = Engine:GetService("InputService")
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
+    self.Name = self.__type
 
 	self:CreateProperty("Seed", "number", 0)
 	self:CreateProperty("ChunkSize", "number", 8, "Int")

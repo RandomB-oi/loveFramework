@@ -1,12 +1,12 @@
 local module = {}
 module.Derives = "ConstraintBase"
-
+module.__index = module
 module.__type = "UISizeConstraint"
 
 module.ConstraintCategory = "Size"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 	
 	self:CreateProperty("Min", "Vector", Vector.new(0,0))

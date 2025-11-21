@@ -6,8 +6,8 @@ local LoadedServices = {}
 module.ClassIcon = "Engine/Assets/InstanceIcons/Workspace.png"
 module.FrameRendering = false
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 	-- self:SetParent(nil)
 	
@@ -44,7 +44,7 @@ function module:GetService(name)
 end
 
 function module:Update(dt)
-	self:CheckProperties()
+	-- self:CheckProperties()
 	if not (self.Enabled and not self.Paused) then return end
 
 

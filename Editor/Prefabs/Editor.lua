@@ -97,6 +97,7 @@ return function()
 	viewport:Enable():Unpause()
 	viewport.Name = "Viewport"
 	viewport:SetParent(viewportHolder)
+	newScene.Viewport = viewport
 
 	local explorer = Instance.new("Explorer")
 	explorer.Position = UDim2.new(0, 0, 0, 0)

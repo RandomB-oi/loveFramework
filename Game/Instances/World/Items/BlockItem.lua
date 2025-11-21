@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "Item"
-
+module.__index = module
 module.__type = "BlockItem"
 
 module.Items = {}

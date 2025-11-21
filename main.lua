@@ -1,7 +1,5 @@
 local EngineScene = require("Engine.main")
-
 local RunService = EngineScene:GetService("RunService")
-print(RunService.TimeScale, rawget(RunService, "__newindex"))
 do
 	RunService._editor = true
 	RunService._running = false

@@ -1,15 +1,15 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "ContainerGui"
 
 local Run = Engine:GetService("RunService")
 local Input = Engine:GetService("InputService")
 local ContainerUtility = require("Game.Utility.Container")
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
-    self.Name = self._type
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
+    self.Name = self.__type
     self.Size = UDim2.fromScale(1,1)
     self.Color = Color.new(0,0,0,0)
 	self:CreateProperty("Container", "Container", nil)

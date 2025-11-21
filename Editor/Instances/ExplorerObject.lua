@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "EditorInstance"
-
+module.__index = module
 module.__type = "ExplorerObject"
 
 local Selection = Engine:GetService("Selection")
@@ -87,7 +87,9 @@ module.new = function(object, depth)
 		self:NewChild(newChild)
 	end))
 
+	local first = true
 	self.Maid:GiveTask(self.Object:GetPropertyChangedSignal("Parent"):Connect(function()
+		if first then first = false return end
 		self:Destroy()
 	end))
 
@@ -154,19 +156,23 @@ function module:CalculateDeepestDepth()
 end
 
 function module:UpdateScales()
-	local height = self.Layout.AbsoluteContentSize.Y
-	self.ChildrenList.Size = UDim2.new(1, 0, 0, height)
-
-	if not self.ChildrenList.Enabled then
-		height = 0
-	end
-
-	local deepestDepth = self:CalculateDeepestDepth()
-	self.Size = UDim2.new(1, (deepestDepth - self.Depth) * CellHeight, 0, CellHeight+height)
+	task.delay(0, function()
+		local height = self.Layout.AbsoluteContentSize.Y
+		self.ChildrenList.Size = UDim2.new(1, 0, 0, height)
+		
+		if not self.ChildrenList.Enabled then
+			height = 0
+		end
+		
+		local deepestDepth = self:CalculateDeepestDepth()
+		self.Size = UDim2.new(1, (deepestDepth - self.Depth) * CellHeight, 0, CellHeight+height)
+	end)
 end
 
 function module:Update(dt)
 	module.Base.Update(self, dt)
+
+	-- self:UpdateScales()
 
 	if next(self.Object._children) then
 		self.ToggleButton.Enabled = true

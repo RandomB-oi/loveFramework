@@ -6,9 +6,6 @@ module.Classes = Classes
 module.new = function(className, ...)
 	local new = assert(Classes[className] and Classes[className].new, tostring(className).." is an invalid instance type")
 	local object = new(...)
-	if object.IsA then
-		object.Base = Classes[className]
-	end
 	return object
 end
 
@@ -16,47 +13,59 @@ module.GetClass = function(className)
 	return Classes[className]
 end
 
-local function GetOrphanedClasses()
-	local list = {}
-	for className, class in pairs(Classes) do
-		local derives = rawget(class, "Derives")
-		local base = derives and rawget(class, "Base")
-		if derives and not base then
-			list[className] = class
-		end
-	end
-	return list
-end
-
 local function CreateInstanceMetatable(class)
     return {
         __index = function(self, index)
             local current = class
             while current do
-                if current._index then
-                    local value = current._index(self, index)
+				local currentIndex = rawget(current, "_index")
+                if currentIndex then
+                    local value = currentIndex(self, index)
                     if value ~= nil then return value end
                 end
-                current = current.Base
-            end
+				
+				local value = rawget(current, index)
+				if value ~= nil then return value end
 
-            local selfHas = rawget(self, index)
-            if selfHas ~= nil then return selfHas end
-            return rawget(class, index)
+                current = rawget(current, "Base")
+            end
+			
+			local selfHas = rawget(self, index)
+			if selfHas ~= nil then return selfHas end
+
+			return rawget(class, index)
         end,
 
         __newindex = function(self, index, value)
             local current = class
             while current do
-                if current._newindex then
-                    local handled = current._newindex(self, index, value)
+				local currentIndex = rawget(current, "_newindex")
+                if currentIndex then
+                    local handled = currentIndex(self, index, value)
                     if handled then return end
                 end
-                current = current.Base
+                current = rawget(current, "Base")
             end
             rawset(self, index, value)
         end,
     }
+end
+
+local Metamethods = {
+	"__add","__sub","__mul","__div","__mod","__pow","__unm",
+	"__idiv","__band","__bor","__bxor","__bnot","__shl",
+	"__shr","__concat","__len","__eq","__lt","__le",
+	"__call","__tostring","__tonumber","__gc","__close",
+	-- "__index","__newindex",
+}
+
+local function CopyMetamethods(class, baseClass)
+	for _, metamethodName in pairs(Metamethods) do
+		if not rawget(class, metamethodName) then
+			local metamethod = rawget(baseClass, metamethodName)
+			rawset(class, metamethodName, metamethod)
+		end
+	end
 end
 
 local function GetVarName(object, counts)
@@ -183,19 +192,22 @@ local function UpdateBases()
 		if not rawget(class, "_metatable") then
 			rawset(class, "_metatable", CreateInstanceMetatable(class))
 		end
-		if baseClass and not rawget(class,"Base") then
-			rawset(class, "Base", baseClass)
-			setmetatable(class, baseClass)
+		if baseClass then
+			if not rawget(class,"Base") then
+				rawset(class, "Base", baseClass)
+				setmetatable(class, baseClass)
+			end
+			CopyMetamethods(class, baseClass)
 		end
 	end
 end
 
 function module.RegisterClass(class)
 	local t = rawget(class, "__type")
-	if not rawget(class, "Name") then
-		rawset(class, "Name", t)
-	end
-	if Classes[t] then
+	-- if not rawget(class, "Name") then
+	-- 	rawset(class, "Name", t)
+	-- end
+	if Classes[t] then 
 		print(t, "has registered already")
 	end
 	Classes[t] = class

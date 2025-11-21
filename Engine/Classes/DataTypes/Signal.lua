@@ -1,9 +1,9 @@
 local module = {}
 module.__index = module
-module.__type = "signal"
+module.__type = "Signal"
 	
 module.new = function()
-	return setmetatable({_connections = {}}, module)
+	return setmetatable({}, module)
 end
 
 function module:Connect(callback, order)
@@ -11,15 +11,15 @@ function module:Connect(callback, order)
 		Order = order or 10,
 		_callback = callback,
 		Disconnect = function(connection)
-			for i,v in ipairs(self._connections) do
+			for i,v in ipairs(self) do
 				if v == connection then
-					table.remove(self._connections, i)
+					table.remove(self, i)
 					break
 				end
 			end
 		end,
 	}
-	table.insert(self._connections, connection)
+	table.insert(self, connection)
 	return connection
 end
 
@@ -42,7 +42,7 @@ end
 function module:Fire(...)
 	local args = {...}
 
-	for _, connection in pairs(table.shallowCopy(self._connections)) do
+	for _, connection in pairs(table.shallowCopy(self)) do
 		if type(connection) == "table" then
 			xpcall(coroutine.wrap(connection._callback), function(err)
 				warn(err, debug.traceback())
@@ -56,7 +56,11 @@ function module:ToLua()
 end
 
 function module:Destroy()
-	self._connections = {}
+	local index = next(self)
+	while index do
+		self[index] = nil
+		index = next(self)
+	end
 end
 
 return module

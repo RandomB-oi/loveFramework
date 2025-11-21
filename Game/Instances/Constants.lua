@@ -1,10 +1,10 @@
 local module = {}
 module.Derives = "BaseService"
-
+module.__index = module
 module.__type = "Constants"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
     self.Name = self.__type
 
     -- generic movement

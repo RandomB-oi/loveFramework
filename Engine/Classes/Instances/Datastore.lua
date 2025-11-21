@@ -90,7 +90,7 @@ end
 
 local module = {}
 module.Derives = "BaseInstance"
-
+module.__index = module
 module.__type = "Datastore"
 
 -- module.ClassIcon = "Engine/Assets/InstanceIcons/Folder.png"

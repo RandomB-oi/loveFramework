@@ -1,14 +1,14 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "ImageLabel"
 
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/ImageLabel.png"
 
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("Image", "string", "")

@@ -4,6 +4,7 @@ local TweenClass = {}
 do
 	local module = TweenClass
 	module.Derives = "BaseInstance"
+	module.__index = module
 	
 	module.__type = "Tween"
 	
@@ -78,7 +79,7 @@ end
 
 local module = TweenService
 module.Derives = "BaseService"
-
+module.__index = module
 module.__type = "TweenService"
 
 module.new = function ()

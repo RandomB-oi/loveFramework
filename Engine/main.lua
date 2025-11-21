@@ -32,6 +32,7 @@ do -- DataTypes
 
 	Maid = require("Engine.Classes.DataTypes.Maid")
 	Signal = require("Engine.Classes.DataTypes.Signal")
+	GCSignal = require("Engine.Classes.DataTypes.GCSignal")
 
 	TweenInfo = require("Engine.Classes.DataTypes.TweenInfo")
 end

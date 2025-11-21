@@ -1,12 +1,11 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "WorldChunk"
 
 module.FrameRendering = false
 
 module.new = function(world, chunkX, chunkY)
-    
 	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
     self.RenderLayers = {}
@@ -61,7 +60,8 @@ function module:RenderCanvas()
 
     local prevLayer
     for x, row in pairs(self.Blocks) do
-        for y, blockID in pairs(row) do
+        for y, blockState in pairs(row) do
+            local blockID = blockState.BlockID
             local block = blockID and blockClass.Blocks[blockID]
             if block then
                 local layerID = block:GetRenderLayer()
@@ -71,8 +71,7 @@ function module:RenderCanvas()
                     local layer = self:GetLayer(layerID)
                     love.graphics.setCanvas(layer.Canvas)
                 end
-
-
+                
                 block:Render(x,y, self, self.World)
             end
         end
@@ -110,14 +109,20 @@ function module:GetChunkCoordinates(wx,wy)
 end
 
 function module:ReadBlock(x,y)
-    return self.Blocks[x] and self.Blocks[x][y]
+    return self.Blocks[x] and self.Blocks[x][y] and self.Blocks[x][y].BlockID
+end
+function module:ReadLightLevel(x,y)
+    return self.Blocks[x] and self.Blocks[x][y] and self.Blocks[x][y].LightLevel
 end
 
 function module:WriteBlock(x,y, block, bulk)
     if not self.Blocks[x] then
         self.Blocks[x] = {}
     end
-    self.Blocks[x][y] = block
+    if not self.Blocks[x][y] then
+        self.Blocks[x][y] = {}
+    end
+    self.Blocks[x][y].BlockID = block
 
     if not bulk then
         self:RenderCanvas()

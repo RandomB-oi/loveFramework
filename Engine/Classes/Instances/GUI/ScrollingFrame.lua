@@ -1,13 +1,13 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "ScrollingFrame"
 
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/ScrollingFrame.png"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self.Canvas = nil

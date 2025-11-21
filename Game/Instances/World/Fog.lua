@@ -1,14 +1,14 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "Fog"
 
 -- local Run = Engine:GetService("RunService")
 
 module.new = function(...)
-	local self = setmetatable(module.Base.new(...), module)
-
-    self.Name = "FogFrame"
+	local self = setmetatable(module.Base.new(...), module._metatable)
+    self.Name = self.__type
+    
     self.ZIndex = 1
     self.Size = UDim2.new(1, 0, 1, 0)
     self.Color = Color.new(1,1,1,1)

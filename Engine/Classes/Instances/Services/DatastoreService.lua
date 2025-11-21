@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "BaseService"
-
+module.__index = module
 module.__type = "DatastoreService"
 
 local function CleanPath(path)
@@ -8,8 +8,8 @@ local function CleanPath(path)
 	return path
 end
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self.Datastores = {}

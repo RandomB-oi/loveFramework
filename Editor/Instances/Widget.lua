@@ -1,10 +1,10 @@
 local module = {}
 module.Derives = "EditorInstance"
-
+module.__index = module
 module.__type = "Widget"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 	self.Size = UDim2.new(1, 0, 1, 0)
 	self.Color = Color.from255(46, 46, 46, 255)

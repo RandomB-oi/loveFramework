@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "BaseInstance"
-
+module.__index = module
 module.__type = "Battle"
 
 module.ClassIcon = "Engine/Assets/InstanceIcons/ImageButton.png"
@@ -30,8 +30,8 @@ local function Hurt(amount)
 	GameVariables.Health.Value = math.clamp(GameVariables.Health.Value - amount, 0, GameVariables.MaxHealth.Value)
 end
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Maid = Maid.new()
 	self.Done = Signal.new()
 

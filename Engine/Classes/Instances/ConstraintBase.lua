@@ -1,12 +1,12 @@
 local module = {}
 module.Derives = "BaseInstance"
-
+module.__index = module
 module.__type = "ConstraintBase"
 
 module.ConstraintCategory = "Unknown"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self.ParentMaid = self.Maid:Add(Maid.new())

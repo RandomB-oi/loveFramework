@@ -19,7 +19,8 @@ module._index = function(self, index)
     end
 end
 
-local function propertyTypeMatches(value, desiredType)
+local function PropertyTypeMatches(value, desiredType)
+	if desiredType == "any" then return true end
 	if desiredType then
 		if desiredType == "Instance" then
 			if type(value) == "table" and value.IsA or value == nil then
@@ -44,7 +45,6 @@ local TypeCleaners = {
 module.ClassIcon = "Engine/Assets/InstanceIcons/Unknown.png"
 
 module.new = function()
-	print(module.SetProperty)
 	local self = setmetatable({}, module._metatable)
 	self.Maid = Maid.new()
 	self.ID = tostring(idSerial)
@@ -61,7 +61,7 @@ module.new = function()
 	self:CreateProperty("Parent", "Instance", nil)
 	self:CreateProperty("Archivable", "boolean", true)
 
-	self.AncestryChanged = self.Maid:Add(Signal.new())
+	-- self.AncestryChanged = self.Maid:Add(Signal.new())
 	self.ChildAdded = self.Maid:Add(Signal.new())
 	self.ChildRemoved = self.Maid:Add(Signal.new())
 	self.DescendantAdded = self.Maid:Add(Signal.new())
@@ -97,7 +97,6 @@ function module:CreateProperty(name, propType, defaultValue, cleaner)
 
 	if not self._properties[name] then
 		self._properties[name] = {
-			-- Changed = Signal.new(),
 			Value = defaultValue,
 			PropType = propType,
 			DefaultValue = defaultValue,
@@ -124,7 +123,7 @@ function module:SetProperty(propName, newValue)
 		newValue = TypeCleaners[info.TypeCleaner](newValue)
 	end
 	if newValue ~= info.Value then
-		if propertyTypeMatches(newValue, info.PropType) then
+		if PropertyTypeMatches(newValue, info.PropType) then
 			info.Value = newValue
 
 			if propName == "Parent" then
@@ -146,16 +145,19 @@ function module:SetProperty(propName, newValue)
 
 			self.Changed:Fire(propName, newValue)
 
-			if propName == "Parent" then
-				self.AncestryChanged:Fire()
-				for i,v in ipairs(self:GetChildren(true)) do
-					v.AncestryChanged:Fire()
-				end
-			end
+			-- if propName == "Parent" then
+			-- 	self.AncestryChanged:Fire()
+			-- 	for i,v in ipairs(self:GetChildren(true)) do
+			-- 		v.AncestryChanged:Fire()
+			-- 	end
+			-- end
 		else
-			print("invalid value for "..propName..":",tostring(newValue))
+			print("Invalid value type for "..propName..". Expected ["..info.PropType.."] got ["..typeof(newValue).."]")
+			print(debug.traceback())
+			return false
 		end
 	end
+	return true
 end
 
 function module:SetParent(newParent)
@@ -188,27 +190,27 @@ function module:SetParent(newParent)
 	-- end
 end
 
-function module:CheckProperties()
-	for propName, info in pairs(self._properties) do
-		local newValue = self[propName]
-		if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
-			newValue = TypeCleaners[info.TypeCleaner](newValue)
-		end
-		if newValue ~= info.Value then
-			if propertyTypeMatches(newValue, info.PropType) then
-				info.Value = newValue
+-- function module:CheckProperties()
+-- 	for propName, info in pairs(self._properties) do
+-- 		local newValue = self[propName]
+-- 		if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
+-- 			newValue = TypeCleaners[info.TypeCleaner](newValue)
+-- 		end
+-- 		if newValue ~= info.Value then
+-- 			if PropertyTypeMatches(newValue, info.PropType) then
+-- 				info.Value = newValue
 
-				if info.Changed then
-					info.Changed:Fire(newValue)
-				end
+-- 				if info.Changed then
+-- 					info.Changed:Fire(newValue)
+-- 				end
 
-				self.Changed:Fire(propName, newValue)
-			else
-				self[propName] = info.Value
-			end
-		end
-	end
-end
+-- 				self.Changed:Fire(propName, newValue)
+-- 			else
+-- 				self[propName] = info.Value
+-- 			end
+-- 		end
+-- 	end
+-- end
 
 function module:BindProperty(name, callback)
 	callback(self[name])
@@ -220,7 +222,11 @@ function module:GetPropertyChangedSignal(name)
 	if not info then return end
 
 	if not info.Changed then
-		info.Changed = self.Maid:Add(Signal.new())
+		local newSignal = GCSignal.new(function()
+			info.Changed = nil
+		end)
+		info.Changed = newSignal
+		self.Maid["Changed"..name] = newSignal
 	end
 
 	return info.Changed
@@ -228,7 +234,11 @@ end
 
 function module:GetAttributeChangedSignal(name)
 	if not self.AttributeSignals[name] then
-		self.AttributeSignals[name] = self.Maid:Add(Signal.new())
+		local newSignal = GCSignal.new(function()
+			self.AttributeSignals[name] = nil
+		end)
+		self.AttributeSignals[name] = newSignal
+		self.Maid["AttChanged"..name] = newSignal
 	end
 	return self.AttributeSignals[name]
 end

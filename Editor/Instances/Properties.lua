@@ -1,12 +1,12 @@
 local module = {}
 module.Derives = "Widget"
-
+module.__index = module
 module.__type = "Properties"
 
 local Selection = Engine:GetService("Selection")
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 	
 	self:SetTitle("Properties")
@@ -99,7 +99,9 @@ function module:UpdateProperties()
 		newFrame.PropertyChanged:Connect(function(newValue)
 			for _, object in ipairs(Selection:Get()) do
 				if object._properties[propName] then
-					object[propName] = newValue
+					if not object:SetProperty(propName, newValue) then
+						newFrame:SetValue(object[propName])
+					end
 				end
 			end
 		end)

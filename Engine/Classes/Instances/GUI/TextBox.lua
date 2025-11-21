@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "TextLabel"
-
+module.__index = module
 module.__type = "TextBox"
 
 module.FrameRendering = false
@@ -29,8 +29,18 @@ local UpperReplace = {
     ["`"] = "~",
 }
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+local function concat(list)
+	local str = ""
+	for i,v in pairs(list) do
+		if v then
+			str = str .. v
+		end
+	end
+	return str
+end
+
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	local InputService = Engine:GetService("InputService")
@@ -101,18 +111,16 @@ end
 function module:SubChar(amount)
 	local splitText = string.toArray(self.Text)
 	for i = self.CursorPosition-1, (self.CursorPosition - amount), -1 do
-		if splitText[i] then
-			table.remove(splitText, i)
-		end
+		splitText[i] = ""
 	end
-	self.Text = table.concat(splitText, "")
+	self.Text = concat(splitText)
 	self:MoveCursor(-amount)
 end
 
 function module:AddChar(char)
 	local splitText = string.toArray(self.Text)
 	table.insert(splitText, self.CursorPosition, char)
-	self.Text = table.concat(splitText, "")
+	self.Text = concat(splitText)
 	self:MoveCursor(char:len())
 end
 
@@ -128,7 +136,7 @@ function module:GetDesiredText()
 	if self.Focused and self.CursorPosition ~= -1 then
 		local splitText = string.toArray(self.Text)
 		table.insert(splitText, self.CursorPosition, "|")
-		return table.concat(splitText, "")
+		return concat(splitText)
 	end
 	if self.Text == "" then
 		return self.PlaceholderText

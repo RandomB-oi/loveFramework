@@ -1,10 +1,10 @@
 local module = {}
 module.Derives = "ValueBase"
-
+module.__index = module
 module.__type = "IntValue"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("Value", "number", 0, "Int")

@@ -1,10 +1,10 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "Projectile"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 
 	self.AnchorPoint = Vector.one/2
 	self.Size = UDim2.fromOffset(25,50)

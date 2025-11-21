@@ -1,6 +1,6 @@
 local module = {}
 module.Derives = "Frame"
-
+module.__index = module
 module.__type = "TextLabel"
 
 local DefaultFont = love.graphics.newFont("Engine/Assets/Fonts/FiraMonoTypewriter-text-regular.ttf", 64)
@@ -9,8 +9,8 @@ local DefaultFont = love.graphics.newFont("Engine/Assets/Fonts/FiraMonoTypewrite
 module.FrameRendering = false
 module.ClassIcon = "Engine/Assets/InstanceIcons/TextLabel.png"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("Text", "string", "Text")

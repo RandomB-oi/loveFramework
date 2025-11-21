@@ -1,12 +1,13 @@
 local module = {}
 module.Derives = "BaseInstance"
 module.__type = "Frame"
+module.__index = module
 
 module.FrameRendering = true
 module.ClassIcon = "Engine/Assets/InstanceIcons/Frame.png"
 
-module.new = function()
-	local self = setmetatable(module.Base.new(), module._metatable)
+module.new = function(...)
+	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("ZIndex", "number", 0)
@@ -16,8 +17,7 @@ module.new = function()
 	self:CreateProperty("Color", "Color", Color.from255(255, 255, 255, 255))
 	self:CreateProperty("Rotation", "number", 0)
 	self:CreateProperty("LayoutOrder", "number", 0)
-
-	self.Shader = nil
+	-- self:CreateProperty("Shader", "any", nil)
 
 	self.RenderSize = Vector.zero
 	self.RenderPosition = Vector.zero
