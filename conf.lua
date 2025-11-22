@@ -1,0 +1,25 @@
+function love.conf(t)
+    local raw = arg or {}
+	-- table.insert(raw, "--server")
+	-- table.insert(raw, "--editor")
+	-- table.insert(raw, "--output")
+
+	local parameters = {}
+
+    for _, a in ipairs(raw) do
+		if type(a) == "string" and a:sub(1,2) == "--" then
+			parameters[a:sub(3,-1)] = true
+		end
+    end
+
+	if parameters.server then
+		-- parameters.editor = true
+		-- parameters.output = true
+		t.window = false
+		t.modules.graphics = false
+		parameters.noGraphics = true
+		t.console = true
+	end
+
+	_G.LaunchParameters = parameters
+end

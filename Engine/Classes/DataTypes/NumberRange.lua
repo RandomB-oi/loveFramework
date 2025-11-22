@@ -14,4 +14,12 @@ function module:GetValue()
     return math.random(self.Min * self.Resolution, self.Max * self.Resolution) / self.Resolution
 end
 
+function module:ToLua()
+    return "NumberRange.new("..tostring(self.Min)..","..tostring(self.Max)..","..tostring(self.Resolution)..")"
+end
+
+function module:Serialize()
+    return self.Min, self.Max, self.Resolution
+end
+
 return module

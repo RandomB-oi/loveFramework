@@ -99,6 +99,10 @@ function module:ToLua()
 	return "Color.new("..tostring(self.R)..", "..tostring(self.G)..", "..tostring(self.B)..", "..tostring(self.A)..")"
 end
 
+function module:Serialize()
+    return math.round(self.R*255), math.round(self.G*255), math.round(self.B*255), math.round(self.A*255)
+end
+
 function module:__tostring()
 	return tostring(self.R)..", "..tostring(self.G)..", "..tostring(self.B)..", "..tostring(self.A)
 end

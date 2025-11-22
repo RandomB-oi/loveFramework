@@ -84,8 +84,16 @@ function module:Calculate(size)
 	)
 end
 
+function module:__tostring()
+	return tostring(self.X.Scale)..", "..tostring(self.X.Offset)..", ".. tostring(self.Y.Scale)..", "..tostring(self.Y.Offset)
+end
+
 function module:ToLua()
 	return "UDim2.new("..tostring(self.X.Scale)..", "..tostring(self.X.Offset)..", ".. tostring(self.Y.Scale)..", "..tostring(self.Y.Offset)..")"
+end
+
+function module:Serialize()
+    return self.X.Scale, self.X.Offset, self.Y.Scale, self.Y.Offset
 end
 
 return module

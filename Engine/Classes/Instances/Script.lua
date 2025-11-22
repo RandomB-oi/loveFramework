@@ -11,27 +11,25 @@ module.new = function(...)
 
 	self._waitingThreads = {}
 
-	if Engine:GetService("RunService"):IsRunning() then
-		task.spawn(function()
-			if not self.Parent then
-				self:GetPropertyChangedSignal("Parent"):Wait()
-			end
-			self:ScriptInit()
-			self._scriptInitDone = true
-			repeat
-				local key, thread = next(self._waitingThreads)
-				if key and thread then
-					self._waitingThreads[key] = nil
-					pcall(coroutine.resume, thread)
+	task.spawn(function()
+		if not self.Parent then
+			self:GetPropertyChangedSignal("Parent"):Wait()
+		end
+		self:ScriptInit()
+		self._scriptInitDone = true
+		repeat
+			local key, thread = next(self._waitingThreads)
+			if key and thread then
+				self._waitingThreads[key] = nil
+				pcall(coroutine.resume, thread)
 
-					-- local status = coroutine.status(thread)
-					-- if status == "normal" or status == "suspended" then
-					-- 	coroutine.resume(thread)
-					-- end
-				end
-			until not key
-		end)
-	end
+				-- local status = coroutine.status(thread)
+				-- if status == "normal" or status == "suspended" then
+				-- 	coroutine.resume(thread)
+				-- end
+			end
+		until not key
+	end)
 
 	return self
 end
@@ -59,11 +57,9 @@ function module:ScriptInit()
 end
 
 function module:ScriptUpdate(dt)
-	self.Value = self.Value + dt
 end
 
 function module:Update(...)
-	if not Engine:GetService("RunService"):IsRunning() then return end
 	if not self._scriptInitDone then return end
 	if not self.Enabled then return end
 	self:ScriptUpdate(...)

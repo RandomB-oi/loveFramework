@@ -44,6 +44,14 @@ function module:WriteBits(offset, size, value)
     return self
 end
 
+function module:ToLua()
+    return "Binary.new("..tostring(self.Value)..")"
+end
+
+function module:Serialize()
+    return self.Value
+end
+
 function module:GetSize()
     local number = GetNumber(self)
     return math.ceil(math.log(number, 2))

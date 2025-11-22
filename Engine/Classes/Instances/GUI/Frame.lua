@@ -134,6 +134,7 @@ function module:GetPadding()
 end
 
 function module:UpdateRender()
+	if _G.LaunchParameters.noGraphics then return end
 	local isScene = self:IsA("Scene")
 	if self.Parent or isScene then
 		local parentSize, parentPosition, parentRotation
@@ -154,7 +155,7 @@ function module:UpdateRender()
 			end
 		end
 
-		if self.Parent and self.Parent.GetPadding then
+		if self.Parent and self.Parent.GetPadding and parentPosition then
 			local paddingTL, paddingBR = self.Parent:GetPadding()
 			parentPosition = parentPosition + paddingTL
 			parentSize = parentSize - (paddingBR + paddingTL)

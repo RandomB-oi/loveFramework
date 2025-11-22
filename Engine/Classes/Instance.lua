@@ -122,7 +122,7 @@ function module.CreatePrefab(object, directory, env, parentVar)
 	end
 	for propName, propInfo in pairs(object._properties) do
 		local propValue = object[propName]
-		if propName ~= "Parent" and propValue ~= propInfo.DefaultValue then
+		if propValue ~= propInfo.DefaultValue then
 			local strValue
 			if propInfo.PropType == "Instance" then
 				strValue = tostring(env.VariableNames[propValue or 1])
@@ -144,12 +144,8 @@ function module.CreatePrefab(object, directory, env, parentVar)
 		table.insert(env.Lines, variableName..":AddTag(\""..tagName.."\")")
 	end
 
-	if parentVar then
-		table.insert(env.Lines, variableName..":SetParent("..parentVar..")")
-	end
-
 	if not parentVar then
-		table.insert(env.Lines, "if parent then "..variableName..":SetParent(parent) end")
+		table.insert(env.Lines, "if parent then "..variableName..".Parent = parent end")
 		table.insert(env.Lines, "return "..variableName)
 		table.insert(env.Lines, "end")
 
@@ -174,7 +170,7 @@ end
 function module.BulkSetProperties(instance, properties)
     for propName, value in pairs(properties) do
         if propName == "Parent" then
-            instance:SetParent(value)
+            instance.Parent = value
         else
             instance[propName] = value
         end

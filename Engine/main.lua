@@ -9,13 +9,17 @@ local oldPrint = print
 warn = function(...)
 	oldPrint(...)
 end
+function SendOutputMessage()end
 
 Enum = require("Engine.Classes.DataTypes.Enum")
 math = require("Engine.Utilities.Math")
 table = require("Engine.Utilities.Table")
 string = require("Engine.Utilities.String")
 task = require("Engine.Utilities.Task")
-require("Engine.Utilities.Graphics")
+json = require("Engine.Utilities.json")
+if not _G.LaunchParameters.noGraphics then
+	require("Engine.Utilities.Graphics")
+end
 
 do -- DataTypes
 	Binary = require("Engine.Classes.DataTypes.Binary")
@@ -35,6 +39,7 @@ do -- DataTypes
 	GCSignal = require("Engine.Classes.DataTypes.GCSignal")
 
 	TweenInfo = require("Engine.Classes.DataTypes.TweenInfo")
+	Serializer = require("Engine.Utilities.Serializer")
 end
 
 Instance = require("Engine.Classes.Instance")
@@ -112,16 +117,5 @@ do -- load all instances
 	autoLoad("Engine/Classes/Instances", {"Engine.main"})
 end
 
-Engine = Instance.new("Scene")
-Engine.Name = "Engine"
-
-Engine:GetService("RunService")
-
-for className, info in pairs(Instance.Classes) do
-	if info:IsA("BaseService") then
-		Engine:GetService(className)
-	end
-end
-
-
-return Engine
+require("Engine.Scenes.Engine")
+require("Engine.Scenes.Output")

@@ -3,7 +3,12 @@ module.Derives = "Frame"
 module.__index = module
 module.__type = "TextLabel"
 
-local DefaultFont = love.graphics.newFont("Engine/Assets/Fonts/FiraMonoTypewriter-text-regular.ttf", 64)
+local DefaultFont
+local function GetDefaultFont()
+	if DefaultFont then return DefaultFont end
+	DefaultFont = love.graphics.newFont("Engine/Assets/Fonts/FiraMonoTypewriter-text-regular.ttf", 64)
+	return DefaultFont
+end
 -- local DefaultFont = love.graphics.newFont(64, "normal")
 
 module.FrameRendering = false
@@ -36,6 +41,7 @@ function module:GetDesiredText()
 end
 
 function module:UpdateText()
+	if _G.LaunchParameters.noGraphics then return end
 	local text = self:GetDesiredText()
 	if (self._currentText == text and self._currentFont == self.Font) then
 		return
@@ -48,7 +54,7 @@ function module:UpdateText()
 		self._textObject = nil
 	end
 
-	self._textObject = love.graphics.newText(self.Font or DefaultFont, text)
+	self._textObject = love.graphics.newText(self.Font or GetDefaultFont(), text)
 end
 
 function module:Draw()

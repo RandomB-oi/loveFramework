@@ -112,33 +112,33 @@ module.new = function(propertyName, propertyType)
 	self.Title.Text = propertyName
 	self.Title.XAlignment = Enum.XAlignment.Left
 	self.Title.ZIndex = 1
-	self.Title:SetParent(self)
+	self.Title.Parent = self
 
 	self.Line = self.Maid:Add(Instance.new("Frame"))
 	self.Line.Size = UDim2.new(0, 1, 1, 0)
 	self.Line.Position = UDim2.fromScale(0.5, 0.5)
 	self.Line.Color = Color.new(0.3, 0.3, 0.3, 1)
 	self.Line.AnchorPoint = Vector.one/2
-	self.Line:SetParent(self)
+	self.Line.Parent = self
 
 	self.InteractArea = self.Maid:Add(Instance.new("Frame"))
 	self.InteractArea.Size = UDim2.fromScale(0.5, 1)
 	self.InteractArea.Position = UDim2.fromScale(1, 0)
 	self.InteractArea.Color = Color.new(0, 0, 0, 0)
 	self.InteractArea.AnchorPoint = Vector.xAxis
-	self.InteractArea:SetParent(self)
+	self.InteractArea.Parent = self
 
 	if propertyType == "boolean" then
 		local boolFrame = self.Maid:Add(Instance.new("Button"))
 		boolFrame.Size = UDim2.fromOffset(CellHeight, CellHeight)
 		boolFrame.Color = Color.new(0, 0, 0, 0)
-		boolFrame:SetParent(self.InteractArea)
+		boolFrame.Parent = self.InteractArea
 
 		local icon = self.Maid:Add(Instance.new("ImageLabel"))
 		icon.Position = UDim2.fromScale(0.5, 0.5)
 		icon.AnchorPoint = Vector.one/2
 		icon.Size = UDim2.fromOffset(20, 20)
-		icon:SetParent(boolFrame)
+		icon.Parent = boolFrame
 
 		boolFrame.LeftClicked:Connect(function()
 			self:SetValue(not self:GetValue())
@@ -155,12 +155,12 @@ module.new = function(propertyName, propertyType)
 		local button = self.Maid:Add(Instance.new("Button"))
 		button.Size = UDim2.fromScale(1, 1)
 		button.Color = Color.new(.5, .5, .5, 1)
-		button:SetParent(self.InteractArea)
+		button.Parent = self.InteractArea
 
 		local textLabel = self.Maid:Add(Instance.new("TextLabel"))
 		textLabel.Size = UDim2.fromScale(1, 1)
 		textLabel.XAlignment = Enum.XAlignment.Left
-		textLabel:SetParent(button)
+		textLabel.Parent = button
 		
 		self.PropertyChanged:Connect(function(newValue)
 			textLabel.Text = newValue.Name
@@ -179,7 +179,7 @@ module.new = function(propertyName, propertyType)
 			local dropdown = Instance.new("Dropdown", enumAsList)
 			dropdown.AnchorPoint = Vector.xAxis
 			dropdown.Position = UDim2.fromOffset(button.RenderPosition.X, button.RenderPosition.Y)
-			dropdown:SetParent(EditorScene)
+			dropdown.Parent = EditorScene
 			dropdown.Enabled = true
 			dropdown.ValueSelected:Connect(function(value)
 				self:SetValue(Enum[propertyType][value])
@@ -190,7 +190,7 @@ module.new = function(propertyName, propertyType)
 		local textbox = self.Maid:Add(Instance.new("TextBox"))
 		textbox.Size = UDim2.fromScale(1, 1)
 		textbox.XAlignment = Enum.XAlignment.Left
-		textbox:SetParent(self.InteractArea)
+		textbox.Parent = self.InteractArea
 
 		textbox.FocusLost:Connect(function()
 			local value = PropConverters[propertyType].tovalue(textbox.Text)

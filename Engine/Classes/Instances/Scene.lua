@@ -1,5 +1,6 @@
 local module = {}
 module.Derives = "Frame"
+module.__index = module
 module.__type = "Scene"
 
 local LoadedServices = {}
@@ -9,10 +10,11 @@ module.FrameRendering = false
 module.new = function(...)
 	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
-	-- self:SetParent(nil)
+	-- self.Parent = nil
 	
 	self.Canvas = nil
 	self:CreateProperty("Paused", "boolean", false)
+	self:CreateProperty("Visible", "boolean", true)
 
 	self.Size = UDim2.fromScale(1,1)
 
@@ -32,12 +34,13 @@ end
 function module:GetService(name)
 	if not LoadedServices[name] then
 		local serviceClass = Instance.GetClass(name)
+		if not serviceClass then return end
 		if rawget(serviceClass, "Derives") ~= "BaseService" then
 			return
 		end
 
 		local newService = Instance.new(name)
-		newService:SetParent(Engine)
+		newService.Parent = Engine
 		LoadedServices[name] = newService
 	end
 	return LoadedServices[name]
@@ -46,9 +49,6 @@ end
 function module:Update(dt)
 	-- self:CheckProperties()
 	if not (self.Enabled and not self.Paused) then return end
-
-
-
 	self:UpdateRender()
 
 	local desiredSize = Vector.new(math.round(self.RenderSize.X), math.round(self.RenderSize.Y))
@@ -77,7 +77,7 @@ function module:Update(dt)
 end
 
 function module:Draw()
-	if not (self.Enabled) then return end
+	if not (self.Enabled and self.Visible) then return end
 
 	-- local desiredSize = self.RenderSize
 	-- local renderPosition = self.RenderPosition or Vector.zero
@@ -102,7 +102,7 @@ function module:Draw()
 	-- 	end
 	-- end
 
-	if not self.Canvas then print("no canvas for ",self.Name) return end
+	if not self.Canvas then return end
 	self.Drawn:Fire()
 
 	-- local parentPos = self.Parent and self.Parent.RenderPosition or Vector.zero

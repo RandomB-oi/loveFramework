@@ -25,20 +25,20 @@ module.new = function(object, depth)
 	self.Button.Color = Color.new(0, 0, 0, 0)
 	self.Button.Position = UDim2.new(0, CellHeight, 0, 0)
 	self.Button.ZIndex = 0
-	self.Button:SetParent(self)
+	self.Button.Parent = self
 
 	self.ToggleButton = self.Maid:Add(Instance.new("Button"))
 	self.ToggleButton.Size = UDim2.fromOffset(CellHeight, CellHeight)
 	self.ToggleButton.Color = Color.new(0, 0, 0, 0)
 	self.ToggleButton.ZIndex = 1
-	self.ToggleButton:SetParent(self)
+	self.ToggleButton.Parent = self
 
 	self.ToggleButtonImage = self.Maid:Add(Instance.new("ImageLabel"))
 	self.ToggleButtonImage.Size = UDim2.fromOffset(16,16)
 	self.ToggleButtonImage.Position = UDim2.fromScale(0.5, 0.5)
 	self.ToggleButtonImage.AnchorPoint = Vector.new(0.5, 0.5)
 	self.ToggleButtonImage.ZIndex = 1
-	self.ToggleButtonImage:SetParent(self.ToggleButton)
+	self.ToggleButtonImage.Parent = self.ToggleButton
 
 	self.Title = self.Maid:Add(Instance.new("TextLabel"))
 	self.Title.Size = UDim2.new(1, -CellHeight*2, 0, CellHeight)
@@ -46,33 +46,33 @@ module.new = function(object, depth)
 	self.Title.Text = object.Name
 	self.Title.XAlignment = Enum.XAlignment.Left
 	self.Title.ZIndex = 1
-	self.Title:SetParent(self)
+	self.Title.Parent = self
 
 	self.Line = self.Maid:Add(Instance.new("Frame"))
 	self.Line.Size = UDim2.new(0, 1, 1, -CellHeight)
 	self.Line.Position = UDim2.new(0, CellHeight/2, 0, CellHeight)
 	self.Line.Color = Color.new(.2,.2,.2, 1)
-	self.Line:SetParent(self)
+	self.Line.Parent = self
 
 	self.Icon = self.Maid:Add(Instance.new("ImageLabel"))
 	self.Icon.Size = UDim2.fromOffset(16, 16)
 	self.Icon.AnchorPoint = Vector.one/2
 	self.Icon.Position = UDim2.new(0, CellHeight+CellHeight/2, 0, CellHeight/2)
 	self.Icon.Text = object.Name
-	self.Icon:SetParent(self)
+	self.Icon.Parent = self
 	self.Icon.ZIndex = 1
 	self.Icon.Image = object.ClassIcon
 
 	self.ChildrenList = self.Maid:Add(Instance.new("Frame"))
 	self.ChildrenList.Position = UDim2.new(0, CellHeight, 0, CellHeight)
 	self.ChildrenList.Color = Color.new(0,0,0,0)
-	self.ChildrenList:SetParent(self)
+	self.ChildrenList.Parent = self
 	self.ChildrenList.Enabled = not not DefaultExpanded
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
 	self.Layout.SortMode = Enum.SortMode.Name
 	self.Layout.Padding = UDim2.new(0, 0, 0, 3)
-	self.Layout:SetParent(self.ChildrenList)
+	self.Layout.Parent = self.ChildrenList
 
 	self.ToggleButton.LeftClicked:Connect(function()
 		self.ChildrenList.Enabled = not self.ChildrenList.Enabled
@@ -191,7 +191,7 @@ end
 function module:NewChild(child)
 	local newFrame = Instance.new("ExplorerObject", child, self.Depth + 1)
 	if not newFrame then return end
-	newFrame:SetParent(self.ChildrenList)
+	newFrame.Parent = self.ChildrenList
 end
 
 return Instance.RegisterClass(module)

@@ -13,20 +13,20 @@ module.new = function(...)
 	self.Title.Size = UDim2.new(1, 0, 0, 20)
 	self.Title.Text = "Widget Title"
 	self.Title.Name = "Title"
-	self.Title:SetParent(self)
+	self.Title.Parent = self
 
 	self.WidgetHolder = self.Maid:Add(Instance.new("Frame"))
 	self.WidgetHolder.Size = UDim2.new(1, 0, 1, -20)
 	self.WidgetHolder.Position = UDim2.new(0, 0, 0, 20)
 	self.WidgetHolder.Color = Color.new(0, 0, 0, 0)
 	self.WidgetHolder.Name = "WidgetHolder"
-	self.WidgetHolder:SetParent(self)
+	self.WidgetHolder.Parent = self
 
 	return self
 end
 
 function module:AttachGui(gui)
-	gui:SetParent(self.WidgetHolder)
+	gui.Parent = self.WidgetHolder
 	return gui
 end
 

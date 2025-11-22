@@ -50,8 +50,16 @@ function module:Lerp(other, alpha)
 	)
 end
 
+function module:__tostring()
+	return tostring(self.Scale)..", "..tostring(self.Offset)
+end
+
 function module:ToLua()
 	return "UDim.new("..tostring(self.Scale)..", "..tostring(self.Offset)..")"
+end
+
+function module:Serialize()
+    return self.Scale, self.Offset
 end
 
 return module

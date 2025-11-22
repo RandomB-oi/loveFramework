@@ -14,6 +14,7 @@ module.new = function(...)
 	self:CreateProperty("Image", "string", "")
 
 	self:GetPropertyChangedSignal("Image"):Connect(function(newImage)
+		if _G.LaunchParameters.noGraphics then return end
 		if newImage then
 			self._imageObject = love.graphics.newImage(newImage)
 		end

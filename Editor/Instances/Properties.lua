@@ -21,7 +21,7 @@ module.new = function(...)
 		local layout = self.Maid:Add(Instance.new("UIListLayout"))
 		-- layout.SortMode = Enum.SortMode.Name
 		layout.Padding = UDim2.fromOffset(0, 12)
-		layout:SetParent(self.List)
+		layout.Parent = self.List
 
 		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
 			self.List.CanvasSize = UDim2.fromOffset(size.X or 0, size.Y or 0)
@@ -33,12 +33,12 @@ module.new = function(...)
 		self.PropertiesList = Instance.new("Frame")
 		self.PropertiesList.Color = Color.new(0,0,0,0)
 		self.PropertiesList.LayoutOrder = 1
-		self.PropertiesList:SetParent(self.List)
+		self.PropertiesList.Parent = self.List
 		
 		local layout = self.Maid:Add(Instance.new("UIListLayout"))
 		layout.SortMode = Enum.SortMode.Name
 		layout.Padding = UDim2.fromOffset(0, 0)
-		layout:SetParent(self.PropertiesList)
+		layout.Parent = self.PropertiesList
 
 		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
 			self.PropertiesList.Size = UDim2.new(1, 0, 0, size.Y or 0)
@@ -50,12 +50,12 @@ module.new = function(...)
 		self.AttributesList = Instance.new("Frame")
 		self.AttributesList.Color = Color.new(0,0,0,0)
 		self.AttributesList.LayoutOrder = 2
-		self.AttributesList:SetParent(self.List)
+		self.AttributesList.Parent = self.List
 		
 		local layout = self.Maid:Add(Instance.new("UIListLayout"))
 		layout.SortMode = Enum.SortMode.Name
 		layout.Padding = UDim2.fromOffset(0, 0)
-		layout:SetParent(self.AttributesList)
+		layout.Parent = self.AttributesList
 
 		layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function(size)
 			self.AttributesList.Size = UDim2.new(1, 0, 0, size.Y or 0)
@@ -88,7 +88,7 @@ function module:UpdateProperties()
 	for propName, info in pairs(object._properties) do
 		local newFrame = Instance.new("PropertyFrame", propName, info.PropType)
 		newFrame.Name = propName
-		newFrame:SetParent(self.PropertiesList)
+		newFrame.Parent = self.PropertiesList
 		newFrame:SetValue(object[propName])
 		self.PropertyFrames[propName] = newFrame
 
@@ -110,7 +110,7 @@ function module:UpdateProperties()
 	for attribute, value in pairs(object:GetAttributes()) do
 		local newFrame = Instance.new("PropertyFrame", attribute, typeof(value))
 		newFrame.Name = attribute
-		newFrame:SetParent(self.AttributesList)
+		newFrame.Parent = self.AttributesList
 		newFrame:SetValue(value)
 		self.AttributeFrames[attribute] = newFrame
 
@@ -127,7 +127,7 @@ function module:UpdateProperties()
 
 	
 	-- local addAttributeButton = Instance.new("Button")
-	-- addAttributeButton:SetParent(self.AttributesList)
+	-- addAttributeButton.Parent = self.AttributesList
 	-- addAttributeButton.Name = "!!!!!"
 	-- addAttributeButton.Size = UDim2.new(1,0,0, 20)
 	-- addAttributeButton.Color = Color.new(.1,.1,.1,1)
@@ -138,7 +138,7 @@ function module:UpdateProperties()
 	-- textLabel.Size = UDim2.new(1, 0, 1, 0)
 	-- textLabel.Position = UDim2.new(0, 0, 0, 0)
 	-- textLabel.Text = "Add Attribute"
-	-- textLabel:SetParent(addAttributeButton)
+	-- textLabel.Parent = addAttributeButton
 end
 
 return Instance.RegisterClass(module)

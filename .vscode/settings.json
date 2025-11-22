@@ -10,7 +10,8 @@
 		"lowercase-global",
 		"duplicate-set-field",
 		"discard-returns",
-		"need-check-nil"
+		"need-check-nil",
+		"cast-local-type"
 	],
 	"Lua.runtime.version": "LuaJIT",
 	"Lua.runtime.special": {

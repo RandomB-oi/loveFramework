@@ -47,6 +47,7 @@ module.new = function(...)
 
 	self:CreateProperty("PlaceholderText", "string", "")
 	self:CreateProperty("CursorPosition", "number", -1)
+	self.Text = ""
 
 	self.Focused = false
 	self.FocusLost = self.Maid:Add(Signal.new())

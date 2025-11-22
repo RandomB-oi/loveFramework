@@ -18,13 +18,13 @@ module.new = function(directory)
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
 	self.Layout.SortMode = Enum.SortMode.Name
-	self.Layout:SetParent(self.ExplorerList)
+	self.Layout.Parent = self.ExplorerList
 
 	self:GetPropertyChangedSignal("RootObject"):Connect(function()
 		self.Maid.GameFrame = nil
 		if not self.RootObject then return end
 		self.Maid.GameFrame = Instance.new("ExplorerObject", self.RootObject)
-		self.Maid.GameFrame:SetParent(self.ExplorerList)
+		self.Maid.GameFrame.Parent = self.ExplorerList
 	end)
 	
 

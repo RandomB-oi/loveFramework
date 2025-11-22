@@ -13,6 +13,10 @@ local function NewEnum(enumName)
 		function enumItemMeta:ToLua()
 			return "Enum."..enumName.."."..self.Name
 		end
+
+		function enumItemMeta:Serialize()
+			return enumName, self.Name
+		end
 		EnumMetas[enumName] = enumItemMeta
 		meta = enumItemMeta
 	end
@@ -94,18 +98,18 @@ local EngineEnums = {
 		Nine = NewKeyCode("9"),
 		Zero = NewKeyCode("0"),
 
-		F1 = NewKeyCode("1"),
-		F2 = NewKeyCode("2"),
-		F3 = NewKeyCode("3"),
-		F4 = NewKeyCode("4"),
-		F5 = NewKeyCode("5"),
-		F6 = NewKeyCode("6"),
-		F7 = NewKeyCode("7"),
-		F8 = NewKeyCode("8"),
-		F9 = NewKeyCode("9"),
-		F10 = NewKeyCode("10"),
-		F11 = NewKeyCode("11"),
-		F12 = NewKeyCode("12"),
+		F1 = NewKeyCode("f1"),
+		F2 = NewKeyCode("f2"),
+		F3 = NewKeyCode("f3"),
+		F4 = NewKeyCode("f4"),
+		F5 = NewKeyCode("f5"),
+		F6 = NewKeyCode("f6"),
+		F7 = NewKeyCode("f7"),
+		F8 = NewKeyCode("f8"),
+		F9 = NewKeyCode("f9"),
+		F10 = NewKeyCode("f10"),
+		F11 = NewKeyCode("f11"),
+		F12 = NewKeyCode("f12"),
 
 		A = NewKeyCode("a"),
 		B = NewKeyCode("b"),

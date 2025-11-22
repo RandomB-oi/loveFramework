@@ -11,7 +11,7 @@ module.ClassIcon = "Engine/Assets/InstanceIcons/Script.png"
 module.new = function(...)
 	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
-	self:SetParent(nil)
+	self.Parent = nil
 
 	self:CreateProperty("Source", "string", "")
 	self.Source = "print(\"Hello World\")"
@@ -24,8 +24,6 @@ module.new = function(...)
 end
 
 function module:Run(code)
-	if not Engine:GetService("RunService"):IsRunning() then return end
-	
 	self.Maid.ScriptMaid = nil
 
 	task.spawn(function()

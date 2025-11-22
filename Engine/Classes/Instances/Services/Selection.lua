@@ -9,10 +9,6 @@ module.new = function ()
 
 	self.Selection = {}
 	self.SelectionChanged = self.Maid:Add(Signal.new())
-
-	Engine:GetService("RunService").RunChanged:Connect(function()
-		self:Set({})
-	end)
 	
 	return self
 end

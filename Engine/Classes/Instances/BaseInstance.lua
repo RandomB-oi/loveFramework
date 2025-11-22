@@ -2,7 +2,8 @@ local module = {}
 module.__type = "BaseInstance"
 module.__index = module
 module.All = {}
-local idSerial = 0
+
+module.InstanceCreated = Signal.new()
 
 module._newindex = function(self, index, value)
 	local properties = rawget(self, "_properties")
@@ -42,13 +43,23 @@ local TypeCleaners = {
 	end,
 }
 
+math.randomseed(os.time())
+local function GenerateID()
+    local template = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+    local guid = template:gsub("[xy]", function(c)
+        local r = math.random(0, 15)
+        local v = (c == 'x') and r or (r % 4 + 8) -- For 'y', ensure it's 8, 9, A, or B
+        return string.format("%x", v)
+    end)
+    return guid
+end
+
 module.ClassIcon = "Engine/Assets/InstanceIcons/Unknown.png"
 
-module.new = function()
-	local self = setmetatable({}, module._metatable)
+module.new = function(id)
+	local self = setmetatable(module.All[id] or {}, module._metatable)
 	self.Maid = Maid.new()
-	self.ID = tostring(idSerial)
-	idSerial = idSerial + 1
+	self.ID = id or GenerateID()
 
 	self._children = {}
 	self._properties = {}
@@ -59,6 +70,7 @@ module.new = function()
 	self:CreateProperty("Name", "string", self.__type)
 	self:CreateProperty("Enabled", "boolean", true)
 	self:CreateProperty("Parent", "Instance", nil)
+	self:CreateProperty("Replicates", "boolean", true)
 	self:CreateProperty("Archivable", "boolean", true)
 
 	-- self.AncestryChanged = self.Maid:Add(Signal.new())
@@ -73,13 +85,15 @@ module.new = function()
 	self.Maid:GiveTask(function()
 		module.All[self.ID] = nil
 		if self.Parent then
-			self:SetParent(nil)
+			self.Parent = nil
 		end
 	end)
 
-	self:GetPropertyChangedSignal("Parent"):Connect(function(newParent)
-		self:SetParent(newParent)
-	end)
+	self.InstanceCreated:Fire(self.ID, self)
+
+	-- self:GetPropertyChangedSignal("Parent"):Connect(function(newParent)
+	-- 	self.Parent = newParent
+	-- end)
 
 	return self
 end
@@ -122,7 +136,8 @@ function module:SetProperty(propName, newValue)
 	if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
 		newValue = TypeCleaners[info.TypeCleaner](newValue)
 	end
-	if newValue ~= info.Value then
+	local oldValue = info.Value
+	if newValue ~= oldValue then
 		if PropertyTypeMatches(newValue, info.PropType) then
 			info.Value = newValue
 
@@ -143,7 +158,7 @@ function module:SetProperty(propName, newValue)
 				info.Changed:Fire(newValue)
 			end
 
-			self.Changed:Fire(propName, newValue)
+			self.Changed:Fire(propName, oldValue)
 
 			-- if propName == "Parent" then
 			-- 	self.AncestryChanged:Fire()
@@ -159,58 +174,6 @@ function module:SetProperty(propName, newValue)
 	end
 	return true
 end
-
-function module:SetParent(newParent)
-	self:SetProperty("Parent", newParent)
-	-- if not newParent then newParent = nil end
-	-- if self.Parent == newParent then return end
-
-	-- self.Maid.RemoveParent = nil
-	-- if newParent == self then newParent = nil return end
-	-- self.Parent = newParent
-
-	-- if newParent then
-	-- 	newParent._children[self.ID] = self
-	-- 	newParent.ChildAdded:Fire(self)
-		
-	-- 	self.Maid.RemoveParent = function()
-	-- 		newParent._children[self.ID] = nil
-	-- 		newParent.ChildRemoved:Fire(self)
-	-- 	end
-
-	-- 	-- local scene = newParent:GetScene()
-	-- 	-- if scene then
-	-- 	-- 	scene._canvasNeedsUpdate = true
-	-- 	-- end
-	-- end
-
-	-- self.AncestryChanged:Fire()
-	-- for i,v in ipairs(self:GetChildren(true)) do
-	-- 	v.AncestryChanged:Fire()
-	-- end
-end
-
--- function module:CheckProperties()
--- 	for propName, info in pairs(self._properties) do
--- 		local newValue = self[propName]
--- 		if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
--- 			newValue = TypeCleaners[info.TypeCleaner](newValue)
--- 		end
--- 		if newValue ~= info.Value then
--- 			if PropertyTypeMatches(newValue, info.PropType) then
--- 				info.Value = newValue
-
--- 				if info.Changed then
--- 					info.Changed:Fire(newValue)
--- 				end
-
--- 				self.Changed:Fire(propName, newValue)
--- 			else
--- 				self[propName] = info.Value
--- 			end
--- 		end
--- 	end
--- end
 
 function module:BindProperty(name, callback)
 	callback(self[name])
@@ -236,6 +199,7 @@ function module:GetAttributeChangedSignal(name)
 	if not self.AttributeSignals[name] then
 		local newSignal = GCSignal.new(function()
 			self.AttributeSignals[name] = nil
+			self.Maid["AttChanged"..name] = nil
 		end)
 		self.AttributeSignals[name] = newSignal
 		self.Maid["AttChanged"..name] = newSignal
@@ -253,6 +217,127 @@ function module:SetAttribute(name, value)
 		end
 	end
 	return self
+end
+
+function module:CanReplicate()
+	if self.Parent == Engine then return self.Replicates end
+	if not self.Replicates then return false end
+
+	if self.Parent then
+		return self.Parent:CanReplicate()
+	end
+
+	return false
+end
+
+function module:Replicate(prop, specificClient)
+	local Run = Engine:GetService("RunService")
+	local ServerService = Engine:GetService("ServerService")
+
+	if not Run:IsServer() then print("not server") return end
+
+	local didReplicate = self._replicated
+	local can = self:CanReplicate()
+	self._replicated = can
+
+	if not can then
+		if didReplicate then
+			-- tell to remove it
+		end
+		return
+	end
+
+	local message, data
+	if not prop then
+		message, data = "CreateInstance", {
+			ClassName = self.__type,
+			ID = self.ID,
+			Data = self:SerializeData(),
+		}
+	else
+		message, data = "UpdateProperty", {
+			ID = self.ID,
+			Prop = prop,
+			Value = Serializer.Encode(self[prop]),
+		}
+	end
+
+	if specificClient then
+		ServerService:SendMessage(specificClient, message, data)
+	else
+		ServerService:SendMessageAll(message, data)
+	end
+end
+
+function module.ReplicateInstances(clientID)
+	for id, instance in pairs(module.All) do
+		instance:Replicate(nil, clientID)
+	end
+end
+
+function module:SerializeData()
+	local data = {}
+
+	data.Properties = {}
+	data.Attributes = {}
+	data.Tags = {}
+
+	for prop, value in pairs(self._properties) do
+		if value.Value ~= value.DefaultValue then
+			local can = true
+			
+			if value.PropType == "Instance" and value.Value and not value.Value:CanReplicate() then
+				can = false
+			end
+			
+			if can then
+				data.Properties[prop] = value.Value
+			end
+		end
+	end
+
+	for att, value in pairs(self:GetAttributes()) do
+		data.Attributes[att] = value
+	end
+
+	for _, tag in pairs(self:GetTags()) do
+		table.insert(data.Tags, tag)
+	end
+
+	if not next(data.Properties) then data.Properties = nil end
+	if not next(data.Attributes) then data.Attributes = nil end
+	if not next(data.Tags) then data.Tags = nil end
+	if not next(data) then data = nil end
+
+	return Serializer.Encode(data)
+end
+
+function module:DeserializeData(data)
+	if not data then return end
+	data = Serializer.Decode(data)
+
+
+	if data.Properties then
+		for prop, value in pairs(data.Properties) do
+			self[prop] = value
+		end
+	end
+	
+	if data.Attributes then
+		for att, value in pairs(data.Attributes) do
+			self:SetAttribute(att, value)
+		end
+	end
+
+	if data.Tags then
+		for _, tag in pairs(data.Tags) do
+			self:AddTag(tag)
+		end
+	end
+end
+
+function module:Serialize()
+	return self.ID
 end
 
 function module:GetAttribute(name)
@@ -456,7 +541,7 @@ function module:Clone(ignoreArchivable, _instanceMap, _toSet)
 				local chosenValue = value[1] and _instanceMap[value[1]] or value[1]
 
 				if name == "Parent" then
-					object:SetParent(chosenValue)
+					object.Parent = chosenValue
 				else
 					object[name] = chosenValue
 				end
@@ -483,7 +568,7 @@ function module:ClearAllChildren()
 end
 
 function module:Destroy()
-	self:SetParent(nil)
+	self.Parent = nil
 
 	self.Maid:Destroy()
 

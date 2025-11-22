@@ -1,5 +1,6 @@
 EditorScene = Instance.new("Scene")
-EditorScene:SetParent(Engine)
+EditorScene.Parent = Engine
+EditorScene.Replicates = false
 
 autoLoad("Editor", {"Editor.main"})
 
@@ -7,23 +8,29 @@ function EditorScene:Open(scene)
 	local newEditor = require("Editor.Prefabs.Editor")()
 
 	local explorer = newEditor:FindFirstChild("Explorer", true)
-	explorer.RootObject = scene
+	-- explorer.RootObject = scene
+	
+	explorer.RootObject = Engine
 
-	newEditor.BannerButtons.Run.LeftClicked:Connect(function()
-		explorer.RootObject = Engine:GetService("RunService"):Run()
+	newEditor.Viewport.Paused = true
+	newEditor.BannerButtons.Pause.Enabled = false
+	newEditor.BannerButtons.Unpause.Enabled = true
+
+	newEditor.BannerButtons.Pause.LeftClicked:Connect(function()
+		newEditor.Viewport.Paused = true
 		
-		newEditor.BannerButtons.Stop.Enabled = true
-		newEditor.BannerButtons.Run.Enabled = false
+		newEditor.BannerButtons.Pause.Enabled = false
+		newEditor.BannerButtons.Unpause.Enabled = true
 	end)
 
-	newEditor.BannerButtons.Stop.LeftClicked:Connect(function()
-		explorer.RootObject = Engine:GetService("RunService"):Stop()
+	newEditor.BannerButtons.Unpause.LeftClicked:Connect(function()
+		newEditor.Viewport.Paused = false
 		
-		newEditor.BannerButtons.Stop.Enabled = false
-		newEditor.BannerButtons.Run.Enabled = true
+		newEditor.BannerButtons.Pause.Enabled = true
+		newEditor.BannerButtons.Unpause.Enabled = false
 	end)
 
-	scene:SetParent(newEditor.Viewport)
+	scene.Parent = newEditor.Viewport
 
 	return newEditor
 end
@@ -39,7 +46,7 @@ local function CreateDropdown(options, selected)
 	local mousePos = Engine:GetService("InputService"):GetMouseLocation()
 	dropdown.Position = UDim2.fromOffset(mousePos.X, mousePos.Y)
 	dropdown.AnchorPoint = Vector.zero
-	dropdown:SetParent(EditorScene)
+	dropdown.Parent = EditorScene
 	existingDropdown = dropdown
 	
 	dropdown.ValueSelected:Connect(function(...)
@@ -60,7 +67,7 @@ function EditorScene:CreateContextMenu(object)
 			end
 
 			CreateDropdown(classList, function(className)
-				Instance.new(className):SetParent(object)
+				Instance.new(className).Parent = object
 				return true
 			end)
 			return true
@@ -71,7 +78,7 @@ function EditorScene:CreateContextMenu(object)
 		elseif value == "Duplicate" then
 			local new = object:Clone(true)
 			new.Name = new.Name
-			new:SetParent(object.Parent)
+			new.Parent = object.Parent
 			return true
 		elseif value == "Delete" then
 			object:Destroy()

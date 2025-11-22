@@ -38,7 +38,7 @@ function module:Emit(amount)
 			newObject.Size = self.EmitterObject.Size * self.ParticleSize:GetValue(0)
 			newObject.Enabled = true
 			newObject.Hidden = true
-			newObject:SetParent(self.Parent)
+			newObject.Parent = self.Parent
 		end
         local newParticle = {
 			BaseObject = self.EmitterObject,

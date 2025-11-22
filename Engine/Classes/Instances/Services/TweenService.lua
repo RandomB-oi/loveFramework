@@ -22,7 +22,7 @@ do
 		
 		self.Completed = self.Maid:Add(Signal.new())
 		
-		self:SetParent(self.Object)
+		self.Parent = self.Object
 		
 		return self
 	end

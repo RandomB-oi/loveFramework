@@ -1,7 +1,7 @@
 return function()
 	local newScene = Instance.new("Scene")
 	newScene.Name = "EditorScene"
-	newScene:SetParent(EditorScene)
+	newScene.Parent = EditorScene
 	newScene.ZIndex = 10
 	newScene.Size = UDim2.new(1, 0, 1, 0)
 	newScene.Rotation = 0
@@ -14,13 +14,13 @@ return function()
 	banner.AnchorPoint = Vector.zero
 	banner.Size = UDim2.new(1, 0, 0, bannerSize)
 	banner.Color = Color.from255(46, 46, 46, 255)
-	banner:SetParent(newScene)
+	banner.Parent = newScene
 
 	local bannerList = Instance.new("UIListLayout")
 	bannerList.Padding = UDim2.new(0, 0, 0, 0)
 	bannerList.ListAxis = Vector.new(1, 0)
 	bannerList.SortMode = Enum.SortMode.LayoutOrder
-	bannerList:SetParent(banner)
+	bannerList.Parent = banner
 
 	newScene.BannerButtons = {}
 
@@ -31,20 +31,20 @@ return function()
 		runButton.LayoutOrder = serial
 		runButton.Size = UDim2.new(0, bannerSize, 0, bannerSize)
 		runButton.Color = Color.new(0, 0, 0, 0)
-		runButton:SetParent(banner)
+		runButton.Parent = banner
 
 		local buttonBackdrop = Instance.new("Frame")
 		buttonBackdrop.Size = UDim2.new(1,-4,1,-4)
 		buttonBackdrop.AnchorPoint = Vector.one/2
 		buttonBackdrop.Position = UDim2.new(0.5, 0, 0.5, 0)
 		buttonBackdrop.Color = Color.new(0, 0, 0, .25)
-		buttonBackdrop:SetParent(runButton)
+		buttonBackdrop.Parent = runButton
 
 		local runIcon = Instance.new("ImageLabel")
 		runIcon.Image = image
 		runIcon.Size = UDim2.fromScale(1, 1)
-		Instance.new("UIAspectRatioConstraint"):SetParent(runIcon)
-		runIcon:SetParent(buttonBackdrop)
+		Instance.new("UIAspectRatioConstraint").Parent = runIcon
+		runIcon.Parent = buttonBackdrop
 		runButton.Icon = runIcon
 
 		if text then
@@ -53,7 +53,7 @@ return function()
 			label.AnchorPoint = Vector.new(0, 0.5)
 			label.Size = UDim2.new(1,-bannerSize,1,4)
 			label.Position = UDim2.new(0, bannerSize-2, .5, 0)
-			label:SetParent(buttonBackdrop)
+			label.Parent = buttonBackdrop
 			runButton.Size = runButton.Size + UDim2.new(0, bannerSize * (text:len()*.5), 0, 0)
 		end
 
@@ -62,9 +62,9 @@ return function()
 
 	do
 		newScene.BannerButtons.ToggleFullscreen = newTopButton("Editor/Assets/Maximize.png", "Fullscreen")
-		newScene.BannerButtons.Run = newTopButton("Editor/Assets/Play.png", "Run")
-		newScene.BannerButtons.Stop = newTopButton("Editor/Assets/Stop.png", "Stop")
-		newScene.BannerButtons.Stop.Enabled = false
+		newScene.BannerButtons.Pause = newTopButton("Editor/Assets/Pause.png", "Pause")
+		newScene.BannerButtons.Unpause = newTopButton("Editor/Assets/Unpause.png", "Unpause")
+		newScene.BannerButtons.Unpause.Enabled = false
 	end
 
 
@@ -72,13 +72,13 @@ return function()
 	area.Position = UDim2.new(0, 0, 1, 0)
 	area.AnchorPoint = Vector.new(0, 1)
 	area.Size = UDim2.new(1, 0, 1, -bannerSize)
-	area:SetParent(newScene)
+	area.Parent = newScene
 
 	local viewportWidget = Instance.new("Widget")
 	viewportWidget.Position = UDim2.new(.5, 0, .5, 0)
 	viewportWidget.AnchorPoint = Vector.new(.5, .5)
 	viewportWidget.Size = UDim2.new(.5, 0, 1, 0)
-	viewportWidget:SetParent(area)
+	viewportWidget.Parent = area
 	viewportWidget:SetTitle("Editor")
 
 	local viewportHolder = Instance.new("Frame")
@@ -96,20 +96,20 @@ return function()
 	-- viewport.AnchorPoint = Vector.one/2
 	viewport:Enable():Unpause()
 	viewport.Name = "Viewport"
-	viewport:SetParent(viewportHolder)
+	viewport.Parent = viewportHolder
 	newScene.Viewport = viewport
 
 	local explorer = Instance.new("Explorer")
 	explorer.Position = UDim2.new(0, 0, 0, 0)
 	explorer.AnchorPoint = Vector.zero
 	explorer.Size = UDim2.new(.25, 0, 1, 0)
-	explorer:SetParent(area)
+	explorer.Parent = area
 
 	local properties = Instance.new("Properties")
 	properties.Position = UDim2.new(1, 0, 0, 0)
 	properties.AnchorPoint = Vector.new(1, 0)
 	properties.Size = UDim2.new(.25, 0, 1, 0)
-	properties:SetParent(area)
+	properties.Parent = area
 
 	newScene.BannerButtons.ToggleFullscreen.LeftClicked:Connect(function()
 		local fullscreen = explorer.Enabled

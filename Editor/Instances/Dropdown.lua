@@ -14,12 +14,12 @@ module.new = function(list)
 	self.List = self.Maid:Add(Instance.new("ScrollingFrame"))
 	self.List.Size = UDim2.fromScale(1,1)
 	self.List.Color = Color.new(0, 0, 0, 0)
-	self.List:SetParent(self)
+	self.List.Parent = self
 
 	self.Layout = self.Maid:Add(Instance.new("UIListLayout"))
 	self.Layout.SortMode = Enum.SortMode.Name
 	self.Layout.Padding = UDim2.fromOffset(1, 1)
-	self.Layout:SetParent(self.List)
+	self.Layout.Parent = self.List
 
 	self.ValueSelected = self.Maid:Add(Signal.new())
 
@@ -42,14 +42,14 @@ module.new = function(list)
 		newButton.Size = UDim2.new(1, -12, 0, 20)
 		newButton.LayoutOrder = index
 		newButton.Name = name
-		newButton:SetParent(self.List)
+		newButton.Parent = self.List
 
 		local textLabel = Instance.new("TextLabel")
 		textLabel.Color = Color.new(1, 1, 1, 1)
 		textLabel.Size = UDim2.fromScale(1, 1)
 		textLabel.Text = name
 		textLabel.XAlignment = Enum.XAlignment.Left
-		textLabel:SetParent(newButton)
+		textLabel.Parent = newButton
 
 		newButton.LeftClicked:Connect(function()
 			self.ValueSelected:Fire(name)

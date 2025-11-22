@@ -8,6 +8,7 @@ module.ClassIcon = "Engine/Assets/InstanceIcons/Unknown.png"
 module.new = function(...)
 	local self = setmetatable(module.Base.new(...), module._metatable)
 	self.Name = self.__type
+	self.Replicates = false
 	self.ZIndex = 99999999
 	return self
 end
