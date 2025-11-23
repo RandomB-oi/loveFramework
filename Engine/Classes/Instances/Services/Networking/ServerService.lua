@@ -65,6 +65,8 @@ function module:SendMessage(clientID, name, value)
     local client = self.Clients[clientID]
     if not client then return end
 
+    -- print("send to", name, getStr(value))
+
     client.Peer:send(encode({
         type = name,
         value = value

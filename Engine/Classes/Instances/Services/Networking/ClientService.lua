@@ -13,6 +13,29 @@ local function decode(str)
     return json.decode(str)
 end
 
+local ServerInstances = {}
+local function GetInstance(id, className)
+    local existing = Instance.GetClass("BaseInstance").All[id]
+    if existing then return existing end
+
+    if className then
+        local new = Instance.new(className, id)
+        ServerInstances[id] = new
+        new.Maid:GiveTask(function()
+            ServerInstances[id] = nil
+        end)
+        return new
+    end
+end
+
+local function ClearInstances()
+    local old = ServerInstances
+    ServerInstances = {}
+    for i,v in pairs(old) do
+        v:Destroy()
+    end
+end
+
 module.new = function ()
 	local self = setmetatable(module.Base.new(), module._metatable)
 	self.Name = self.__type
@@ -28,39 +51,29 @@ module.new = function ()
     self.ServerPeer = nil
     self.LocalServer = nil
 
+
+    self.Disconnected:Connect(ClearInstances)
     self.MessageRecieved:Connect(function(message, data)
+        -- print(message, getStr(data))
+
         if message == "CreateInstance" then
-            local object = Instance.GetClass("BaseInstance").All[data.ID] or Instance.new(data.ClassName, data.ID)
-            if object then
-                object:DeserializeData(data.Data)
-            end
+            local object = GetInstance(data.ID, data.ClassName)
+            object:DeserializeData(data.Data)
         elseif message == "UpdateProperty" then
-            local object = Instance.GetClass("BaseInstance").All[data.ID]
+            local object = GetInstance(data.ID)
             if object then
                 object[data.Prop] = Serializer.Decode(data.Value)
             end
-            
+        elseif message == "RemoveInstance" then
+            local object = GetInstance(data.ID)
+            if object then
+                object:Destroy()
+            end
         elseif message == "connect" then
             self.LocalID = data.id
             self:SendMessage("connected")
         end
     end)
-
-    --[[
-	if not prop then
-		ServerService:SendMessageAll("CreateInstance", {
-			ClassName = self.ClassName,
-			ID = self.ID,
-			Data = self:SerializeData(),
-		})
-	else
-		ServerService:SendMessageAll("UpdateProperty", {
-			ID = self.ID,
-			Prop = prop,
-			Value = self[prop]
-		})
-	end    
-    ]]
 
 	return self
 end

@@ -13,6 +13,7 @@ function love.load()
 	end
 
 	if RunService:IsServer() then
+		love.window.setMode(800, 600, {resizable = true})
 		require("Server")
 	else
 		require("Client")

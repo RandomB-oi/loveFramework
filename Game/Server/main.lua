@@ -16,9 +16,10 @@ function scriptObject:ScriptUpdate(dt)
 	local et = RunService.ElapsedTime
 	local x = math.sin(et)/2+0.5
 	local y = math.cos(et)/2+0.5
-	ReplicateObject.Position = UDim2.new(x,0,y,0)
+	ReplicateObject.Position = UDim2.new(1-x,0,y,0)
 	
 	ReplicateObject.Rotation = (et*90) % 360
 end
+scriptObject.Enabled = false
 
 scriptObject.Parent = GameScene.Shared

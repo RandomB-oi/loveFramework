@@ -12,10 +12,14 @@ function love.conf(t)
 		end
     end
 
+	if parameters.output then
+		t.console = true
+	end
+
 	if parameters.server then
 		-- parameters.editor = true
 		-- parameters.output = true
-		-- t.console = true
+		t.console = true
 		-- t.window = false
 		-- t.modules.graphics = false
 		-- parameters.noGraphics = true

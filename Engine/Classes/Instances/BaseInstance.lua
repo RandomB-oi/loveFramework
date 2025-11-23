@@ -234,38 +234,39 @@ function module:Replicate(prop, specificClient)
 	local Run = Engine:GetService("RunService")
 	local ServerService = Engine:GetService("ServerService")
 
-	if not Run:IsServer() then print("not server") return end
+	if not Run:IsServer() then return end
 
 	local didReplicate = self._replicated
 	local can = self:CanReplicate()
 	self._replicated = can
 
+	local message, data
 	if not can then
 		if didReplicate then
-			-- tell to remove it
+			message, data = "RemoveInstance", {ID = self.ID}
 		end
-		return
+	else
+		if not prop or (not didReplicate and can) then
+			message, data = "CreateInstance", {
+				ClassName = self.__type,
+				ID = self.ID,
+				Data = self:SerializeData(),
+			}
+		else
+			message, data = "UpdateProperty", {
+				ID = self.ID,
+				Prop = prop,
+				Value = Serializer.Encode(self[prop]),
+			}
+		end
 	end
 
-	local message, data
-	if not prop then
-		message, data = "CreateInstance", {
-			ClassName = self.__type,
-			ID = self.ID,
-			Data = self:SerializeData(),
-		}
-	else
-		message, data = "UpdateProperty", {
-			ID = self.ID,
-			Prop = prop,
-			Value = Serializer.Encode(self[prop]),
-		}
-	end
-
-	if specificClient then
-		ServerService:SendMessage(specificClient, message, data)
-	else
-		ServerService:SendMessageAll(message, data)
+	if message and data then
+		if specificClient then
+			ServerService:SendMessage(specificClient, message, data)
+		else
+			ServerService:SendMessageAll(message, data)
+		end
 	end
 end
 
@@ -569,7 +570,7 @@ end
 
 function module:Destroy()
 	self.Parent = nil
-
+	self:Replicate()
 	self.Maid:Destroy()
 
 	self:ClearAllChildren()
