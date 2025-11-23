@@ -1,8 +1,6 @@
-GameScene = Instance.new("DataModel")
-GameScene.Name = "Test Game"
+GameScene = Instance.new("DataModel","GameScene")
+GameScene.Name = "Networking Test"
 GameScene.Parent = Engine
 
-autoLoad("Game/Shared/Classes")
-autoLoad("Game/Shared/Instances")
-Instance.GetClass("Block").Init()
-Instance.GetClass("Item").Init()
+-- autoLoad("Game/Shared/Classes")
+-- autoLoad("Game/Shared/Instances")

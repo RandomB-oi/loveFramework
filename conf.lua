@@ -15,10 +15,10 @@ function love.conf(t)
 	if parameters.server then
 		-- parameters.editor = true
 		-- parameters.output = true
+		t.console = true
 		t.window = false
 		t.modules.graphics = false
 		parameters.noGraphics = true
-		t.console = true
 	end
 
 	_G.LaunchParameters = parameters

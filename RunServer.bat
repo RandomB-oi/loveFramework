@@ -1,1 +1,2 @@
-love . --server --editor
+love . --server
+pause
