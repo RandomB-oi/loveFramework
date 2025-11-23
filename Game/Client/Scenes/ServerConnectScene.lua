@@ -91,6 +91,7 @@ serverIP.Position = UDim2.new(0, 0, 0, 0)
 serverIP.AnchorPoint = Vector.new(0.5, 0)
 serverIP.Color = Color.from255(255,255,255,200)
 serverIP.PlaceholderText = "Server IP"
+serverIP.Text = "147.185.221.19" -- generated ip from play-it, deleted after done testing
 serverIP.LayoutOrder = 1
 serverIP.Parent = joinBackdrop
 
@@ -100,6 +101,7 @@ serverPort.Position = UDim2.new(0, 0, 0, 0)
 serverPort.AnchorPoint = Vector.new(0.5, 0)
 serverPort.Color = Color.from255(255,255,255,200)
 serverPort.PlaceholderText = "Server Port"
+serverPort.Text = "11474"
 serverPort.LayoutOrder = 2
 serverPort.Parent = joinBackdrop
 local connectButton = NewButton("Connect")

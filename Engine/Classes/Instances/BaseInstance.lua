@@ -220,7 +220,7 @@ function module:SetAttribute(name, value)
 end
 
 function module:CanReplicate()
-	if self.Parent == Engine then return self.Replicates end
+	if self.Parent == Engine or self:IsA("DataModel") then return self.Replicates end
 	if not self.Replicates then return false end
 
 	if self.Parent then

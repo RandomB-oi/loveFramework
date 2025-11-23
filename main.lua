@@ -1,8 +1,7 @@
 require("Engine.main")
 local RunService = Engine:GetService("RunService")
 
-function love.load(_args)
-	-- local launchParameters = {} for _, arg in ipairs(_args) do launchParameters[arg] = true end
+function love.load()
 	_G.LaunchParameters = _G.LaunchParameters or {}
 	
 	if _G.LaunchParameters.editor then
@@ -18,5 +17,4 @@ function love.load(_args)
 	else
 		require("Client")
 	end
-	print("done")
 end

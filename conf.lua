@@ -1,7 +1,7 @@
 function love.conf(t)
     local raw = arg or {}
-	-- table.insert(raw, "--server")
-	-- table.insert(raw, "--editor")
+	table.insert(raw, "--server")
+	table.insert(raw, "--editor")
 	-- table.insert(raw, "--output")
 
 	local parameters = {}
@@ -15,10 +15,10 @@ function love.conf(t)
 	if parameters.server then
 		-- parameters.editor = true
 		-- parameters.output = true
-		t.console = true
-		t.window = false
-		t.modules.graphics = false
-		parameters.noGraphics = true
+		-- t.console = true
+		-- t.window = false
+		-- t.modules.graphics = false
+		-- parameters.noGraphics = true
 	end
 
 	_G.LaunchParameters = parameters
