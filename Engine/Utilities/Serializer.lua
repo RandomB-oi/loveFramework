@@ -10,7 +10,7 @@ local typeLookup = {
 
 	Binary = Binary.new,
 	Vector = Vector.new,
-	Color = Color.new,
+	Color = Color.from255,
 	ColorSequence = ColorSequence.new,
 	NumberRange = NumberRange.new,
 	NumberSequence = NumberSequence.new,
