@@ -53,7 +53,7 @@ function module:Await(callback)
 end
 
 function module:ScriptInit()
-	print("Hello World!")
+	-- print("Hello World!")
 end
 
 function module:ScriptUpdate(dt)

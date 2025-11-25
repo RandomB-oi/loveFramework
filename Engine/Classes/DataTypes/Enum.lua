@@ -86,6 +86,10 @@ local EngineEnums = {
 		Bottom = NewEnum("VerticalDirection"),
 	},
 
+	EncodingMethod = {
+		Json = NewEnum("EncodingMethod"),
+	},
+
 	KeyCode = {
 		One = NewKeyCode("1"),
 		Two = NewKeyCode("2"),

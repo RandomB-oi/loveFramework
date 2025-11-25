@@ -5,7 +5,7 @@ local typeLookup = {
 		return Enum[category][name]
 	end,
 	Instance = function(id)
-		return Instance.GetClass("BaseInstance").All[id]
+		return id
 	end,
 
 	Binary = Binary.new,
@@ -57,6 +57,7 @@ function module.Decode(value)
 		end
 		return decoded
 	end
+
 	return value
 end
 

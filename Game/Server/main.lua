@@ -1,3 +1,6 @@
+local ServerService = Engine:GetService("ServerService")
+ServerService.PlayerClass = "Frame"
+
 local NonReplicateObject = Instance.new("NumberValue")
 NonReplicateObject.Name = "TestNonReplicateObject"
 NonReplicateObject.Parent = GameScene.Server
@@ -20,6 +23,6 @@ function scriptObject:ScriptUpdate(dt)
 	
 	ReplicateObject.Rotation = (et*90) % 360
 end
-scriptObject.Enabled = false
+-- scriptObject.Enabled = false
 
-scriptObject.Parent = GameScene.Shared
+scriptObject.Parent = GameScene.Server

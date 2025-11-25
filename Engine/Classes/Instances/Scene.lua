@@ -46,6 +46,14 @@ function module:GetService(name)
 	return LoadedServices[name]
 end
 
+function module:GetServices()
+	local loadedServicesArray = {}
+	for name, service in pairs(LoadedServices) do
+		table.insert(loadedServicesArray, service)
+	end
+	return loadedServicesArray
+end
+
 function module:Update(dt)
 	-- self:CheckProperties()
 	if not (self.Enabled and not self.Paused) then return end

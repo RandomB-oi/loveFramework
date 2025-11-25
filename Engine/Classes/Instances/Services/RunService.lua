@@ -5,7 +5,7 @@ module.__type = "RunService"
 
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module._metatable)
+	local self = setmetatable(module.Base.new(module.__type), module._metatable)
 	self.Name = self.__type
 
 	self:CreateProperty("ElapsedTime", "number", 0)

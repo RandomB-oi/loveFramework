@@ -16,13 +16,16 @@ else
 	GameScene.Parent = Engine
 end
 
-local function Update(dt)
-	RunService.ElapsedTime = RunService.ElapsedTime + dt
-	local title = GameScene.Name.." - "..tostring(math.round(1/(dt)))
+	-- local title = GameScene.Name.." - "..tostring(math.round(1/(dt)))
 	-- local title = GameScene.Name.." - "..tostring(#GameScene:GetChildren(true).. " instances")
-	Engine:Unpause():Enable()
+Engine:BindProperty("Name", function(title)
 	Engine.Name = title
 	love.window.setTitle(title)
+end)
+
+local function Update(dt)
+	RunService.ElapsedTime = RunService.ElapsedTime + dt * RunService.TimeScale
+	Engine:Unpause():Enable()
 	
 	task.update(dt)
 	

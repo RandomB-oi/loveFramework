@@ -5,14 +5,18 @@ local ClientService = Engine:GetService("ClientService")
 local ServerConnectScene = require("Game.Client.Scenes.ServerConnectScene")
 ServerConnectScene.Parent = GameScene.Client
 
-local stopServerButton = Instance.new("Button")
-stopServerButton.Parent = GameScene.Client
-stopServerButton.Position = UDim2.fromScale(0.5, 0.5)
+local ConnectedScene = require("Game.Client.Scenes.ConnectedScene")
+ConnectedScene.Parent = GameScene.Client
 
-stopServerButton.LeftClicked:Connect(function()
-	ClientService:DisconnectFromServer()
+ServerConnectScene.Enabled = true
+ConnectedScene.Enabled = false
+
+ClientService.Connected:Connect(function()
+	ServerConnectScene.Enabled = false
+	ConnectedScene.Enabled = true
 end)
 
 ClientService.Disconnected:Connect(function()
 	ServerConnectScene.Enabled = true
+	ConnectedScene.Enabled = false
 end)

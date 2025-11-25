@@ -106,14 +106,14 @@ function module:UpdateOrder()
 	local contentSize = Vector.zero
 	local paddingSize = self.Padding:Calculate(parentSize) * self.ListAxis
 	
-	for _, list in ipairs(array) do
+	for k, list in ipairs(array) do
 		for index, child in ipairs(list[2]) do
 			local size = child:GetModifiedSize(child.Size:Calculate(parentSize))
 
 			orderedChildren[child] = contentSize
 			contentSize = contentSize + size * self.ListAxis
 
-			if next(list[2], index) then
+			if next(list[2], index) or next(array, k) then
 				contentSize = contentSize + paddingSize
 			end
 		end

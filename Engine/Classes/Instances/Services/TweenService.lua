@@ -83,7 +83,7 @@ module.__index = module
 module.__type = "TweenService"
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module._metatable)
+	local self = setmetatable(module.Base.new(module.__type), module._metatable)
 	self.Name = self.__type
 	
 	return self

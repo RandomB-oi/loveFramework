@@ -5,16 +5,64 @@ module.__type = "ClientService"
 
 local enet = require("enet")
 
-local function encode(tbl)
-    return json.encode(tbl)
-end
-
-local function decode(str)
-    return json.decode(str)
-end
-
 local ServerInstances = {}
-local function GetInstance(id, className)
+
+local function ClearInstances()
+    local old = ServerInstances
+    ServerInstances = {}
+    for i,v in pairs(old) do
+        v:Destroy()
+    end
+end
+
+module.new = function ()
+	local self = setmetatable(module.Base.new(module.__type), module._metatable)
+	self.Name = self.__type
+
+    self.Connected = Signal.new()
+    self.Disconnected = Signal.new()
+    self.MessageRecieved = Signal.new()
+
+    self:CreateProperty("ServerIP", "string", "")
+    self:CreateProperty("ServerPort", "string", "")
+    self:CreateProperty("LocalID", "string", "")
+    self.Hidden = false
+
+    self.Host = enet.host_create()
+    self.ServerPeer = nil
+    self.LocalServer = nil
+
+
+    self.Disconnected:Connect(ClearInstances)
+    self.MessageRecieved:Connect(function(message, data)
+        if message == "CreateInstance" then
+            local data = Serializer.Decode(data)
+            local object = self:GetInstance(data.ID, data.ClassName)
+            object:DeserializeData(data)
+        elseif message == "UpdateProperty" then
+            local object = self:GetInstance(data.ID)
+            if object then
+                object[data.Prop] = Serializer.Decode(data.Value)
+            end
+        elseif message == "RemoveInstance" then
+            local object = self:GetInstance(data.ID)
+            if object then
+                object:Destroy()
+            end
+        elseif message == "Batch" then
+            for _, command in pairs(data) do
+                self.MessageRecieved:Fire(command.name, command.data)
+            end
+        elseif message == "connect" then
+            self.LocalID = data.id
+            self:SendMessage("connected")
+        end
+    end)
+
+	return self
+end
+
+function module:GetInstance(id, className)
     local existing = Instance.GetClass("BaseInstance").All[id]
     if existing then return existing end
 
@@ -28,56 +76,6 @@ local function GetInstance(id, className)
     end
 end
 
-local function ClearInstances()
-    local old = ServerInstances
-    ServerInstances = {}
-    for i,v in pairs(old) do
-        v:Destroy()
-    end
-end
-
-module.new = function ()
-	local self = setmetatable(module.Base.new(), module._metatable)
-	self.Name = self.__type
-
-    self.Disconnected = Signal.new()
-    self.MessageRecieved = Signal.new()
-
-    self:CreateProperty("ServerIP", "string", "")
-    self:CreateProperty("ServerPort", "string", "")
-    self:CreateProperty("LocalID", "string", "")
-
-    self.Host = enet.host_create()
-    self.ServerPeer = nil
-    self.LocalServer = nil
-
-
-    self.Disconnected:Connect(ClearInstances)
-    self.MessageRecieved:Connect(function(message, data)
-        -- print(message, getStr(data))
-
-        if message == "CreateInstance" then
-            local object = GetInstance(data.ID, data.ClassName)
-            object:DeserializeData(data.Data)
-        elseif message == "UpdateProperty" then
-            local object = GetInstance(data.ID)
-            if object then
-                object[data.Prop] = Serializer.Decode(data.Value)
-            end
-        elseif message == "RemoveInstance" then
-            local object = GetInstance(data.ID)
-            if object then
-                object:Destroy()
-            end
-        elseif message == "connect" then
-            self.LocalID = data.id
-            self:SendMessage("connected")
-        end
-    end)
-
-	return self
-end
-
 function module:ConnectedToServer()
     return not not (self.ServerPeer or self._connected)
 end
@@ -89,7 +87,10 @@ function module:ConnectToServer(ip, port)
     self.ServerPort = tostring(port)
 
     self.ServerPeer = self.Host:connect(ip .. ":" .. port)
-    return not not self.ServerPeer
+    if self.ServerPeer then
+        self.Connected:Fire()
+        return true
+    end
 end
 
 function module:HostLocalServer()
@@ -127,11 +128,16 @@ function module:SendMessage(name, value)
     
     task.spawn(function()
         if not (self.LocalID and self._connected) then repeat until (self.ServerPeer and self._connected) end
-        self.ServerPeer:send(encode({
+        local encodingService = Engine:GetService("EncodingService")
+        local success, data = encodingService:Encode({
             type = "message",
             name = name,
-            value = value
-        }))
+            data = value
+        }, encodingService.ReplicationEncodingMethod)
+
+        if success then
+            self.ServerPeer:send(data)
+        end
     end)
 end
 
@@ -139,11 +145,15 @@ function module:Update()
     if not Engine:GetService("RunService"):IsClient() then return end
     if not self.ServerPeer then return end
     local event = self.Host:service(0)
+    local encodingService = Engine:GetService("EncodingService")
+
     while event do
         if event.type == "receive" then
-            local data = decode(event.data)
+            local success,  data = encodingService:Decode(event.data, encodingService.ReplicationEncodingMethod)
 
-            self.MessageRecieved:Fire(data.type, data.value)
+            if success then
+                self.MessageRecieved:Fire(data.name, data.data)
+            end
         elseif event.type == "connect" then
             self._connected = true
 

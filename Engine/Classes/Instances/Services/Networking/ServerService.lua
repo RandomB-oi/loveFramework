@@ -6,18 +6,14 @@ module.__type = "ServerService"
 local enet = require("enet")
 local ConnectedClient = require("Engine.Classes.Instances.Services.Networking.ConnectedClient")
 
-local function encode(tbl)
-    return json.encode(tbl)
-end
-
-local function decode(str)
-    return json.decode(str)
-end
+local MessageRate = 1/20
+local lastMessageSend = -math.huge
 
 module.new = function ()
-	local self = setmetatable(module.Base.new(), module._metatable)
+	local self = setmetatable(module.Base.new(module.__type), module._metatable)
 	self.Name = self.__type
-
+    self.Replicates = true
+    self.Hidden = false
     self.Clients = {}
     self.Host = nil
 
@@ -26,8 +22,28 @@ module.new = function ()
     self.MessageRecieved = self.Maid:Add(Signal.new())
 
     self:CreateProperty("PlayerClass", "string", "Folder")
+    -- self:CreateProperty("ServerTime", "number", 0)
 
-    self.MessageRecieved:Connect(print)
+    -- Engine:GetService("RunService"):GetPropertyChangedSignal("ElapsedTime"):Connect(function(value)
+    --     self.ServerTime = value
+    -- end)
+
+    -- self.ClientConnected:Connect(Instance.GetClass("BaseInstance").ReplicateInstances)
+    self.ClientConnected:Connect(function(clientID)
+        GameScene:Replicate(nil, clientID)
+        for _, service in ipairs(Engine:GetServices()) do
+            service:Replicate(nil, clientID)
+        end
+    end)
+
+    -- self.MessageRecieved:Connect(print)
+    self.MessageRecieved:Connect(function(clientID, message, data)
+        if message == "Batch" then
+            for _, command in pairs(data) do
+                self.MessageRecieved:Fire(clientID, command.name, command.data)
+            end
+        end
+    end)
 
 	return self
 end
@@ -45,12 +61,10 @@ function module:StartServer(port)
     print("Server hosted on port", port)
 
     local BaseInstance = Instance.GetClass("BaseInstance")
-    BaseInstance.ReplicateInstances()
+    -- BaseInstance.ReplicateInstances()
 
     local function newInstance(id, object)
         object.Changed:Connect(function(prop)
-            if not object.Replicates then return end
-
             object:Replicate(prop)
         end)
     end
@@ -65,12 +79,7 @@ function module:SendMessage(clientID, name, value)
     local client = self.Clients[clientID]
     if not client then return end
 
-    -- print("send to", name, getStr(value))
-
-    client.Peer:send(encode({
-        type = name,
-        value = value
-    }))
+    client:SendMessage(name, value)
 end
 
 function module:SendMessageAll(name, value)
@@ -101,7 +110,6 @@ function module:AddClient(peer)
     self:SendMessage(clientID, "connect", {
         id = clientID,
     })
-    Instance.GetClass("BaseInstance").ReplicateInstances(clientID)
 
     self.ClientConnected:Fire(clientID)
 end
@@ -111,17 +119,25 @@ function module:Update()
     if not self.Enabled then return end
     if not self.Host then return end
 
+    local encodingService = Engine:GetService("EncodingService")
+
+    if os.clock() - lastMessageSend > MessageRate then
+        lastMessageSend = os.clock()
+        for _, client in pairs(self.Clients) do
+            client:BatchSend()
+        end
+    end
+
     local event = self.Host:service(0)
     while event do
         if event.type == "connect" then
             self:AddClient(event.peer)
         elseif event.type == "receive" then
-            local data = decode(event.data)
-            if data and data.type == "message" then
-                -- find which client this is
+            local success, data = encodingService:Decode(event.data, encodingService.ReplicationEncodingMethod)
+            if success and data then
                 local clientID = self:GetClientIDFromPeer(event.peer)
                 if clientID then    
-                    self.MessageRecieved:Fire(clientID, data.name, data.value)
+                    self.MessageRecieved:Fire(clientID, data.name, data.data)
                 end
             end
 
@@ -134,15 +150,6 @@ function module:Update()
 
         event = self.Host:service(0)
     end
-end
-
-function module:Replicate(object, info)
-    --[[
-    info - {
-        [1] = mode [1: instance new, 2: instance changed]
-        [2] = mode1: {className, id}, mode2: serializedProperties
-    }
-    ]]
 end
 
 return Instance.RegisterClass(module)

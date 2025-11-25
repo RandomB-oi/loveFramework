@@ -101,4 +101,8 @@ do -- load all instances
 end
 
 require("Engine.Scenes.Engine")
-require("Engine.Scenes.Output")
+
+if _G.LaunchParameters.debug then
+	require("Engine.Scenes.Output")
+	require("Engine.Scenes.FPSCounter")
+end

@@ -1,9 +1,9 @@
 local Run = Engine:GetService("RunService")
-if not Run:IsClient() or not _G.LaunchParameters.output then return end
 
 local OutputScene = Instance.new("Scene")
 OutputScene.ZIndex = 10
 OutputScene.Enabled = false
+OutputScene.Hidden = true
 OutputScene.Parent = Engine
 
 local frame = Instance.new("Frame")

@@ -14,10 +14,19 @@ module._newindex = function(self, index, value)
 end
 
 module._index = function(self, index)
+	if module[index] then return end
+	
     local properties = rawget(self, "_properties")
-    if properties and properties[index] then
-        return properties[index].Value
+	local info = properties[index]
+    if info then
+		if info.Value ~= nil then
+        	return info.Value
+		end
+		return info.DefaultValue
     end
+
+	local foundChild = self:FindFirstChild(index)
+	if foundChild then return foundChild end
 end
 
 local function PropertyTypeMatches(value, desiredType)
@@ -119,7 +128,6 @@ function module:CreateProperty(name, propType, defaultValue, cleaner)
 	end
 end
 
-
 function module:GetFullName()
 	local path = {}
 	local object = self
@@ -132,6 +140,10 @@ end
 
 function module:SetProperty(propName, newValue)
 	local info = self._properties[propName]
+
+	if info.PropType == "Instance" and type(newValue) == "string" then
+		newValue = module.All[newValue]
+	end
 
 	if info.TypeCleaner and TypeCleaners[info.TypeCleaner] then
 		newValue = TypeCleaners[info.TypeCleaner](newValue)
@@ -247,11 +259,7 @@ function module:Replicate(prop, specificClient)
 		end
 	else
 		if not prop or (not didReplicate and can) then
-			message, data = "CreateInstance", {
-				ClassName = self.__type,
-				ID = self.ID,
-				Data = self:SerializeData(),
-			}
+			message, data = "CreateInstance", self:SerializeData()
 		else
 			message, data = "UpdateProperty", {
 				ID = self.ID,
@@ -270,18 +278,22 @@ function module:Replicate(prop, specificClient)
 	end
 end
 
-function module.ReplicateInstances(clientID)
-	for id, instance in pairs(module.All) do
-		instance:Replicate(nil, clientID)
-	end
-end
+-- function module.ReplicateInstances(clientID)
+-- 	for id, instance in pairs(module.All) do
+-- 		instance:Replicate(nil, clientID)
+-- 	end
+-- end
 
 function module:SerializeData()
+	if not self.Replicates then return end
+	
 	local data = {}
-
+	data.ClassName = self.__type
+	data.ID = self.ID
 	data.Properties = {}
 	data.Attributes = {}
 	data.Tags = {}
+	data.Children = {}
 
 	for prop, value in pairs(self._properties) do
 		if value.Value ~= value.DefaultValue then
@@ -305,9 +317,17 @@ function module:SerializeData()
 		table.insert(data.Tags, tag)
 	end
 
+	for _, child in ipairs(self:GetChildren()) do
+		local serializedData = child:SerializeData()
+		if serializedData then
+			table.insert(data.Children, serializedData)
+		end
+	end
+
 	if not next(data.Properties) then data.Properties = nil end
 	if not next(data.Attributes) then data.Attributes = nil end
 	if not next(data.Tags) then data.Tags = nil end
+	if not next(data.Children) then data.Children = nil end
 	if not next(data) then data = nil end
 
 	return Serializer.Encode(data)
@@ -315,12 +335,21 @@ end
 
 function module:DeserializeData(data)
 	if not data then return end
-	data = Serializer.Decode(data)
-
-
+	if data.Children then
+		local clientService = Engine:GetService("ClientService")
+		for _, child in ipairs(data.Children) do
+			local object = clientService:GetInstance(child.ID, child.ClassName)
+			object:DeserializeData(child)
+		end
+	end
+	local parent
 	if data.Properties then
 		for prop, value in pairs(data.Properties) do
-			self[prop] = value
+			if prop == "Parent" then
+				parent = value
+			else
+				self[prop] = value
+			end
 		end
 	end
 	
@@ -335,6 +364,7 @@ function module:DeserializeData(data)
 			self:AddTag(tag)
 		end
 	end
+	self.Parent = parent
 end
 
 function module:Serialize()
@@ -382,13 +412,9 @@ function module:DrawChildren()
 			child:Draw()
 		end
 	end
-	-- for _, child in ipairs() do
-	-- 	child:Draw()
-	-- end
 end
 
 function module:Update(dt)
-	-- self:CheckProperties()
 	for _, child in ipairs(self:GetChildren()) do
 		child:Update(dt)
 	end
@@ -541,11 +567,7 @@ function module:Clone(ignoreArchivable, _instanceMap, _toSet)
 			for name, value in pairs(props) do
 				local chosenValue = value[1] and _instanceMap[value[1]] or value[1]
 
-				if name == "Parent" then
-					object.Parent = chosenValue
-				else
-					object[name] = chosenValue
-				end
+				object[name] = chosenValue
 			end
 		end
 	end
@@ -554,8 +576,9 @@ function module:Clone(ignoreArchivable, _instanceMap, _toSet)
 end
 
 function module:GetConstraint(constraintType)
-	if not self._constraintChildren then return end
-	return self._constraintChildren[constraintType]
+	local constraintChildren = rawget(self, "_constraintChildren")
+	if not constraintChildren then return end
+	return constraintChildren[constraintType]
 end
 
 function module:ClearAllChildren()
