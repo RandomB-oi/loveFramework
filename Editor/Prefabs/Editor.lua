@@ -1,12 +1,12 @@
 return function()
 	local newScene = Instance.new("Scene")
 	newScene.Name = "EditorScene"
-	newScene.Parent = EditorScene
 	newScene.ZIndex = 10
 	newScene.Size = UDim2.new(1, 0, 1, 0)
 	newScene.Rotation = 0
 	newScene.Position = UDim2.fromScale(0.5, 0.5)
 	newScene.AnchorPoint = Vector.one/2
+	newScene.Parent = EditorScene
 
 	local bannerSize = 24
 	local banner = Instance.new("Frame")

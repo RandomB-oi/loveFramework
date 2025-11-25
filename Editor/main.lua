@@ -1,6 +1,7 @@
 EditorScene = Instance.new("Scene")
-EditorScene.Parent = Engine
 EditorScene.Replicates = false
+EditorScene.Hidden = true
+EditorScene.Parent = Engine
 
 autoLoad("Editor", {"Editor.main"})
 
@@ -8,9 +9,9 @@ function EditorScene:Open(scene)
 	local newEditor = require("Editor.Prefabs.Editor")()
 
 	local explorer = newEditor:FindFirstChild("Explorer", true)
-	-- explorer.RootObject = scene
+	explorer.RootObject = scene
 	
-	explorer.RootObject = Engine
+	-- explorer.RootObject = Engine
 
 	newEditor.Viewport.Paused = true
 	newEditor.BannerButtons.Pause.Enabled = false

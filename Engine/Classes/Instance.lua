@@ -14,8 +14,15 @@ module.GetClass = function(className)
 end
 
 local function CreateInstanceMetatable(class)
+	-- local cachedMetas = {index = {length = 0, list = {}}, newindex = {length = 0, list = {}}}
     return {
         __index = function(self, index)
+			local selfHas = rawget(self, index)
+			if selfHas ~= nil then return selfHas end
+
+			local classHas = rawget(class, index)
+			if classHas ~= nil then return classHas end
+
             local current = class
             while current do
 				local currentIndex = rawget(current, "_index")
@@ -29,11 +36,6 @@ local function CreateInstanceMetatable(class)
 
                 current = rawget(current, "Base")
             end
-			
-			local selfHas = rawget(self, index)
-			if selfHas ~= nil then return selfHas end
-
-			return rawget(class, index)
         end,
 
         __newindex = function(self, index, value)
