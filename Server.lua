@@ -41,15 +41,15 @@ local function Update(dt)
 end
 
 if _G.LaunchParameters.sepThread then -- running on separate thread
+	local channel = love.thread.getChannel("server_events")
 	while true do
 		dt = os.clock() - lastTick
 		lastTick = os.clock()
 
 		Update(dt)
-
-		local msg = love.thread.getChannel("server_events"):pop()
+		local msg = channel:pop()
 		if msg == "shutdown" then
-			return false
+			break
 		end
 
 		if love.timer then

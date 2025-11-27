@@ -1,4 +1,5 @@
 local ServerConnectScene = Instance.new("Scene")
+ServerConnectScene.Name = "ServerConnectScene"
 
 local ClientService = Engine:GetService("ClientService")
 

@@ -1,4 +1,5 @@
 local ConnectedScene = Instance.new("Scene")
+ConnectedScene.Name = "ConnectedScene"
 ConnectedScene.Enabled = false
 
 local ClientService = Engine:GetService("ClientService")

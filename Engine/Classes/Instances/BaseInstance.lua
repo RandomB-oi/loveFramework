@@ -97,14 +97,15 @@ module.new = function(id)
 			self.Parent = nil
 		end
 	end)
-
-	self.InstanceCreated:Fire(self.ID, self)
-
 	-- self:GetPropertyChangedSignal("Parent"):Connect(function(newParent)
 	-- 	self.Parent = newParent
 	-- end)
 
 	return self
+end
+
+function module:Final()
+	self.InstanceCreated:Fire(self.ID, self)
 end
 
 function module:GetProperties()
@@ -342,14 +343,14 @@ function module:DeserializeData(data)
 			object:DeserializeData(child)
 		end
 	end
-	local parent
+	-- local parent
 	if data.Properties then
 		for prop, value in pairs(data.Properties) do
-			if prop == "Parent" then
-				parent = value
-			else
+			-- if prop == "Parent" then
+			-- 	parent = value
+			-- else
 				self[prop] = value
-			end
+			-- end
 		end
 	end
 	
@@ -364,7 +365,8 @@ function module:DeserializeData(data)
 			self:AddTag(tag)
 		end
 	end
-	self.Parent = parent
+
+	-- self.Parent = parent
 end
 
 function module:Serialize()

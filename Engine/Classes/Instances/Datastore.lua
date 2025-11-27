@@ -15,7 +15,7 @@ function getStr(value, alreadyDoneTables, tabs, oneLine)
 	elseif type(value) == "table" then
 		if value.IsA then
 			-- return "\""..value.__tostring(value).."\""
-			return "\""..tostring(value).."\""
+			return "\""..typeof(value).."\""
 		end
 		
 		if value.ToLua then

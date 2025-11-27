@@ -9,9 +9,9 @@ function EditorScene:Open(scene)
 	local newEditor = require("Editor.Prefabs.Editor")()
 
 	local explorer = newEditor:FindFirstChild("Explorer", true)
-	explorer.RootObject = scene
+	-- explorer.RootObject = scene
 	
-	-- explorer.RootObject = Engine
+	explorer.RootObject = Engine
 
 	newEditor.Viewport.Paused = true
 	newEditor.BannerButtons.Pause.Enabled = false

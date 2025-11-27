@@ -4,10 +4,39 @@ module.__index = module
 module.__type = "ServerService"
 
 local enet = require("enet")
-local ConnectedClient = require("Engine.Classes.Instances.Services.Networking.ConnectedClient")
+local ConnectedClient = require("Engine.Classes.Instances.Networking.ConnectedClient")
 
 local MessageRate = 1/20
 local lastMessageSend = -math.huge
+
+
+local function GetClientIDFromPeer(self, peer)
+    for id, p in pairs(self.Clients) do
+        if p.Peer == peer then
+            return id
+        end
+    end
+end
+
+local function AddClient(self, peer)
+    local newClient = ConnectedClient.new(peer)
+    local clientID = newClient.ID
+    self.Clients[clientID] = newClient
+
+    newClient.Maid:GiveTask(function()
+        self.Clients[clientID] = nil
+        local exitCode = newClient.DisconnectCode or 0
+
+        newClient.Peer:disconnect_later(exitCode)
+        self.ClientDisconnected:Fire(clientID, exitCode)
+    end)
+
+    self:SendMessage(clientID, "connect", {
+        id = clientID,
+    })
+
+    self.ClientConnected:Fire(clientID)
+end
 
 module.new = function ()
 	local self = setmetatable(module.Base.new(module.__type), module._metatable)
@@ -22,6 +51,7 @@ module.new = function ()
     self.MessageRecieved = self.Maid:Add(Signal.new())
 
     self:CreateProperty("PlayerClass", "string", "Folder")
+    self:CreateProperty("PlayerObjectParent", "Instance", nil)
     -- self:CreateProperty("ServerTime", "number", 0)
 
     -- Engine:GetService("RunService"):GetPropertyChangedSignal("ElapsedTime"):Connect(function(value)
@@ -42,18 +72,15 @@ module.new = function ()
             for _, command in pairs(data) do
                 self.MessageRecieved:Fire(clientID, command.name, command.data)
             end
+        elseif message == "RemoteEvent" then
+            local remote = Instance.GetClass("BaseInstance").All[data.ID]
+            if remote then
+                remote:_addEvent({clientID, unpack(data.Data)})
+            end
         end
     end)
 
 	return self
-end
-
-function module:GetClientIDFromPeer(peer)
-    for id, p in pairs(self.Clients) do
-        if p.Peer == peer then
-            return id
-        end
-    end
 end
 
 function module:StartServer(port)
@@ -88,30 +115,15 @@ function module:SendMessageAll(name, value)
     end
 end
 
+function module:GetPlayerObject(clientID)
+    local client = self.Clients[clientID]
+    return client and client.Instance
+end
+
 function module:DisconnectClient(clientID, code)
     local client = self.Clients[clientID]
     client.DisconnectCode = code
     client:Destroy()
-end
-
-function module:AddClient(peer)
-    local newClient = ConnectedClient.new(peer)
-    local clientID = newClient.ID
-    self.Clients[clientID] = newClient
-
-    newClient.Maid:GiveTask(function()
-        self.Clients[clientID] = nil
-        local exitCode = newClient.DisconnectCode or 0
-
-        newClient.Peer:disconnect_later(exitCode)
-        self.ClientDisconnected:Fire(clientID, exitCode)
-    end)
-
-    self:SendMessage(clientID, "connect", {
-        id = clientID,
-    })
-
-    self.ClientConnected:Fire(clientID)
 end
 
 function module:Update()
@@ -131,18 +143,18 @@ function module:Update()
     local event = self.Host:service(0)
     while event do
         if event.type == "connect" then
-            self:AddClient(event.peer)
+            AddClient(self, event.peer)
         elseif event.type == "receive" then
             local success, data = encodingService:Decode(event.data, encodingService.ReplicationEncodingMethod)
             if success and data then
-                local clientID = self:GetClientIDFromPeer(event.peer)
+                local clientID = GetClientIDFromPeer(self, event.peer)
                 if clientID then    
                     self.MessageRecieved:Fire(clientID, data.name, data.data)
                 end
             end
 
         elseif event.type == "disconnect" then
-            local clientID = self:GetClientIDFromPeer(event.peer)
+            local clientID = GetClientIDFromPeer(self, event.peer)
             if clientID then
                 self:DisconnectClient(clientID)
             end

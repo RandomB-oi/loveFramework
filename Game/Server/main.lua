@@ -1,5 +1,6 @@
 local ServerService = Engine:GetService("ServerService")
 ServerService.PlayerClass = "Frame"
+ServerService.PlayerObjectParent = "Players"
 
 local NonReplicateObject = Instance.new("NumberValue")
 NonReplicateObject.Name = "TestNonReplicateObject"
@@ -26,3 +27,12 @@ end
 -- scriptObject.Enabled = false
 
 scriptObject.Parent = GameScene.Server
+
+local newRemote = Instance.new("RemoteEvent")
+newRemote.Name = "TestRemote"
+newRemote.Parent = GameScene.Shared
+newRemote.Event:Connect(print)
+
+ServerService.ClientConnected:Connect(function(clientID)
+	newRemote:FireClient(clientID, "you just joined")
+end)

@@ -31,5 +31,6 @@ function FPSScene.Draw(...)
     else
         goodFPS:Apply()
     end
-	love.graphics.drawCustomText(tostring(fps), 20,10,1)
+    
+	love.graphics.drawCustomText(tostring(fps), FPSScene.RenderSize.X - 12,10,1)
 end

@@ -28,7 +28,6 @@ module.new = function ()
     self:CreateProperty("LocalID", "string", "")
     self.Hidden = false
 
-    self.Host = enet.host_create()
     self.ServerPeer = nil
     self.LocalServer = nil
 
@@ -48,6 +47,13 @@ module.new = function ()
             local object = self:GetInstance(data.ID)
             if object then
                 object:Destroy()
+            end
+        elseif message == "RemoteEvent" then
+            local remote = Instance.GetClass("BaseInstance").All[data.ID]
+            if remote then
+                remote:_addEvent(data.Data)
+            else
+                Instance.GetClass("RemoteEvent")._addEvent(data.ID, data.Data)
             end
         elseif message == "Batch" then
             for _, command in pairs(data) do
@@ -77,15 +83,17 @@ function module:GetInstance(id, className)
 end
 
 function module:ConnectedToServer()
-    return not not (self.ServerPeer or self._connected)
+    return not not (self.Host and self.ServerPeer or self._connected)
 end
 
 function module:ConnectToServer(ip, port)
     if self:ConnectedToServer() then return end
+    self:DisconnectFromServer()
 
     self.ServerIP = tostring(ip)
     self.ServerPort = tostring(port)
 
+    self.Host = enet.host_create()
     self.ServerPeer = self.Host:connect(ip .. ":" .. port)
     if self.ServerPeer then
         self.Connected:Fire()
@@ -97,7 +105,6 @@ function module:HostLocalServer()
     if self:ConnectedToServer() then return end
     local thread = love.thread.newThread("Server.lua")
     thread:start()
-    
     local success = self:ConnectToServer("localhost", 6767)
     if success then
         self.LocalServer = thread
@@ -110,12 +117,19 @@ end
 
 function module:DisconnectFromServer()
     self._connected = false
+    
     if self.ServerPeer then
         self.ServerPeer:disconnect()
         self.ServerPeer = nil
         self.Disconnected:Fire()
         print("Disconnect from server")
     end
+    if self.Host then
+        self.Host:destroy()
+        self.Host = nil
+        print("clean host")
+    end
+    
     if self.LocalServer then
         love.thread.getChannel("server_events"):push("shutdown")
         self.LocalServer = nil
@@ -143,7 +157,7 @@ end
 
 function module:Update()
     if not Engine:GetService("RunService"):IsClient() then return end
-    if not self.ServerPeer then return end
+    if not (self.ServerPeer and self.Host) then return end
     local event = self.Host:service(0)
     local encodingService = Engine:GetService("EncodingService")
 

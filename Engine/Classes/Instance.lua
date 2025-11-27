@@ -6,6 +6,10 @@ module.Classes = Classes
 module.new = function(className, ...)
 	local new = assert(Classes[className] and Classes[className].new, tostring(className).." is an invalid instance type")
 	local object = new(...)
+	if object and object.Final and not rawget(object,"_final") then
+		rawset(object, "_final", true)
+		object:Final()
+	end
 	return object
 end
 

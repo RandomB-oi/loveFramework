@@ -149,8 +149,8 @@ function module:UpdateRender()
 				parentPosition = Vector.zero
 				parentRotation = 0
 			end
-
-			if parentPosition and self.Parent and self.Parent.CanvasPosition then
+			
+			if parentPosition and self.Parent and self.Parent._properties.CanvasPosition then
 				parentPosition = parentPosition - self.Parent.CanvasPosition
 			end
 		end
